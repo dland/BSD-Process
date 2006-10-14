@@ -1,0 +1,50 @@
+The file is the README for BSD::Process version 0.01
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+TESTING
+
+This module requires the following modules for thorough testing:
+
+    Test::More
+    Test::Pod
+    Test::Pod::Coverage
+
+It can also make use of Devel::Cover if available.
+
+UNINSTALLATION
+
+This is a pure-Perl module. The following one-liner should print
+out the canonical path of the file:
+
+  perl -MBSD::Process -le 'print $INC{"BSD-Process"}'
+
+Just delete this file. There is also the question of the man page.
+Finding that is left as an exercise to the reader.
+
+USAGE
+
+use BSD::Process;
+
+STATUS
+
+This module is under active development.
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2006.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
