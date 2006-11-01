@@ -142,14 +142,14 @@ XSLoader::load __PACKAGE__, $VERSION;
 sub new {
     my $class = shift;
     my $pid   = shift;
-	my $args;
-	if (ref($pid) eq 'HASH') {
-		$args = $pid;
-		$pid  = $$;
-	}
-	else {
-    	$args = shift || {};
-	}
+    my $args;
+    if (ref($pid) eq 'HASH') {
+        $args = $pid;
+        $pid  = $$;
+    }
+    else {
+        $args = shift || {};
+    }
     $pid = $$ unless defined $pid;
     my $self = {
         _pid  => $pid
@@ -170,14 +170,14 @@ sub refresh {
 
 sub info {
     my $pid = shift;
-	my $args;
-	if (ref($pid) eq 'HASH') {
-		$args = $pid;
-		$pid  = $$;
-	}
-	else {
-    	$args = shift || {};
-	}
+    my $args;
+    if (ref($pid) eq 'HASH') {
+        $args = $pid;
+        $pid  = $$;
+    }
+    else {
+        $args = shift || {};
+    }
     $pid = $$ unless defined $pid;
     my $resolve = exists $args->{resolve} ? $args->{resolve} : 0;
     return _info($pid, $resolve);
