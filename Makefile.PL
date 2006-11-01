@@ -5,6 +5,12 @@
 use strict;
 use ExtUtils::MakeMaker;
 
+my $module_name = 'BSD::Process';
+
+if ($Config{osname} ne 'freebsd') {
+    die "$module_name does not support the ($Config{osname}) platform.\n";
+}
+
 eval "use ExtUtils::MakeMaker::Coverage";
 if( $@ ) {
     print "Can't load ExtUtils::MakeMaker::Coverage, not adding testcover target\n";
@@ -14,14 +20,14 @@ else {
 }
 
 WriteMakefile(
-    NAME          => 'BSD::Process',
+    NAME          => $module_name,
     ABSTRACT_FROM => 'Process.pm',
     VERSION_FROM  => 'Process.pm',
     AUTHOR        => 'David Landgren',
     LIBS          => ['-lkvm'],
     LICENSE       => 'perl',
     PREREQ_PM     => {
-        'XSLoader'        => 0,
-        'Class::Accessor' => 0.25,
+        'XSLoader'        => 0
+        'Class::Accessor' => '0.25',
     },
 );
