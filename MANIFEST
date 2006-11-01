@@ -6,6 +6,7 @@ README
 Process.pm
 Process.xs
 eg/procinfo
+eg/showprocattr
 t/00-basic.t
 t/01-func.t
 t/02-method.t
