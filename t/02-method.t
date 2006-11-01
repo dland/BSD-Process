@@ -19,18 +19,18 @@ use BSD::Process;
     ok(defined($pe->{start}), 'attribute start (coalesced struct timeval)' );
     ok(defined($pe->{childtime}), 'attribute childtime (coalesced struct timeval)');
 
-    is($pe->pid,   $pe->{pid},   'method pid' );
-    is($pe->ppid,  $pe->{ppid},  'method ppid');
-    is($pe->pgid,  $pe->{pgid},  'method pgid');
-    is($pe->tpgid, $pe->{tpgid}, 'method tpgid');
-    is($pe->sid,   $pe->{sid},   'method tpgid');
-    is($pe->tsid,  $pe->{tsid},  'method tsid');
-    is($pe->jobc,  $pe->{jobc},  'method jobc');
-    is($pe->uid,   $pe->{uid},   'method uid');
-    is($pe->ruid,  $pe->{ruid},  'method ruid');
-    is($pe->svuid, $pe->{svuid}, 'method svuid');
-    is($pe->rgid,  $pe->{rgid},  'method rgid');
-    is($pe->svgid, $pe->{svgid}, 'method svgid');
+    is($pe->pid,     $pe->{pid},     'method pid' );
+    is($pe->ppid,    $pe->{ppid},    'method ppid');
+    is($pe->pgid,    $pe->{pgid},    'method pgid');
+    is($pe->tpgid,   $pe->{tpgid},   'method tpgid');
+    is($pe->sid,     $pe->{sid},     'method tpgid');
+    is($pe->tsid,    $pe->{tsid},    'method tsid');
+    is($pe->jobc,    $pe->{jobc},    'method jobc');
+    is($pe->uid,     $pe->{uid},     'method uid');
+    is($pe->ruid,    $pe->{ruid},    'method ruid');
+    is($pe->svuid,   $pe->{svuid},   'method svuid');
+    is($pe->rgid,    $pe->{rgid},    'method rgid');
+    is($pe->svgid,   $pe->{svgid},   'method svgid');
     is($pe->ngroups, $pe->{ngroups}, 'method ngroups');
 
     # longhand method names
