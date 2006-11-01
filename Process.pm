@@ -19,7 +19,35 @@ $VERSION = '0.01';
 @EXPORT_OK = (qw(process_info process_list));
 
 BEGIN {
-    my %alias = (
+    my %alias_FreeBSD_4 = (
+        process_pid              => 'pid',
+        parent_pid               => 'ppid',
+        process_group_id         => 'pgid',
+        tty_process_group_id     => 'tpgid',
+        process_session_id       => 'sid',
+        job_control_counter      => 'jobc',
+        resident_set_size        => 'rssize',
+        rssize_before_swap       => 'swrss',
+        text_size                => 'tsize',
+        exit_status              => 'xstat',
+        accounting_flags         => 'acflag',
+        percent_cpu              => 'pctcpu',
+        estimated_cpu            => 'estcpu',
+        sleep_time               => 'slptime',
+        time_last_swap           => 'swtime',
+        elapsed_time             => 'runtime',
+        process_flags            => 'flag',
+        nice_priority            => 'nice',
+        process_lock_count       => 'lock',
+        run_queue_index          => 'rqindex',
+        current_cpu              => 'oncpu',
+        last_cpu                 => 'lastcpu',
+        wchan_message            => 'wmesg',
+        setlogin_name            => 'login',
+        command_name             => 'comm',
+    );
+
+    my %alias_FreeBSD_6 = (
         process_args             => 'args',
         process_pid              => 'pid',
         parent_pid               => 'ppid',
@@ -131,29 +159,54 @@ BEGIN {
         involuntary_context_switch_ch => 'nivcsw_ch',
     );
 
+    my $alias;
+    eval {
+        # lighter than pulling in Config
+        use BSD::Sysctl;
+        my $osrelease = BSD::Sysctl::sysctl('kern.osrelease');
+        if ($osrelease =~ /^4/) {
+            $alias = \%alias_FreeBSD_4;
+        }
+        else {
+            $alias = \%alias_FreeBSD_6;
+        }
+    };
+
+    if (!defined $alias) {
+        eval {
+            use Config;
+            if ($Config{osvers} =~ /^4/) {
+                $alias = \%alias_FreeBSD_4;
+            }
+            else {
+                $alias = \%alias_FreeBSD_6;
+            }
+        }
+    }
+
     # make some shorthand accessors
-    BSD::Process->mk_ro_accessors( values %alias );
+    BSD::Process->mk_ro_accessors( values %$alias );
 
     # and map some longhand aliases to them
     no strict 'refs';
-    for my $long (keys %alias) {
-        *{$long} = *{$alias{$long}};
+    for my $long (keys %$alias) {
+        *{$long} = *{$alias->{$long}};
     }
 
     sub attr {
-        return values(%alias);
+        return values(%$alias);
     }
 
     sub attr_len {
         my $len = 0;
-        for my $attr(values %alias) {
+        for my $attr(values %$alias) {
             $len = length($attr) if $len < length($attr);
         }
         return $len;
     }
 
     sub attr_alias {
-        return keys(%alias);
+        return keys(%$alias);
     }
 }
 
@@ -995,9 +1048,9 @@ asking the system to return the information about a process.
 
 =head1 NOTES
 
-Currently, only FreeBSD version 6 is supported. Support for earlier
-versions of FreeBSD and versions of NetBSD and OpenBSD will be added
-in future versions.
+Currently, only FreeBSD versions 4 and 6 are supported. Support for
+version 5 of FreeBSD and versions of NetBSD and OpenBSD will be
+added in future versions.
 
 =head1 SEE ALSO
 

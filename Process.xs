@@ -49,12 +49,14 @@ struct kinfo_proc *_proc_request (kvm_t *kd, int request, int param, int *pnr) {
     case 6:
         kip = kvm_getprocs(kd, KERN_PROC_RUID, param, pnr);
         break;
+#if __FreeBSD_version >= 500000
     case 10:
         kip = kvm_getprocs(kd, KERN_PROC_RGID, param, pnr);
         break;
     case 11:
         kip = kvm_getprocs(kd, KERN_PROC_GID, param, pnr);
         break;
+#endif
     case 0:
     default:
         kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, pnr);
@@ -76,9 +78,44 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     short g;
     AV *grlist;
     struct rusage *rp;
+#if __FreeBSD_version < 500000
+    struct proc *p;
+    struct eproc *e;
+#endif
 
     h = (HV *)sv_2mortal((SV *)newHV());
 
+#if __FreeBSD_version < 500000
+    p = &kp->kp_proc;
+    e = &kp->kp_eproc;
+    hv_store(h, "pid",     3, newSViv(kp->kp_proc.p_pid), 0);
+    hv_store(h, "ppid",    4, newSViv(kp->kp_eproc.e_ppid), 0);
+    hv_store(h, "pgid",    4, newSViv(kp->kp_eproc.e_pgid), 0);
+    hv_store(h, "jobc",    4, newSViv(kp->kp_eproc.e_jobc), 0);
+    hv_store(h, "tpgid",   5, newSViv(kp->kp_eproc.e_tpgid), 0);
+    hv_store(h, "wmesg",   5, newSVpv(kp->kp_eproc.e_wmesg, 0), 0);
+    hv_store(h, "tsize",   5, newSViv(kp->kp_eproc.e_xsize), 0);
+    hv_store(h, "rssize",  6, newSViv(kp->kp_eproc.e_xrssize), 0);
+    hv_store(h, "swrss",   5, newSViv(kp->kp_eproc.e_xswrss), 0);
+    hv_store(h, "flag",    4, newSViv(kp->kp_eproc.e_flag), 0);
+    hv_store(h, "login",   5, newSVpv(kp->kp_eproc.e_login, 0), 0);
+    hv_store(h, "sid",     3, newSViv(kp->kp_eproc.e_sid), 0);
+    hv_store(h, "estcpu",  6, newSViv(kp->kp_proc.p_estcpu), 0);
+    hv_store(h, "pctcpu",  6, newSViv(kp->kp_proc.p_pctcpu), 0);
+    hv_store(h, "slptime", 7, newSViv(kp->kp_proc.p_slptime), 0);
+    hv_store(h, "swtime",  6, newSViv(kp->kp_proc.p_swtime), 0);
+    hv_store(h, "runtime", 7, newSViv(kp->kp_proc.p_runtime), 0);
+    hv_store(h, "lock",    4, newSViv(kp->kp_proc.p_lock), 0);
+    hv_store(h, "rqindex", 7, newSViv(kp->kp_proc.p_rqindex), 0);
+    hv_store(h, "oncpu",   5, newSViv(kp->kp_proc.p_oncpu), 0);
+    hv_store(h, "lastcpu", 7, newSViv(kp->kp_proc.p_lastcpu), 0);
+    hv_store(h, "nice",    4, newSViv(kp->kp_proc.p_nice), 0);
+    hv_store(h, "comm",    4, newSVpv(kp->kp_proc.p_comm, 0), 0);
+    hv_store(h, "xstat",   5, newSViv(kp->kp_proc.p_xstat), 0);
+    hv_store(h, "acflag",  6, newSViv(kp->kp_proc.p_acflag), 0);
+#endif
+
+#if __FreeBSD_version >= 600000
     nlistf = memf = PATH_DEV_NULL;
     kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
     argv = kvm_getargv(kd, kp, 0);
@@ -295,6 +332,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "nsignals_ch", 3+8, newSViv(rp->ru_nsignals), 0);
     hv_store(h, "nvcsw_ch",    3+5, newSViv(rp->ru_nvcsw), 0);
     hv_store(h, "nivcsw_ch",   3+6, newSViv(rp->ru_nivcsw), 0);
+#endif
 
     return h;
 }
@@ -306,7 +344,11 @@ PROTOTYPES: ENABLE
 short
 max_kernel_groups()
     CODE:
+#if __FreeBSD_version < 500000
+        RETVAL = 0;
+#else
         RETVAL = KI_NGROUPS;
+#endif
     OUTPUT:
         RETVAL
 
@@ -356,7 +398,11 @@ _list(int request, int param)
         if (kip) {
             int p;
             for (p = 0; p < nr; ++kip, ++p) {
+#if __FreeBSD_version < 500000
+                mPUSHi(kip->kp_proc.p_pid);
+#else
                 mPUSHi(kip->ki_pid);
+#endif
             }
             kvm_close(kd);
         }
@@ -396,10 +442,14 @@ _all(int resolve, int request, int param)
         RETVAL = out;
         for (p = 0; p < nr; ++kip, ++p) {
             h = _procinfo( kip, resolve );
-            hv_store(h, "_pid",     4, newSViv(kip->ki_pid), 0);
             hv_store(h, "_resolve", 8, newSViv(resolve), 0);
-
+#if __FreeBSD_version < 500000
+            hv_store(h, "_pid",     4, newSViv(kip->kp_proc.p_pid), 0);
+            sprintf( pidbuf, "%d", kip->kp_proc.p_pid );
+#else
+            hv_store(h, "_pid",     4, newSViv(kip->ki_pid), 0);
             sprintf( pidbuf, "%d", kip->ki_pid );
+#endif
             hv_store(out, pidbuf, strlen(pidbuf),
                 sv_bless(newRV((SV *)h), package), 0);
         }

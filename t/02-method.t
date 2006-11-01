@@ -8,6 +8,9 @@ use Test::More;
 
 use BSD::Process;
 
+use Config;
+my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
+
 plan tests => 242
     + BSD::Process::max_kernel_groups
     + scalar(BSD::Process::attr_alias);
@@ -20,27 +23,15 @@ plan tests => 242
     is( $pi->{sid}, $pe->{sid}, 'attribute sid' );
     is( $pi->{tsid}, $pe->{tsid}, 'attribute tsid' );
 
-    is($pe->args,        delete $pe->{args},        'method args' );
     is($pe->pid,         delete $pe->{pid},         'method pid' );
     is($pe->ppid,        delete $pe->{ppid},        'method ppid');
     is($pe->pgid,        delete $pe->{pgid},        'method pgid');
     is($pe->tpgid,       delete $pe->{tpgid},       'method tpgid');
     is($pe->sid,         delete $pe->{sid},         'method tpgid');
-    is($pe->tsid,        delete $pe->{tsid},        'method tsid');
     is($pe->jobc,        delete $pe->{jobc},        'method jobc');
-    is($pe->uid,         delete $pe->{uid},         'method uid');
-    is($pe->ruid,        delete $pe->{ruid},        'method ruid');
-    is($pe->svuid,       delete $pe->{svuid},       'method svuid');
-    is($pe->rgid,        delete $pe->{rgid},        'method rgid');
-    is($pe->svgid,       delete $pe->{svgid},       'method svgid');
-    my $ngroups;
-    is($pe->ngroups,     $ngroups = delete $pe->{ngroups}, 'method ngroups');
-    is($pe->size,        delete $pe->{size},        'method size');
     is($pe->rssize,      delete $pe->{rssize},      'method rssize');
     is($pe->swrss,       delete $pe->{swrss},       'method swrss');
     is($pe->tsize,       delete $pe->{tsize},       'method tsize');
-    is($pe->dsize,       delete $pe->{dsize},       'method dsize');
-    is($pe->ssize,       delete $pe->{ssize},       'method ssize');
     is($pe->xstat,       delete $pe->{xstat},       'method xstat');
     is($pe->acflag,      delete $pe->{acflag},      'method acflag');
     is($pe->pctcpu,      delete $pe->{pctcpu},      'method pctcpu');
@@ -48,9 +39,34 @@ plan tests => 242
     is($pe->slptime,     delete $pe->{slptime},     'method slptime');
     is($pe->swtime,      delete $pe->{swtime},      'method swtime');
     is($pe->runtime,     delete $pe->{runtime},     'method runtime');
+    is($pe->flag,        delete $pe->{flag},        'method flag');
+    is($pe->nice,        delete $pe->{nice},        'method nice');
+    is($pe->lock,        delete $pe->{lock},        'method lock');
+    is($pe->rqindex,     delete $pe->{rqindex},     'method rqindex');
+    is($pe->oncpu,       delete $pe->{oncpu},       'method oncpu');
+    is($pe->lastcpu,     delete $pe->{lastcpu},     'method lastcpu');
+    is($pe->wmesg,       delete $pe->{wmesg},       'method wmesg');
+    is($pe->login,       delete $pe->{login},       'method login');
+    is($pe->comm,        delete $pe->{comm},        'method comm');
+
+    my $ngroups;
+	SKIP: {
+		skip( "not supported on FreeBSD 4.x", 86 )
+			if $RUNNING_ON_FREEBSD_4;
+
+    is($pe->args,        delete $pe->{args},        'method args' );
+    is($pe->tsid,        delete $pe->{tsid},        'method tsid');
+    is($pe->uid,         delete $pe->{uid},         'method uid');
+    is($pe->ruid,        delete $pe->{ruid},        'method ruid');
+    is($pe->svuid,       delete $pe->{svuid},       'method svuid');
+    is($pe->rgid,        delete $pe->{rgid},        'method rgid');
+    is($pe->svgid,       delete $pe->{svgid},       'method svgid');
+    is($pe->ngroups,     $ngroups = delete $pe->{ngroups}, 'method ngroups');
+    is($pe->size,        delete $pe->{size},        'method size');
+    is($pe->dsize,       delete $pe->{dsize},       'method dsize');
+    is($pe->ssize,       delete $pe->{ssize},       'method ssize');
     is($pe->start,       delete $pe->{start},       'method start');
     is($pe->childtime,   delete $pe->{childtime},   'method childtime');
-    is($pe->flag,        delete $pe->{flag},        'method flag');
     is($pe->advlock,     delete $pe->{advlock},     'method advlock');
     is($pe->controlt,    delete $pe->{controlt},    'method controlt');
     is($pe->kthread,     delete $pe->{kthread},     'method kthread');
@@ -78,16 +94,8 @@ plan tests => 242
     is($pe->stat_5,      delete $pe->{stat_5},      'method stat_5');
     is($pe->stat_6,      delete $pe->{stat_6},      'method stat_6');
     is($pe->stat_7,      delete $pe->{stat_7},      'method stat_7');
-    is($pe->nice,        delete $pe->{nice},        'method nice');
-    is($pe->lock,        delete $pe->{lock},        'method lock');
-    is($pe->rqindex,     delete $pe->{rqindex},     'method rqindex');
-    is($pe->oncpu,       delete $pe->{oncpu},       'method oncpu');
-    is($pe->lastcpu,     delete $pe->{lastcpu},     'method lastcpu');
     is($pe->ocomm,       delete $pe->{ocomm},       'method ocomm');
-    is($pe->wmesg,       delete $pe->{wmesg},       'method wmesg');
-    is($pe->login,       delete $pe->{login},       'method login');
     is($pe->lockname,    delete $pe->{lockname},    'method lockname');
-    is($pe->comm,        delete $pe->{comm},        'method comm');
     is($pe->emul,        delete $pe->{emul},        'method emul');
     is($pe->jid,         delete $pe->{jid},         'method jid');
     is($pe->numthreads,  delete $pe->{numthreads},  'method numthreads');
@@ -136,7 +144,7 @@ plan tests => 242
     is( ref($grouplist), 'ARRAY', q{... it's a list} );
     is( scalar(@$grouplist), $ngroups, "... of the expected size" )
         or diag("grouplist = (@$grouplist)");
-
+	} # SKIP
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all methods have been accounted for' )
         or diag( 'leftover: ' . join( ',', grep {!/^_/} keys %$pe ));
@@ -144,26 +152,15 @@ plan tests => 242
     $pe->refresh;
 
     # longhand method names
-    is($pe->process_args,                  delete $pe->{args},        'alias process_args' );
     is($pe->process_pid,                   delete $pe->{pid},         'alias process_pid' );
     is($pe->parent_pid,                    delete $pe->{ppid},        'alias parent_pid');
     is($pe->process_group_id,              delete $pe->{pgid},        'alias process_group_id');
     is($pe->tty_process_group_id,          delete $pe->{tpgid},       'alias tty_process_group_id');
     is($pe->process_session_id,            delete $pe->{sid},         'alias tty_process_group_id');
-    is($pe->terminal_session_id,           delete $pe->{tsid},        'alias terminal_session_id');
     is($pe->job_control_counter,           delete $pe->{jobc},        'alias job_control_counter');
-    is($pe->effective_user_id,             delete $pe->{uid},         'alias effective_user_id');
-    is($pe->real_user_id,                  delete $pe->{ruid},        'alias real_user_id');
-    is($pe->saved_effective_user_id,       delete $pe->{svuid},       'alias saved_effective_user_id');
-    is($pe->real_group_id,                 delete $pe->{rgid},        'alias real_group_id');
-    is($pe->saved_effective_group_id,      delete $pe->{svgid},       'alias saved_effective_group_id');
-    is($pe->number_of_groups,              delete $pe->{ngroups},     'alias number_of_groups');
-    is($pe->virtual_size,                  delete $pe->{size},        'alias virtual_size');
     is($pe->resident_set_size,             delete $pe->{rssize},      'alias resident_set_size');
     is($pe->rssize_before_swap,            delete $pe->{swrss},       'alias rssize_before_swap');
     is($pe->text_size,                     delete $pe->{tsize},       'alias text_size');
-    is($pe->data_size,                     delete $pe->{dsize},       'alias data_size');
-    is($pe->stack_size,                    delete $pe->{ssize},       'alias stack_size');
     is($pe->exit_status,                   delete $pe->{xstat},       'alias exit_status');
     is($pe->accounting_flags,              delete $pe->{acflag},      'alias accounting_flags');
     is($pe->percent_cpu,                   delete $pe->{pctcpu},      'alias percent_cpu');
@@ -171,9 +168,32 @@ plan tests => 242
     is($pe->sleep_time,                    delete $pe->{slptime},     'alias sleep_time');
     is($pe->time_last_swap,                delete $pe->{swtime},      'alias time_last_swap');
     is($pe->elapsed_time,                  delete $pe->{runtime},     'alias elapsed_time');
+    is($pe->process_flags,                 delete $pe->{flag},        'alias process_flags');
+    is($pe->nice_priority,                 delete $pe->{nice},        'alias nice_priority');
+    is($pe->process_lock_count,            delete $pe->{lock},        'alias process_lock_count');
+    is($pe->run_queue_index,               delete $pe->{rqindex},     'alias run_queue_index');
+    is($pe->current_cpu,                   delete $pe->{oncpu},       'alias current_cpu');
+    is($pe->last_cpu,                      delete $pe->{lastcpu},     'alias last_cpu');
+    is($pe->wchan_message,                 delete $pe->{wmesg},       'alias wchan_message');
+    is($pe->setlogin_name,                 delete $pe->{login},       'alias setlogin_name');
+    is($pe->command_name,                  delete $pe->{comm},        'alias command_name');
+
+	SKIP: {
+		skip( "not supported on FreeBSD 4.x", 84 )
+			if $RUNNING_ON_FREEBSD_4;
+    is($pe->process_args,                  delete $pe->{args},        'alias process_args' );
+    is($pe->terminal_session_id,           delete $pe->{tsid},        'alias terminal_session_id');
+    is($pe->effective_user_id,             delete $pe->{uid},         'alias effective_user_id');
+    is($pe->real_user_id,                  delete $pe->{ruid},        'alias real_user_id');
+    is($pe->saved_effective_user_id,       delete $pe->{svuid},       'alias saved_effective_user_id');
+    is($pe->real_group_id,                 delete $pe->{rgid},        'alias real_group_id');
+    is($pe->saved_effective_group_id,      delete $pe->{svgid},       'alias saved_effective_group_id');
+    is($pe->number_of_groups,              delete $pe->{ngroups},     'alias number_of_groups');
+    is($pe->virtual_size,                  delete $pe->{size},        'alias virtual_size');
+    is($pe->data_size,                     delete $pe->{dsize},       'alias data_size');
+    is($pe->stack_size,                    delete $pe->{ssize},       'alias stack_size');
     is($pe->start_time,                    delete $pe->{start},       'alias start_time');
     is($pe->children_time,                 delete $pe->{childtime},   'alias children_time');
-    is($pe->process_flags,                 delete $pe->{flag},        'alias process_flags');
     is($pe->posix_advisory_lock,           delete $pe->{advlock},     'alias posix_advisory_lock');
     is($pe->has_controlling_terminal,      delete $pe->{controlt},    'alias has_controlling_terminal');
     is($pe->is_kernel_thread,              delete $pe->{kthread},     'alias is_kernel_thread');
@@ -201,16 +221,8 @@ plan tests => 242
     is($pe->is_a_zombie,                   delete $pe->{stat_5},      'alias is_a_zombie');
     is($pe->is_waiting_on_intr,            delete $pe->{stat_6},      'alias is_waiting_on_intr');
     is($pe->is_blocked,                    delete $pe->{stat_7},      'alias is_blocked');
-    is($pe->nice_priority,                 delete $pe->{nice},        'alias nice_priority');
-    is($pe->process_lock_count,            delete $pe->{lock},        'alias process_lock_count');
-    is($pe->run_queue_index,               delete $pe->{rqindex},     'alias run_queue_index');
-    is($pe->current_cpu,                   delete $pe->{oncpu},       'alias current_cpu');
-    is($pe->last_cpu,                      delete $pe->{lastcpu},     'alias last_cpu');
     is($pe->old_command_name,              delete $pe->{ocomm},       'alias old_command_name');
-    is($pe->wchan_message,                 delete $pe->{wmesg},       'alias wchan_message');
-    is($pe->setlogin_name,                 delete $pe->{login},       'alias setlogin_name');
     is($pe->name_of_lock,                  delete $pe->{lockname},    'alias name_of_lock');
-    is($pe->command_name,                  delete $pe->{comm},        'alias command_name');
     is($pe->emulation_name,                delete $pe->{emul},        'alias emulation_name');
     is($pe->process_jail_id,               delete $pe->{jid},         'alias process_jail_id');
     is($pe->number_of_threads,             delete $pe->{numthreads},  'alias number_of_threads');
@@ -252,13 +264,18 @@ plan tests => 242
     is($pe->signals_received_ch,           delete $pe->{nsignals_ch}, 'alias signals_received');
     is($pe->voluntary_context_switch_ch,   delete $pe->{nvcsw_ch},    'alias voluntary_context_switch');
     is($pe->involuntary_context_switch_ch, delete $pe->{nivcsw_ch},   'alias involuntary_context_switch');
+	} # SKIP
 
-    $grouplist = $pe->group_list;
+	SKIP: {
+		skip( "not supported on FreeBSD 4.x", 3 )
+			if $RUNNING_ON_FREEBSD_4;
+    my $grouplist = $pe->group_list;
     delete $pe->{groups};
     ok( defined($grouplist), 'alias group_list' );
     is( ref($grouplist), 'ARRAY', q{... it's also a list} );
     is( scalar(@$grouplist), $ngroups, "... also of the expected size" )
         or diag("grouplist = (@$grouplist)");
+	} # SKIP
 
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all aliases have been accounted for' )
@@ -279,6 +296,9 @@ plan tests => 242
     my $sym_imp = BSD::Process->new(     {resolve => 1} );
     my $sym_exp = BSD::Process->new( $$, {resolve => 1} );
 
+	SKIP: {
+		skip( "not supported on FreeBSD 4.x", 13 )
+			if $RUNNING_ON_FREEBSD_4;
     is( $num->uid,   scalar(getpwnam($sym_imp->uid)),   'implicit pid resolve muid' );
     is( $num->ruid,  scalar(getpwnam($sym_imp->ruid)),  'implicit pid resolve ruid' );
     is( $num->svuid, scalar(getpwnam($sym_imp->svuid)), 'implicit pid resolve svuid' );
@@ -306,4 +326,5 @@ plan tests => 242
             pass( "resolve group $gid (undefined)" );
         }
     }
+	} # SKIP
 }

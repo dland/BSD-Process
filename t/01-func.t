@@ -8,19 +8,45 @@ use Test::More;
 
 use BSD::Process;
 
+use Config;
+my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
+
 plan tests => 151 + scalar(BSD::Process::attr);
 
 my $info = BSD::Process::info();
 
 # remove all attributes from object, should be none left over
-ok( defined( delete $info->{args} ), 'attribute args');
 ok( defined( delete $info->{pid} ), 'attribute pid');
 ok( defined( delete $info->{ppid} ), 'attribute ppid');
 ok( defined( delete $info->{pgid} ), 'attribute pgid');
 ok( defined( delete $info->{tpgid} ), 'attribute tpgid');
 ok( defined( delete $info->{sid} ), 'attribute sid');
-ok( defined( delete $info->{tsid} ), 'attribute tsid');
 ok( defined( delete $info->{jobc} ), 'attribute jobc');
+ok( defined( delete $info->{rssize} ), 'attribute rssize');
+ok( defined( delete $info->{swrss} ), 'attribute swrss');
+ok( defined( delete $info->{tsize} ), 'attribute tsize');
+ok( defined( delete $info->{xstat} ), 'attribute xstat');
+ok( defined( delete $info->{acflag} ), 'attribute acflag');
+ok( defined( delete $info->{pctcpu} ), 'attribute pctcpu');
+ok( defined( delete $info->{estcpu} ), 'attribute estcpu');
+ok( defined( delete $info->{slptime} ), 'attribute slptime');
+ok( defined( delete $info->{swtime} ), 'attribute swtime');
+ok( defined( delete $info->{runtime} ), 'attribute runtime');
+ok( defined( delete $info->{flag} ), 'attribute flag');
+ok( defined( delete $info->{nice} ), 'attribute nice');
+ok( defined( delete $info->{lock} ), 'attribute lock');
+ok( defined( delete $info->{rqindex} ), 'attribute rqindex');
+ok( defined( delete $info->{oncpu} ), 'attribute oncpu');
+ok( defined( delete $info->{lastcpu} ), 'attribute lastcpu');
+ok( defined( delete $info->{wmesg} ), 'attribute wmesg');
+ok( defined( delete $info->{login} ), 'attribute login');
+ok( defined( delete $info->{comm} ), 'attribute comm');
+
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 84 )
+		if $RUNNING_ON_FREEBSD_4;
+ok( defined( delete $info->{args} ), 'attribute args');
+ok( defined( delete $info->{tsid} ), 'attribute tsid');
 ok( defined( delete $info->{uid} ), 'attribute uid');
 ok( defined( delete $info->{ruid} ), 'attribute ruid');
 ok( defined( delete $info->{svuid} ), 'attribute svuid');
@@ -29,21 +55,10 @@ ok( defined( delete $info->{svgid} ), 'attribute svgid');
 my $ngroups;
 ok( defined( $ngroups = delete $info->{ngroups} ), 'attribute ngroups');
 ok( defined( delete $info->{size} ), 'attribute size');
-ok( defined( delete $info->{rssize} ), 'attribute rssize');
-ok( defined( delete $info->{swrss} ), 'attribute swrss');
-ok( defined( delete $info->{tsize} ), 'attribute tsize');
 ok( defined( delete $info->{dsize} ), 'attribute dsize');
 ok( defined( delete $info->{ssize} ), 'attribute ssize');
-ok( defined( delete $info->{xstat} ), 'attribute xstat');
-ok( defined( delete $info->{acflag} ), 'attribute acflag');
-ok( defined( delete $info->{pctcpu} ), 'attribute pctcpu');
-ok( defined( delete $info->{estcpu} ), 'attribute estcpu');
-ok( defined( delete $info->{slptime} ), 'attribute slptime');
-ok( defined( delete $info->{swtime} ), 'attribute swtime');
-ok( defined( delete $info->{runtime} ), 'attribute runtime');
 ok( defined( delete $info->{start} ), 'attribute start');
 ok( defined( delete $info->{childtime} ), 'attribute childtime');
-ok( defined( delete $info->{flag} ), 'attribute flag');
 ok( defined( delete $info->{advlock} ), 'attribute advlock');
 ok( defined( delete $info->{controlt} ), 'attribute controlt');
 ok( defined( delete $info->{kthread} ), 'attribute kthread');
@@ -71,16 +86,8 @@ ok( defined( delete $info->{stat_4} ), 'attribute stat_4');
 ok( defined( delete $info->{stat_5} ), 'attribute stat_5');
 ok( defined( delete $info->{stat_6} ), 'attribute stat_6');
 ok( defined( delete $info->{stat_7} ), 'attribute stat_7');
-ok( defined( delete $info->{nice} ), 'attribute nice');
-ok( defined( delete $info->{lock} ), 'attribute lock');
-ok( defined( delete $info->{rqindex} ), 'attribute rqindex');
-ok( defined( delete $info->{oncpu} ), 'attribute oncpu');
-ok( defined( delete $info->{lastcpu} ), 'attribute lastcpu');
 ok( defined( delete $info->{ocomm} ), 'attribute ocomm');
-ok( defined( delete $info->{wmesg} ), 'attribute wmesg');
-ok( defined( delete $info->{login} ), 'attribute login');
 ok( defined( delete $info->{lockname} ), 'attribute lockname');
-ok( defined( delete $info->{comm} ), 'attribute comm');
 ok( defined( delete $info->{emul} ), 'attribute emul');
 ok( defined( delete $info->{jid} ), 'attribute jid');
 ok( defined( delete $info->{numthreads} ), 'attribute numthreads');
@@ -130,6 +137,7 @@ ok( defined($grouplist), 'attribute groups' );
 is( ref($grouplist), 'ARRAY', q{... it's a list} );
 is( scalar(@$grouplist), $ngroups, "... of the expected size" )
     or diag("grouplist = (@$grouplist)");
+} # SKIP
 
 # check for typos in hv_store calls in Process.xs
 is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
@@ -164,7 +172,9 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     or diag("proclist: (@all)");
 
 # processes owned by a uid
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 4 )
+		if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each uid
     my %uid;
     for my $pid (@all) {
@@ -197,12 +207,14 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
 }
 
 # processes owned by a ruid
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 4 )
+		if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each real uid
     my %ruid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $ruid{$proc->{ruid}}++;
+        $ruid{$proc->{ruid}}++ if defined $proc->{ruid};
     }
 
     # now find the uids that own the most processes
@@ -234,13 +246,15 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
 }
 
 # processes owned by an effective gid
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 4 )
+		if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each effective gid
     # kinfo_proc lacks a gid field, so we'll punt with a real gid
     my %gid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $gid{$proc->{rgid}}++;
+        $gid{$proc->{rgid}}++ if defined $proc->{rgid};
     }
 
     # now find the gids that own the most processes
@@ -256,12 +270,14 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
 }
 
 # processes owned by a rgid
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 4 )
+		if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each real gid
     my %rgid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $rgid{$proc->{rgid}}++;
+        $rgid{$proc->{rgid}}++ if defined $proc->{rgid};
     }
 
     # now find the gids that own the most processes
@@ -276,14 +292,15 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     cmp_ok( scalar(@proc), '<=', $biggest_rgid, "rgid $bigger smaller or equal to rgid $biggest" );
 }
 
-
 # process groups
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 4 )
+		if $RUNNING_ON_FREEBSD_4;
     # count the processes in each process group
     my %pgid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $pgid{$proc->{pgid}}++;
+        $pgid{$proc->{pgid}}++ if defined $proc->{pgid};
     }
 
     # now find the process groups with the most members
@@ -304,7 +321,7 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     my %sid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $sid{$proc->{sid}}++;
+        $sid{$proc->{sid}}++ if defined $proc->{sid};
     }
 
     # now find the process groups with the most members
@@ -328,48 +345,64 @@ is( $parent->{pid}, $info->{ppid}, 'my parent is indeed my parent' );
 isnt( $info->{pid}, $parent->{ppid}, 'I am not my grandparent' );
 isnt( $parent->{pid}, $parent->{ppid}, 'and my parent is not my grandparent' );
 
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 2 )
+		if $RUNNING_ON_FREEBSD_4;
 my $resolved = BSD::Process::info({resolve => 1});
 is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve implicit pid' );
 
 $resolved = BSD::Process::info($info->{pid}, {resolve => 1});
 is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
+}
 
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 1 )
+		if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( uid => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all uid root's processes} );
 }
 
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 1 )
+		if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( effective_user_id => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all effective uid root's processes} );
 }
 
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 1 )
+		if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( ruid => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all ruid root's processes} );
 }
 
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 1 )
+		if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( real_user_id => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all real_user_id root's processes} );
 }
 
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 1 )
+		if $RUNNING_ON_FREEBSD_4;
     my $wheel = BSD::Process::all( gid => 'wheel' );
     my $gid_wheel_count = 0;
     $wheel->{$_}->rgid == 0 and ++$gid_wheel_count for keys %$wheel;
     is( $gid_wheel_count, scalar(keys %$wheel), q{counted all gid wheel's processes} );
 }
 
-{
+SKIP: {
+	skip( "not supported on FreeBSD 4.x", 1 )
+		if $RUNNING_ON_FREEBSD_4;
     my $wheel = BSD::Process::all( effective_group_id => 'wheel' );
     my $gid_wheel_count = 0;
     $wheel->{$_}->rgid == 0 and ++$gid_wheel_count for keys %$wheel;
