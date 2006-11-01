@@ -8,7 +8,7 @@ use Test::More;
 
 use BSD::Process;
 
-plan tests => 231 + BSD::Process::max_kernel_groups;
+plan tests => 236 + BSD::Process::max_kernel_groups;
 
 {
     my $pi = BSD::Process->new();   # implicit pid
@@ -263,16 +263,23 @@ plan tests => 231 + BSD::Process::max_kernel_groups;
 {
     # check symbolic uids and gids
     my $num = BSD::Process->new();
-    my $sym = BSD::Process->new( {resolve => 1} );
+    my $sym_imp = BSD::Process->new(     {resolve => 1} );
+    my $sym_exp = BSD::Process->new( $$, {resolve => 1} );
 
-    is( $num->uid,   scalar(getpwnam($sym->uid)),   'resolve uid' );
-    is( $num->ruid,  scalar(getpwnam($sym->ruid)),  'resolve ruid' );
-    is( $num->svuid, scalar(getpwnam($sym->svuid)), 'resolve svuid' );
-    is( $num->rgid,  scalar(getgrnam($sym->rgid)),  'resolve rgid' );
-    is( $num->svgid, scalar(getgrnam($sym->svgid)), 'resolve svgid' );
+    is( $num->uid,   scalar(getpwnam($sym_imp->uid)),   'implicit pid resolve muid' );
+    is( $num->ruid,  scalar(getpwnam($sym_imp->ruid)),  'implicit pid resolve ruid' );
+    is( $num->svuid, scalar(getpwnam($sym_imp->svuid)), 'implicit pid resolve svuid' );
+    is( $num->rgid,  scalar(getgrnam($sym_imp->rgid)),  'implicit pid resolve rgid' );
+    is( $num->svgid, scalar(getgrnam($sym_imp->svgid)), 'implicit pid resolve svgid' );
+
+    is( $num->uid,   scalar(getpwnam($sym_exp->uid)),   'explicit pid resolve uid' );
+    is( $num->ruid,  scalar(getpwnam($sym_exp->ruid)),  'explicit pid resolve ruid' );
+    is( $num->svuid, scalar(getpwnam($sym_exp->svuid)), 'explicit pid resolve svuid' );
+    is( $num->rgid,  scalar(getgrnam($sym_exp->rgid)),  'explicit pid resolve rgid' );
+    is( $num->svgid, scalar(getgrnam($sym_exp->svgid)), 'explicit pid resolve svgid' );
 
     my $num_grouplist = $num->groups;
-    my $sym_grouplist = $sym->group_list;
+    my $sym_grouplist = $sym_imp->group_list;
 
     is( ref($num_grouplist), 'ARRAY', 'numeric grouplist is an ARRAY' );
     is( ref($sym_grouplist), 'ARRAY', 'symbolic grouplist is an ARRAY' );

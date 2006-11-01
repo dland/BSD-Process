@@ -56,9 +56,6 @@ _list(int request, int param)
         nlistf = memf = PATH_DEV_NULL;
         kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
         switch(request) {
-        case 0:
-            kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
-            break;
         case 2:
             kip = kvm_getprocs(kd, KERN_PROC_PGRP, param, &nr);
             break;
@@ -77,6 +74,7 @@ _list(int request, int param)
         case 11:
             kip = kvm_getprocs(kd, KERN_PROC_GID, param, &nr);
             break;
+        case 0:
         default:
             kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
             break;

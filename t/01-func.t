@@ -4,13 +4,11 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 131;
+use Test::More tests => 136;
 
 use BSD::Process;
 
-my $info = BSD::Process::info($$);
-is( $info->{pid}, $$, "system says my pid is the same ($$)" );
-isnt( $info->{pid}, $info->{ppid}, 'I am not my parent' );
+my $info = BSD::Process::info();
 
 # remove all attributes from object, should be none left over
 ###ok( defined( delete $info->{args} ), 'attribute args');
@@ -181,10 +179,10 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     cmp_ok( scalar(@proc), '<=', $biggest_ruid, "ruid $bigger smaller or equal to ruid $biggest" );
 }
 
-# processes owned by a gid
+# processes owned by an effective gid
 {
     # count the processes owned by each effective gid
-	# kinfo_proc lacks a gid field, so we'll punt with a real gid
+    # kinfo_proc lacks a gid field, so we'll punt with a real gid
     my %gid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
@@ -241,7 +239,7 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     cmp_ok( scalar(@proc), '<', $all_procs, "pgid $biggest smaller than count of all processes" );
 
     my $biggest_pgid = @proc;
-    @proc = BSD::Process::list( pgid => $bigger );
+    @proc = BSD::Process::list( process_group_id => $bigger );
     cmp_ok( scalar(@proc), '<',  $all_procs, "pgid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_pgid, "pgid $bigger smaller or equal to pgid $biggest" );
 }
@@ -266,3 +264,18 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     cmp_ok( scalar(@proc), '<',  $all_procs, "sid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_sid, "sid $bigger smaller or equal to sid $biggest" );
 }
+
+$info = BSD::Process::info($$);
+is( $info->{pid}, $$, "system says my pid is the same ($$)" );
+isnt( $info->{pid}, $info->{ppid}, 'I am not my parent' );
+
+my $parent = BSD::Process::info($info->{ppid});
+is( $parent->{pid}, $info->{ppid}, 'my parent is indeed my parent' );
+isnt( $info->{pid}, $parent->{ppid}, 'I am not my grandparent' );
+isnt( $parent->{pid}, $parent->{ppid}, 'and my parent is not my grandparent' );
+
+my $resolved = BSD::Process::info({resolve => 1});
+is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve implicit pid' );
+
+$resolved = BSD::Process::info($info->{pid}, {resolve => 1});
+is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
