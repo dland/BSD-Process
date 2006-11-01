@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 139;
+use Test::More tests => 140;
 
 use BSD::Process;
 
@@ -306,3 +306,10 @@ is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve implicit pid' );
 
 $resolved = BSD::Process::info($info->{pid}, {resolve => 1});
 is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
+
+{
+	my $root = BSD::Process::all( uid => 'root' );
+	my $uid_root_count = 0;
+	$root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+	is( $uid_root_count, scalar(keys %$root), q{counted all root's processes} );
+}

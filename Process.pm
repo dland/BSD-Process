@@ -177,6 +177,7 @@ sub _request {
     if (exists $arg{uid}) {
         $request = 5;
         $param   = $arg{uid};
+        $param =~ /\D/ and $param = scalar(getpwnam($param));
     }
     elsif (exists $arg{effective_user_id}) {
         $request = 5;
