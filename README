@@ -7,11 +7,18 @@ make
 make test
 make install
 
+Building this module requires a FreeBSD system and a C compiler.
+Support for OpenBSD and NetBSD will appear in future releases.
+
 TESTING
 
-This module requires the following modules for thorough testing:
+This module requires the following module for thorough testing:
 
     Test::More
+
+This module will use the following modules if they are available:
+(their absence is not a problem).
+
     Test::Pod
     Test::Pod::Coverage
 
@@ -19,17 +26,40 @@ It can also make use of Devel::Cover if available.
 
 UNINSTALLATION
 
-This is a pure-Perl module. The following one-liner should print
-out the canonical path of the file:
+This Perl module has components which will be found in the following
+directories:
 
-  perl -MBSD::Process -le 'print $INC{"BSD-Process"}'
-
-Just delete this file. There is also the question of the man page.
-Finding that is left as an exercise to the reader.
+  .../perl5/site_perl/5.x.x/mach/auto/BSD/Process/*
+  .../perl5/site_perl/5.x.x/mach/BSD/Process.pm
+  .../perl5/5.x.x/man/man3/BSD::Process.3
 
 USAGE
 
-use BSD::Process;
+    use BSD::Process;
+
+    my $proc = BSD::Process->new;
+    print $proc->rssize, " resident set size\n";
+    print "This process has made $proc->{minflt}  page reclaims\n";
+
+    print $proc->user_time, " seconds spent on the CPU\n";
+    $proc->refresh;
+    print "And now $proc->{utime} seconds\n";
+
+HELPING
+
+Patches welcome!
+
+If you would like to see this module work on other operating systems,
+but don't particularly wish to hack on the source yourself, and you
+have a publically accessible machine on the net, and you are fine
+with the idea of giving me an account on said machine, then drop
+me a line.
+
+I will send you my public key for connecting via ssh. All I need
+is a shell and a C compiler, and I give you my word that I will not
+do anything evil. If required, I will connect only from a fixed
+address (which would allow you to set up an AllowUsers USER@HOST
+rule in your sshd_config file).
 
 STATUS
 
