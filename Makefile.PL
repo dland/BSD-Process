@@ -4,6 +4,7 @@
 
 use strict;
 use ExtUtils::MakeMaker;
+use Config;
 
 my $module_name = 'BSD::Process';
 
@@ -27,7 +28,7 @@ WriteMakefile(
     LIBS          => ['-lkvm'],
     LICENSE       => 'perl',
     PREREQ_PM     => {
-        'XSLoader'        => 0
+        'XSLoader'        => 0,
         'Class::Accessor' => '0.25',
     },
 );
