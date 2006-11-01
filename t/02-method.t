@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 use BSD::Process;
 
@@ -32,5 +32,9 @@ use BSD::Process;
     is($pe->svuid, $pe->{svuid}, 'method svuid');
     is($pe->rgid,  $pe->{rgid},  'method rgid');
     is($pe->svgid, $pe->{svgid}, 'method svgid');
+
+    # longhand method names
+    is($pi->parent_pid,         $pi->ppid,  'alias parent_pid');
+    is($pi->process_group_id,   $pi->pgid,  'alias process_group_id');
 }
 

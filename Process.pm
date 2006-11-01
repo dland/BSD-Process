@@ -13,10 +13,31 @@ use XSLoader;
 use base qw(Class::Accessor);
 
 BSD::Process->mk_ro_accessors( qw(
-	pid ppid pgid tpgid sid tsid jobc uid ruid svuid rgid svgid
-	ngroups size rssize swrss tsize dsize ssize xstat acflag
-	pctcpu estcpu slptime swtime runtime
+    pid ppid pgid tpgid sid tsid jobc uid ruid svuid rgid svgid
+    ngroups size rssize swrss tsize dsize ssize xstat acflag
+    pctcpu estcpu slptime swtime runtime
 ));
+
+# create some longhand aliases of the method names
+
+*parent_pid              = *ppid;
+*process_group_id        = *pgid;
+*tty_process_group_id    = *tpgid;
+*process_session_id      = *sid;
+*terminal_session_id     = *tsid;
+*job_control_counter     = *jobc;
+*effective_user_id       = *uid;
+*real_user_id            = *ruid;
+*saved_effective_user_id = *uid;
+*number_of_groups        = *ngroups;
+*virtual_size            = *size;
+*resident_set_size       = *rssize;
+*rssize_before_swap      = *swrss;
+*text_size               = *tsize;
+*data_size               = *dsize;
+*stack_size              = *ssize;
+*exit_status             = *xstat;
+*accounting_flags        = *acflag;
 
 use vars qw($VERSION @ISA);
 $VERSION = '0.01';
