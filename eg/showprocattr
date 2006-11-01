@@ -90,6 +90,12 @@ Print the version of this program and exit.
 
 =back
 
+=head1 EXAMPLES
+
+C<procshowattr -n kthread>
+
+Show only the processes that are kernel threads.
+
 =head1 SEE ALSO
 
 L<BSD::Process>
