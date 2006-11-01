@@ -9,8 +9,8 @@ use Test::More tests => 3;
 use BSD::Process;
 
 {
-    my $pi = BSD::Process::new();   # implicit pid
-    my $pe = BSD::Process::new($$); # explicit pid
+    my $pi = BSD::Process->new();   # implicit pid
+    my $pe = BSD::Process->new($$); # explicit pid
 
     is( $pi->{pid}, $pe->{pid}, 'attribute pid' );
     is( $pi->{sid}, $pe->{sid}, 'attribute sid' );

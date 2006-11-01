@@ -102,8 +102,8 @@ sub new {
     my $pid = shift;
     $pid = $$ unless defined $pid;
     return bless {
-        _pid => $pid,
-        _info($pid),
+        _pid  => $pid,
+        _info => _info($pid),
     },
     $class;
 }
