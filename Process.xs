@@ -10,6 +10,8 @@
 #include <kvm.h>
 #include <sys/types.h>
 #include <sys/sysctl.h> /* KERN_PROC_* */
+#include <pwd.h> /* struct passwd */
+#include <grp.h> /* struct group */
 
 #include <sys/param.h> /* struct kinfo_proc prereq*/
 #if __FreeBSD__ >= 5
@@ -26,6 +28,8 @@
 #define PATH_DEV_NULL "/dev/null"
 
 #define TIME_FRAC(t) ( (double)(t).tv_sec + (double)(t).tv_usec/1000000 )
+#define P_FLAG(f)    ((ki.ki_flag   & f) ? 1 : 0))
+#define KI_FLAG(f)   ((ki.ki_kiflag & f) ? 1 : 0))
 
 static int proc_info_mib[4] = { -1, -1, -1, -1 };
 
@@ -56,7 +60,7 @@ list()
         XSRETURN(nr);
 
 SV *
-_info(int pid)
+_info(int pid, int resolve)
     PREINIT:
         /* TODO: int pid should be pid_t pid */
         size_t len;
@@ -66,6 +70,8 @@ _info(int pid)
         const char *nlistf, *memf;
         char **argv;
         SV *argsv;
+        struct passwd *pw;
+        struct group *gr;
         struct rusage *rp;
         HV *h;
 
@@ -106,18 +112,82 @@ _info(int pid)
 
         h = (HV *)sv_2mortal((SV *)newHV());
         RETVAL = newRV((SV *)h);
-        hv_store(h, "pid",             3, newSViv(ki.ki_pid), 0);
-        hv_store(h, "ppid",            4, newSViv(ki.ki_ppid), 0);
-        hv_store(h, "pgid",            4, newSViv(ki.ki_pgid), 0);
-        hv_store(h, "tpgid",           5, newSViv(ki.ki_tpgid), 0);
-        hv_store(h, "sid",             3, newSViv(ki.ki_sid), 0);
-        hv_store(h, "tsid",            4, newSViv(ki.ki_tsid), 0);
-        hv_store(h, "jobc",            4, newSViv(ki.ki_jobc), 0);
-        hv_store(h, "uid",             3, newSViv(ki.ki_uid), 0);
-        hv_store(h, "ruid",            4, newSViv(ki.ki_ruid), 0);
-        hv_store(h, "svuid",           5, newSViv(ki.ki_svuid), 0);
-        hv_store(h, "rgid",            4, newSViv(ki.ki_rgid), 0);
-        hv_store(h, "svgid",           5, newSViv(ki.ki_svgid), 0);
+        hv_store(h, "pid",   3, newSViv(ki.ki_pid), 0);
+        hv_store(h, "ppid",  4, newSViv(ki.ki_ppid), 0);
+        hv_store(h, "pgid",  4, newSViv(ki.ki_pgid), 0);
+        hv_store(h, "tpgid", 5, newSViv(ki.ki_tpgid), 0);
+        hv_store(h, "sid",   3, newSViv(ki.ki_sid), 0);
+        hv_store(h, "tsid",  4, newSViv(ki.ki_tsid), 0);
+        hv_store(h, "jobc",  4, newSViv(ki.ki_jobc), 0);
+        if (!resolve) {
+            /* numeric user and group ids */
+            hv_store(h, "uid",   3, newSViv(ki.ki_uid), 0);
+            hv_store(h, "ruid",  4, newSViv(ki.ki_ruid), 0);
+            hv_store(h, "svuid", 5, newSViv(ki.ki_svuid), 0);
+            hv_store(h, "rgid",  4, newSViv(ki.ki_rgid), 0);
+            hv_store(h, "svgid", 5, newSViv(ki.ki_svgid), 0);
+        }
+        else {
+            /* first, the user ids */
+            pw = getpwuid(ki.ki_uid);
+            if (!pw) {
+                /* shouldn't ever happen... */
+                hv_store(h, "uid", 3, newSViv(ki.ki_uid), 0);
+            }
+            else {
+                len = strlen(pw->pw_name);
+                hv_store(h, "uid", 3, newSVpvn(pw->pw_name,len), 0);
+            }
+
+            /* if the real uid is the same, use the previous results */
+            if (ki.ki_ruid != ki.ki_uid) {
+                pw = getpwuid(ki.ki_ruid);
+                if (pw) {
+                    len = strlen(pw->pw_name);
+                }
+            }
+            if (pw) {
+                hv_store(h, "ruid", 4, newSVpvn(pw->pw_name,len), 0);
+            }
+            else {
+                hv_store(h, "ruid", 4, newSViv(ki.ki_ruid), 0);
+            }
+
+            if (ki.ki_svuid != ki.ki_uid) {
+                pw = getpwuid(ki.ki_svuid);
+                len = strlen(pw->pw_name);
+            }
+            if (pw) {
+                hv_store(h, "svuid", 5, newSVpvn(pw->pw_name,len), 0);
+            }
+            else {
+                hv_store(h, "svuid", 5, newSViv(ki.ki_svuid), 0);
+            }
+
+            /* and now the group ids */
+            gr = getgrgid(ki.ki_rgid);
+            if (gr) {
+                len = strlen(gr->gr_name);
+                hv_store(h, "rgid", 4, newSVpvn(gr->gr_name,len), 0);
+            }
+            else {
+                hv_store(h, "rgid", 4, newSViv(ki.ki_rgid), 0);
+            }
+
+            if (ki.ki_svgid != ki.ki_rgid) {
+                gr = getgrgid(ki.ki_svgid);
+                if (gr) {
+                    len = strlen(gr->gr_name);
+                }
+            }
+            if (gr) {
+                hv_store(h, "svgid", 5, newSVpvn(gr->gr_name,len), 0);
+            }
+            else {
+                hv_store(h, "svgid", 5, newSViv(ki.ki_svgid), 0);
+            }
+        }
+
         hv_store(h, "ngroups",         7, newSViv(ki.ki_ngroups), 0);
         hv_store(h, "size",            4, newSViv(ki.ki_size), 0);
         hv_store(h, "rssize",          6, newSViv(ki.ki_rssize), 0);
@@ -134,45 +204,28 @@ _info(int pid)
         hv_store(h, "runtime",         7, newSViv(ki.ki_runtime), 0);
         hv_store(h, "start",           5, newSVnv(TIME_FRAC(ki.ki_start)), 0);
         hv_store(h, "childtime",       9, newSVnv(TIME_FRAC(ki.ki_childtime)), 0);
+
         hv_store(h, "flag",            4, newSViv(ki.ki_flag), 0);
-        hv_store(h, "advlock",         7,
-            newSViv((ki.ki_flag & P_ADVLOCK) ? 1 : 0), 0);
-        hv_store(h, "controlt",        8,
-            newSViv((ki.ki_flag & P_CONTROLT) ? 1 : 0), 0);
-        hv_store(h, "kthread",         7,
-            newSViv((ki.ki_flag & P_KTHREAD) ? 1 : 0), 0);
-        hv_store(h, "noload",          6,
-            newSViv((ki.ki_flag & P_NOLOAD) ? 1 : 0), 0);
-        hv_store(h, "ppwait",          6,
-            newSViv((ki.ki_flag & P_PPWAIT) ? 1 : 0), 0);
-        hv_store(h, "profil",          6,
-            newSViv((ki.ki_flag & P_PROFIL) ? 1 : 0), 0);
-        hv_store(h, "stopprof",        8,
-            newSViv((ki.ki_flag & P_STOPPROF) ? 1 : 0), 0);
-        hv_store(h, "hadthreads",     10,
-            newSViv((ki.ki_flag & P_HADTHREADS) ? 1 : 0), 0);
-        hv_store(h, "sugid",           5,
-            newSViv((ki.ki_flag & P_SUGID) ? 1 : 0), 0);
-        hv_store(h, "system",          6,
-            newSViv((ki.ki_flag & P_SYSTEM) ? 1 : 0), 0);
-        hv_store(h, "single_exit",    11,
-            newSViv((ki.ki_flag & P_SINGLE_EXIT) ? 1 : 0), 0);
-        hv_store(h, "traced",          6,
-            newSViv((ki.ki_flag & P_TRACED) ? 1 : 0), 0);
-        hv_store(h, "waited",          6,
-            newSViv((ki.ki_flag & P_WAITED) ? 1 : 0), 0);
-        hv_store(h, "wexit",           5,
-            newSViv((ki.ki_flag & P_WEXIT) ? 1 : 0), 0);
-        hv_store(h, "exec",            4,
-            newSViv((ki.ki_flag & P_EXEC) ? 1 : 0), 0);
+        hv_store(h, "advlock",         7, newSViv(P_FLAG(P_ADVLOCK), 0);
+        hv_store(h, "controlt",        8, newSViv(P_FLAG(P_CONTROLT), 0);
+        hv_store(h, "kthread",         7, newSViv(P_FLAG(P_KTHREAD), 0);
+        hv_store(h, "noload",          6, newSViv(P_FLAG(P_NOLOAD), 0);
+        hv_store(h, "ppwait",          6, newSViv(P_FLAG(P_PPWAIT), 0);
+        hv_store(h, "profil",          6, newSViv(P_FLAG(P_PROFIL), 0);
+        hv_store(h, "stopprof",        8, newSViv(P_FLAG(P_STOPPROF), 0);
+        hv_store(h, "hadthreads",     10, newSViv(P_FLAG(P_HADTHREADS), 0);
+        hv_store(h, "sugid",           5, newSViv(P_FLAG(P_SUGID), 0);
+        hv_store(h, "system",          6, newSViv(P_FLAG(P_SYSTEM), 0);
+        hv_store(h, "single_exit",    11, newSViv(P_FLAG(P_SINGLE_EXIT), 0);
+        hv_store(h, "traced",          6, newSViv(P_FLAG(P_TRACED), 0);
+        hv_store(h, "waited",          6, newSViv(P_FLAG(P_WAITED), 0);
+        hv_store(h, "wexit",           5, newSViv(P_FLAG(P_WEXIT), 0);
+        hv_store(h, "exec",            4, newSViv(P_FLAG(P_EXEC), 0);
 
         hv_store(h, "kiflag",          6, newSViv(ki.ki_kiflag), 0);
-        hv_store(h, "locked",          6,
-            newSViv((ki.ki_kiflag & KI_LOCKBLOCK) ? 1 : 0), 0);
-        hv_store(h, "isctty",          6,
-            newSViv((ki.ki_kiflag & KI_CTTY) ? 1 : 0), 0);
-        hv_store(h, "issleader",       9,
-            newSViv((ki.ki_kiflag & KI_SLEADER) ? 1 : 0), 0);
+        hv_store(h, "locked",          6, newSViv(KI_FLAG(KI_LOCKBLOCK), 0);
+        hv_store(h, "isctty",          6, newSViv(KI_FLAG(KI_CTTY), 0);
+        hv_store(h, "issleader",       9, newSViv(KI_FLAG(KI_SLEADER), 0);
 
         hv_store(h, "stat",            4, newSViv((int)ki.ki_stat), 0);
         hv_store(h, "stat_1",          6, newSViv((int)ki.ki_stat == 1 ? 1 : 0), 0);

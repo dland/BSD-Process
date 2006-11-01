@@ -12,11 +12,11 @@ use Exporter;
 use XSLoader;
 use base qw(Class::Accessor);
 
-use vars qw($VERSION @ISA);
+use vars qw($VERSION @ISA @EXPORTER);
 $VERSION = '0.01';
 @ISA = qw(Exporter Class::Accessor);
 
-@Exporter = ('process_info');
+@EXPORTER = ('process_info');
 
 BEGIN {
     my %alias = (
@@ -143,10 +143,12 @@ sub new {
     my $class = shift;
     my $pid   = shift;
     $pid = $$ unless defined $pid;
+    my $args = shift || {};
     my $self = {
         _pid  => $pid
     };
-    my $info = _info($self->{_pid});
+    $self->{_resolve} = exists $args->{resolve} ? $args->{resolve} : 0;
+    my $info = _info($self->{_pid}, $self->{_resolve});
     @{$self}{keys %$info} = values %$info;
 
     return bless $self, $class;
@@ -154,7 +156,7 @@ sub new {
 
 sub refresh {
     my $self = shift;
-    my $info = _info($self->{_pid});
+    my $info = _info($self->{_pid}, $self->{_resolve});
     @{$self}{keys %$info} = values %$info;
     return $self;
 }
@@ -162,7 +164,9 @@ sub refresh {
 sub info {
     my $pid = shift;
     $pid = $$ unless defined $pid;
-    return _info($pid);
+    my $args = shift || {};
+    my $resolve = exists $args->{resolve} ? $args->{resolve} : 0;
+    return _info($pid, $resolve);
 }
 
 *process_info = *info;
@@ -207,6 +211,24 @@ The input value will be coerced to a number, thus, if a some random
 string is passed in, it will be coerced to 0, and you will receive
 the process information of process 0 (the swapper). If no parameter
 is passed, the pid of the running process is assumed.
+
+A hash reference may be passed as an optional second parameter, to
+adjust the way the information is formatted.
+
+=over 4
+
+=item resolve
+
+Indicates whether the fields that correspond to user ids (uids)
+and group ids (gids) should be resovled to their symbolic
+equivalents. Internally, the code calls C<getpwuid> and
+C<getgrgid> as appropriate.
+
+  my $proc = BSD::Process::info( $$, {resolve => 1} );
+  print $proc->{uid};
+  # on my system, prints 'david', rather than 1001
+
+=back
 
 A reference to a hash is returned, which is basically a C<BSD::Process>
 object, without all the object-oriented fluff around it. The keys

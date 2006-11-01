@@ -4,16 +4,21 @@ use strict;
 use BSD::Process;
 use Getopt::Std;
 
-getopts( 'n', \my %opt );
+getopts( 'nr', \my %opt );
 
 my @line;
 my @width = (0) x (1 + @ARGV);
 
 PROC:
 for my $pid (sort {$a <=> $b} BSD::Process::list) {
-    my $proc = BSD::Process->new($pid);
-    my $id   = "$proc->{comm}($proc->{pid})";
-    my @out  =
+    my $proc = BSD::Process->new(
+		$pid,
+		{
+			resolve => exists($opt{r}) ? 1 : 0,
+		}
+	);
+    my $id = "$proc->{comm}($proc->{pid})";
+    my @out =
         map { defined $proc->{$_} ? $proc->{$_} : '' }
         @ARGV;
 
