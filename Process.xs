@@ -75,7 +75,7 @@ _info(int pid)
         proc_info_mib[3] = pid;
         len = sizeof(ki);
         if (sysctl(proc_info_mib, sizeof(proc_info_mib)/sizeof(proc_info_mib[0]), &ki, &len, NULL, 0) == -1) {
-            warn( "kern.proc.pid.%d is insane\n", pid);
+            /* process identified by pid has probably exited */
             XSRETURN_UNDEF;
         }
         h = (HV *)sv_2mortal((SV *)newHV());

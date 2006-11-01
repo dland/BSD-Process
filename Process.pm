@@ -139,7 +139,7 @@ XSLoader::load __PACKAGE__, $VERSION;
 
 sub new {
     my $class = shift;
-    my $pid = shift;
+    my $pid   = shift;
     $pid = $$ unless defined $pid;
     my $self = {
         _pid  => $pid
@@ -174,13 +174,18 @@ released 2006-mm-dd.
 
   use BSD::Process;
 
+  my $proc = BSD::Process->new;
+  print $proc->rssize, " resident set size\n";
+  print "This process has made $proc->{minflt}  page reclaims\n";
+
+  print $proc->user_time, " seconds spent on the CPU\n";
+  $proc->refresh;
+  print "And now $proc->{utime} seconds\n";
+
 =head1 DESCRIPTION
 
-C<BSD::Process> is designed to retrieve information about running
-processes from the BSD kernel. Information about a process is
-encapsulated in a C<BSD::Process> object. The data may be
-access via accessors, or through the underlying hash is speed is
-of the essence.
+C<BSD::Process> retrieves information about running
+processes from the BSD kernel and stores them in an object.
 
 =head1 FUNCTIONS
 
@@ -188,18 +193,20 @@ of the essence.
 
 =item info
 
-Returns the process information specified by a pid. A numeric value
-is expected. If garbage is passed, the process information of process
-0 will be returned.
+Returns the process information specified by a process identifier
+(or I<pid>). A numeric value is expected. If garbage is passed, the
+process information of process 0 (the swapper) will be returned.
+If the pid does not (or no longer) correspond to process, undef is
+returned.
 
 =item list
 
-Returns an array of pids (process identifier) of all the running
+Returns an array of pids identifier) of all the running
 processes on the system. Note: fleet-footed processes may have
 disappeared between the time they are observed running and the time
 the information is acquired about them. If this is a problem, you
 should be looking at C<all()>, which will return an array of
-C<BSD::Process> objects.
+C<BSD::Process> objects. The list is not sorted.
 
 A C<BSD::Process> object is instantiated from a pid, hence the
 utility of this routine. Note: this routine is not exported, you
@@ -242,12 +249,6 @@ parameter is given, the pid of the current process is
 used by default. This routine will return undef if the
 pid of a non-existent process is given.
 
-The process information is returned and
-may be accessed through read-only accessors. Since speed may
-be of the essence, you are welcome to access the underlying
-hash directly. Modifying the values in the hash has no
-effect on the running process.
-
   my $init = BSD::Process(1); # get info about init
 
 =item refresh
@@ -265,6 +266,12 @@ of measuring elapsed CPU time:
   print "that took $elapsed microseconds of CPU time\n";
 
 =back
+
+The process information is returned and
+may be accessed through read-only accessors. Since speed may
+be of the essence, you are welcome to access the underlying
+hash directly. Modifying the values in the hash has no
+effect on the running process.
 
 The following methods may be called on a C<BSD::Process>
 object. Each process attribute may be accessed via a longer,
@@ -503,6 +510,8 @@ following attibutes.
 
 =item is_being_forked, stat_1
 
+Status indicates that the process is being forked.
+
 =item is_runnable, stat_2
 
 Status indicates the process is runnable.
@@ -702,6 +711,10 @@ switches performed by the process.
 =item voluntary_context_switch_ch, nvcsw_ch
 
 =item involuntary_context_switch_ch => 'nivcsw_ch
+
+These attributes store the resource usage of the child processes
+spawned by this process. Currently, the kernel only fills in the
+information for the the C<utime_ch> and C<stime_ch> fields.
 
 =back
 
