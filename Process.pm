@@ -275,45 +275,98 @@ The attribute name is the same as the terse method name.
 
 =item process_pid, pid
 
+The identifier that identifies a process in a unique manner. No two
+process share the same pid (process id).
+
 =item parent_pid, ppid
+
+The pid of the parent process that spawned the current process. Many
+processes may share the same parent pid. Processes whose parents
+exit before they do are reparented to init (pid 1).
 
 =item process_group_id, pgid
 
+A number of processes may belong to the same group (for instance,
+all the process in a shell pipeline). In this case they share the
+same pgid.
+
 =item tty_process_group_id, tpgid
+
+Similarly, a number of processes belong to the same tty process
+group. This means that they were all originated from the same
+console login session or terminal window.
 
 =item process_session_id, sid
 
+Processes also belong to a session, identified by the process
+session id.
+
 =item terminal_session_id, tsid
+
+A process that has belongs to a tty process group will also have
+a terminal session id.
 
 =item job_control_counter, jobc
 
+The job control counter of a process. (purpose?)
+
 =item effective_user_id, uid
+
+The user id under which the process is running. A program with the
+setuid bit set can be launched by any user, and the effective user
+id will be that of the program itself, rather than that of the user.
 
 =item real_user_id, ruid
 
+The user id of the user that launched the process.
+
 =item saved_effective_user_id, svuid
+
+The saved effective user id of the process. (purpose?)
 
 =item real_group_id, rgid
 
+The primary group id of the user that launched the process.
+
 =item saved_effective_group_id, svgid
+
+The saved effective group id of the process. (purpose?)
 
 =item number_of_groups, ngroups
 
+The number of groups to which the process belongs.
+
 =item virtual_size, size
+
+The size (in bytes) of virtual memory occupied by the process.
 
 =item resident_set_size, rssize
 
+The size (in kilobytes) of physical memory occupied by the process.
+
 =item rssize_before_swap, swrss
+
+The resident set size of the process before the last swap.
 
 =item text_size, tsize
 
+Text size (in pages) of the process.
+
 =item data_size, dsize
+
+Data size (in pages) of the process.
 
 =item stack_size, ssize
 
+Stack size (in pages) of the process.
+
 =item exit_status, xstat
 
+Exit status of the process (usually zero).
+
 =item accounting_flags, acflag
+
+Process accounting flags (TODO: decode them).
 
 =item percent_cpu, pctcpu
 
