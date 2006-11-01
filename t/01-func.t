@@ -11,8 +11,7 @@ use BSD::Process;
 my $info = BSD::Process::info();
 
 # remove all attributes from object, should be none left over
-###ok( defined( delete $info->{args} ), 'attribute args');
-pass('foo');
+ok( defined( delete $info->{args} ), 'attribute args');
 ok( defined( delete $info->{pid} ), 'attribute pid');
 ok( defined( delete $info->{ppid} ), 'attribute ppid');
 ok( defined( delete $info->{pgid} ), 'attribute pgid');

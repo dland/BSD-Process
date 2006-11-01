@@ -20,6 +20,7 @@ $VERSION = '0.01';
 
 BEGIN {
     my %alias = (
+        process_args             => 'args',
         process_pid              => 'pid',
         parent_pid               => 'ppid',
         process_group_id         => 'pgid',
@@ -431,6 +432,10 @@ A modification of a value in the underlying hash of the object
 has no corresponding effect on the system process it represents.
 
 =over 4
+
+=item process_arguments, args
+
+The command line arguments passed to the program.
 
 =item process_pid, pid
 
@@ -881,13 +886,12 @@ None.
 
 =item L<BSD::Sysctl>
 
-General information about Perl.
-
 =back
 
 =head1 BUGS
 
-None known.
+The process arguments are concatenated into a string. It might be
+more useful to return them as an array of arguments.
 
 Please report all bugs at
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BSD-Process|rt.cpan.org>

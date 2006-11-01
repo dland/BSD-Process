@@ -8,7 +8,7 @@ use Test::More;
 
 use BSD::Process;
 
-plan tests => 236 + BSD::Process::max_kernel_groups;
+plan tests => 238 + BSD::Process::max_kernel_groups;
 
 {
     my $pi = BSD::Process->new();   # implicit pid
@@ -18,6 +18,7 @@ plan tests => 236 + BSD::Process::max_kernel_groups;
     is( $pi->{sid}, $pe->{sid}, 'attribute sid' );
     is( $pi->{tsid}, $pe->{tsid}, 'attribute tsid' );
 
+    is($pe->args,        delete $pe->{args},        'method args' );
     is($pe->pid,         delete $pe->{pid},         'method pid' );
     is($pe->ppid,        delete $pe->{ppid},        'method ppid');
     is($pe->pgid,        delete $pe->{pgid},        'method pgid');
@@ -139,6 +140,7 @@ plan tests => 236 + BSD::Process::max_kernel_groups;
     $pe->refresh;
 
     # longhand method names
+    is($pe->process_args,                  delete $pe->{args},        'alias process_args' );
     is($pe->process_pid,                   delete $pe->{pid},         'alias process_pid' );
     is($pe->parent_pid,                    delete $pe->{ppid},        'alias parent_pid');
     is($pe->process_group_id,              delete $pe->{pgid},        'alias process_group_id');
