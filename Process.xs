@@ -33,6 +33,36 @@
 
 static int proc_info_mib[4] = { -1, -1, -1, -1 };
 
+struct kinfo_proc *_proc_request (kvm_t *kd, int request, int param, int *pnr) {
+    struct kinfo_proc *kip;
+
+    switch(request) {
+    case 2:
+        kip = kvm_getprocs(kd, KERN_PROC_PGRP, param, pnr);
+        break;
+    case 3:
+        kip = kvm_getprocs(kd, KERN_PROC_SESSION, param, pnr);
+        break;
+    case 5:
+        kip = kvm_getprocs(kd, KERN_PROC_UID, param, pnr);
+        break;
+    case 6:
+        kip = kvm_getprocs(kd, KERN_PROC_RUID, param, pnr);
+        break;
+    case 10:
+        kip = kvm_getprocs(kd, KERN_PROC_RGID, param, pnr);
+        break;
+    case 11:
+        kip = kvm_getprocs(kd, KERN_PROC_GID, param, pnr);
+        break;
+    case 0:
+    default:
+        kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, pnr);
+        break;
+    }
+    return(kip);
+}
+
 HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     HV *h;
     const char *nlistf, *memf;
@@ -53,8 +83,8 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
     argv = kvm_getargv(kd, kp, 0);
 
-    /*
     if( *argv ) {
+#ifdef NEVER
         len = strlen(*argv);
         argsv = newSVpvn(*argv, len);
         while (*++argv) {
@@ -62,14 +92,15 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
             sv_catpvn(argsv, *argv, strlen(*argv));
             len += strlen(*argv)+1;
         }
-        hv_store(h, "args", 4, newSVpvn(SvPVX(argsv), SvCUR(argsv)), 0);
+        hv_store(h, "args", 4, argsv, 0);
+#else
+        hv_store(h, "args", 4, newSVpvn("", 0), 0);
+#endif
     }
     else {
         hv_store(h, "args", 4, newSVpvn("", 0), 0);
     }
     kvm_close(kd);
-    */
-    hv_store(h, "args", 4, newSVpvn("", 0), 0);
 
     hv_store(h, "pid",   3, newSViv(kp->ki_pid), 0);
     hv_store(h, "ppid",  4, newSViv(kp->ki_ppid), 0);
@@ -286,30 +317,7 @@ _list(int request, int param)
     PPCODE:
         nlistf = memf = PATH_DEV_NULL;
         kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
-        switch(request) {
-        case 2:
-            kip = kvm_getprocs(kd, KERN_PROC_PGRP, param, &nr);
-            break;
-        case 3:
-            kip = kvm_getprocs(kd, KERN_PROC_SESSION, param, &nr);
-            break;
-        case 5:
-            kip = kvm_getprocs(kd, KERN_PROC_UID, param, &nr);
-            break;
-        case 6:
-            kip = kvm_getprocs(kd, KERN_PROC_RUID, param, &nr);
-            break;
-        case 10:
-            kip = kvm_getprocs(kd, KERN_PROC_RGID, param, &nr);
-            break;
-        case 11:
-            kip = kvm_getprocs(kd, KERN_PROC_GID, param, &nr);
-            break;
-        case 0:
-        default:
-            kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
-            break;
-        }
+        kip = _proc_request(kd, request, param, &nr);
         if (kip) {
             int p;
             for (p = 0; p < nr; ++kip, ++p)

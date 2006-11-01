@@ -170,7 +170,7 @@ sub refresh {
     return $self;
 }
 
-sub list {
+sub _request {
     my %arg = @_;
     my $request = 0;
     my $param   = 0;
@@ -222,7 +222,15 @@ sub list {
         $request = 2;
         $param   = $arg{process_session_id};
     }
-    return _list($request, $param);
+    return ($request, $param);
+}
+
+sub list {
+    return _list(_request(@_));
+}
+
+sub all {
+    return _all(_request(@_));
 }
 
 sub info {
