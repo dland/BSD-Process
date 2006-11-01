@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 116;
+use Test::More tests => 119;
 
 use BSD::Process;
 
@@ -134,29 +134,52 @@ is( scalar(@$grouplist), $ngroups, "... of the expected size" )
 is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
     or diag( 'leftover: ' . join( ',', keys %$info ));
 
+# process groups
 {
     my @proc = BSD::Process::list();
     cmp_ok( scalar(@proc), '>', 10, 'list of processes' )
         or diag("proclist: (@proc)");
 
-	# count the processes in each process groups
-	my %pgid;
-	for my $pid (@proc) {
-		my $proc = BSD::Process->new($pid);
-		$pgid{$proc->{pgid}}++;
-	}
+    # count the processes in each process group
+    my %pgid;
+    for my $pid (@proc) {
+        my $proc = BSD::Process->new($pid);
+        $pgid{$proc->{pgid}}++;
+    }
 
-	# now find the process groups with the most members
-	my ($biggest, $bigger) = (sort {$pgid{$b} <=> $pgid{$a} || $a <=> $b} keys %pgid )[0,1];
-	diag( "pgid $biggest has $pgid{$biggest} members" );
-	diag( "pgid $bigger has $pgid{$bigger} members" );
+    # now find the process groups with the most members
+    my ($biggest, $bigger) = (sort {$pgid{$b} <=> $pgid{$a} || $a <=> $b} keys %pgid )[0,1];
 
-	my $all_procs = @proc;
+    my $all_procs = @proc;
     @proc = BSD::Process::list( pgid => $biggest );
-	cmp_ok( scalar(@proc), '<', $all_procs, "pgid $biggest smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<', $all_procs, "pgid $biggest smaller than count of all processes" );
 
-	my $biggest_pgid = @proc;
+    my $biggest_pgid = @proc;
     @proc = BSD::Process::list( pgid => $bigger );
-	cmp_ok( scalar(@proc), '<',  $all_procs, "pgid $biggest smaller than count of all processes" );
-	cmp_ok( scalar(@proc), '<=', $biggest_pgid, "pgid $bigger smaller or equal to pgid $biggest" );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "pgid $biggest smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<=', $biggest_pgid, "pgid $bigger smaller or equal to pgid $biggest" );
+}
+
+# process sessions
+{
+    my @proc = BSD::Process::list();
+
+    # count the processes in each process session
+    my %sid;
+    for my $pid (@proc) {
+        my $proc = BSD::Process->new($pid);
+        $sid{$proc->{pgid}}++;
+    }
+
+    # now find the process groups with the most members
+    my ($biggest, $bigger) = (sort {$sid{$b} <=> $sid{$a} || $a <=> $b} keys %sid )[0,1];
+
+    my $all_procs = @proc;
+    @proc = BSD::Process::list( sid => $biggest );
+    cmp_ok( scalar(@proc), '<', $all_procs, "sid $biggest smaller than count of all processes" );
+
+    my $biggest_sid = @proc;
+    @proc = BSD::Process::list( process_session_id => $bigger );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "sid $biggest smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<=', $biggest_sid, "sid $bigger smaller or equal to sid $biggest" );
 }

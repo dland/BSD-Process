@@ -181,6 +181,14 @@ sub list {
 		$request = 2;
 		$param   = $arg{process_group_id};
 	}
+	elsif (exists $arg{sid}) {
+		$request = 2;
+		$param   = $arg{sid};
+	}
+	elsif (exists $arg{process_session_id}) {
+		$request = 2;
+		$param   = $arg{process_session_id};
+	}
 	return _list($request, $param);
 }
 
@@ -229,10 +237,9 @@ processes from the BSD kernel and stores them in an object.
 
 =head1 FUNCTIONS
 
-=over 8
+=over 4
 
-=item info
-=item process_info
+=item info, process_info
 
 Returns the process information specified by a process identifier
 (or I<pid>).
@@ -262,7 +269,7 @@ C<getgrgid> as appropriate.
 
 A reference to a hash is returned, which is basically a C<BSD::Process>
 object, without all the object-oriented fluff around it. The keys
-are documented below in the METHODS section.  Only the short names
+are documented below in the METHODS section. Only the short names
 exist, the longer descriptive names are not defined.
 
 If the pid does not (or does no longer) correspond to process, undef
@@ -290,6 +297,24 @@ have to call it by its fully-qualified name.
     my $proc =  BSD::Process::info($p);
     print "$p $proc->{ppid}\n"; # print each pid and its parent pid
   }
+
+The set of processes may be restricted by specifying a condition,
+defined as a key/value pair to C<list()>. The following restrictions
+are available:
+
+=over 4
+
+=item pgid, process_group_id
+
+Return the processes that belong to the specified process group.
+
+  my @pgid = BSD::Process::list( process_group_id => 378 );
+
+=item sid, process_session_id
+
+Return the processes that belong to the specified process session.
+
+=back
 
 =item all
 
@@ -319,7 +344,7 @@ easier to calculate in a cross-platform manner.
 
 =head1 METHODS
 
-=over 8
+=over 4
 
 =item new
 
@@ -362,7 +387,7 @@ simpler code. The following three statements are equivalent:
 A modification of a value in the underlying hash of the object
 has no corresponding effect on the system process it represents.
 
-=over 8
+=over 4
 
 =item process_pid, pid
 
@@ -809,7 +834,7 @@ None.
 
 =head1 SEE ALSO
 
-=over 8
+=over 4
 
 =item L<BSD::Sysctl>
 
@@ -838,7 +863,7 @@ David Landgren, copyright (C) 2006. All rights reserved.
 
 http://www.landgren.net/perl/
 
-If you (find a) use this module, I'd love to hear about it.  If you
+If you (find a) use this module, I'd love to hear about it. If you
 want to be informed of updates, send me a note. You know my first
 name, you know my domain. Can you guess my e-mail address?
 
