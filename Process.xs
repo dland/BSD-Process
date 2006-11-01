@@ -369,6 +369,7 @@ _all(int resolve, int request, int param)
         char pidbuf[16];
         const char *nlistf, *memf;
         HV *h;
+		HV *package;
         HV *out;
         int p;
 
@@ -383,11 +384,17 @@ _all(int resolve, int request, int param)
         }
 
         out = (HV *)sv_2mortal((SV *)newHV());
+		package = gv_stashpv("BSD::Process", 0);
+
         RETVAL = out;
         for (p = 0; p < nr; ++kip, ++p) {
             h = _procinfo( kip, resolve );
+    		hv_store(h, "_pid",     4, newSViv(kip->ki_pid), 0);
+    		hv_store(h, "_resolve", 8, newSViv(resolve), 0);
+
             sprintf( pidbuf, "%d", kip->ki_pid );
-            hv_store(out, pidbuf, strlen(pidbuf), newRV((SV *)h), 0);
+            hv_store(out, pidbuf, strlen(pidbuf),
+				sv_bless(newRV((SV *)h), package), 0);
         }
         kvm_close(kd);
 
