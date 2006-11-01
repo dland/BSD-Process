@@ -10,6 +10,7 @@ use warnings;
 
 use Exporter;
 use XSLoader;
+use Class::Accessor;
 
 use vars qw/$VERSION @ISA/;
 $VERSION = '0.01';
