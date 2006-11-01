@@ -12,11 +12,11 @@ my @width = (0) x (1 + @ARGV);
 PROC:
 for my $pid (sort {$a <=> $b} BSD::Process::list) {
     my $proc = BSD::Process->new(
-		$pid,
-		{
-			resolve => exists($opt{r}) ? 1 : 0,
-		}
-	);
+        $pid,
+        {
+            resolve => exists($opt{r}) ? 1 : 0,
+        }
+    );
     my $id = "$proc->{comm}($proc->{pid})";
     my @out =
         map { defined $proc->{$_} ? $proc->{$_} : '' }
