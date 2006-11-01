@@ -1,5 +1,5 @@
 # 01-func.t
-# Basic sanity checks for BSD::Process
+# Test the public BSD::Process routines
 #
 # Copyright (C) 2006 David Landgren
 
