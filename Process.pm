@@ -16,6 +16,8 @@ use vars qw($VERSION @ISA);
 $VERSION = '0.01';
 @ISA = qw(Exporter Class::Accessor);
 
+@Exporter = ('process_info');
+
 BEGIN {
     my %alias = (
         process_pid              => 'pid',
@@ -158,8 +160,12 @@ sub refresh {
 }
 
 sub info {
-    return _info(0+$_[0]);
+    my $pid = shift;
+    $pid = $$ unless defined $pid;
+    return _info($pid);
 }
+
+*process_info = *info;
 
 =head1 NAME
 
@@ -192,17 +198,32 @@ processes from the BSD kernel and stores them in an object.
 =over 8
 
 =item info
+=item process_info
 
 Returns the process information specified by a process identifier
-(or I<pid>). A numeric value is expected. If garbage is passed, the
-process information of process 0 (the swapper) will be returned.
-If the pid does not (or no longer) correspond to process, undef is
-returned.
+(or I<pid>).
+
+The input value will be coerced to a number, thus, if a some random
+string is passed in, it will be coerced to 0, and you will receive
+the process information of process 0 (the swapper). If no parameter
+is passed, the pid of the running process is assumed.
+
+A reference to a hash is returned, which is basically a C<BSD::Process>
+object, without all the object-oriented fluff around it. The keys
+are documented below in the METHODS section.  Only the short names
+exist, the longer descriptive names are not defined.
+
+If the pid does not (or does no longer) correspond to process, undef
+is returned.
+
+The function C<info> is not exportable (since many programs will
+no doubt already have a routine named C<info>). The alias C<process_info>
+is exportable.
 
 =item list
 
-Returns an array of pids identifier) of all the running
-processes on the system. Note: fleet-footed processes may have
+Returns an array of pids identifier) of all the running processes
+on the system. Note: fleet-footed processes may have
 disappeared between the time they are observed running and the time
 the information is acquired about them. If this is a problem, you
 should be looking at C<all()>, which will return an array of
@@ -243,13 +264,12 @@ NOT YET IMPLEMENTED.
 
 =item new
 
-Creates a new C<BSD::Process> object. A valid pid of a
-running process is passed as a parameter. If no
-parameter is given, the pid of the current process is
-used by default. This routine will return undef if the
-pid of a non-existent process is given.
+Creates a new C<BSD::Process> object. The caveats that apply
+to the input parameter for C<list> concerning the input parameter
+(the pid of the process to examine) also apply here.
 
-  my $init = BSD::Process(1); # get info about init
+  my $init = BSD::Process->new(1); # get info about init
+  print "children of init have taken $init->{childtime} seconds\n";
 
 =item refresh
 
@@ -267,24 +287,21 @@ of measuring elapsed CPU time:
 
 =back
 
-The process information is returned and
-may be accessed through read-only accessors. Since speed may
-be of the essence, you are welcome to access the underlying
-hash directly. Modifying the values in the hash has no
-effect on the running process.
+The following methods may be called on a C<BSD::Process> object.
+Each process attribute may be accessed via two methods, a longer,
+more descriptive name, or a terse name (inspired by the member
+name in the underlying C<kinfo_proc> C struct).
 
-The following methods may be called on a C<BSD::Process>
-object. Each process attribute may be accessed via a longer,
-descriptive method, or a terse method. Furthermore, you may
-also interpolate the attribute directly into a string.
-
-The following three statements are equivalent:
+Furthermore, you may also interpolate the attribute (equivalent to
+the terse method name) directly into a string. This can lead to
+simpler code. The following three statements are equivalent:
 
   print "rss=", $p->resident_set_size;
   print "rss=", $p->rssize;
   print "rss=$p->{rssize};
 
-The attribute name is the same as the terse method name.
+A modification of a value in the underlying hash of the object
+has no corresponding effect on the system process it represents.
 
 =over 8
 
@@ -494,6 +511,13 @@ via the following attributes.
 
 Flag indicating that the process is waiting on a lock (whose name
 may be obtained from the C<lock> attribute).
+
+  if ($p->is_locked) {
+    print "$p->{comm} is waiting on lock $p->{lockname}\n";
+  }
+  else {
+    print "not waiting on a lock\n";
+  }
 
 =item controlling_tty_active, isctty
 
