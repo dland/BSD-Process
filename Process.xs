@@ -89,7 +89,7 @@ _info(int pid)
         hv_store(h, "svuid",           5, newSVnv(ki.ki_svuid), 0);
         hv_store(h, "rgid",            4, newSVnv(ki.ki_rgid), 0);
         hv_store(h, "svgid",           5, newSVnv(ki.ki_svgid), 0);
-        hv_store(h, "ngroups",         4, newSVnv(ki.ki_rgid), 0);
+        hv_store(h, "ngroups",         7, newSVnv(ki.ki_ngroups), 0);
         hv_store(h, "size",            4, newSVnv(ki.ki_size), 0);
         hv_store(h, "rssize",          6, newSVnv(ki.ki_rssize), 0);
         hv_store(h, "swrss",           5, newSVnv(ki.ki_swrss), 0);
