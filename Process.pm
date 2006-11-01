@@ -62,10 +62,18 @@ BEGIN {
         waited_on_by_other       => 'waited',
         working_on_exiting       => 'wexit',
         process_called_exec      => 'exec',
+        kernel_session_flag      => 'kiflag',
         is_locked                => 'locked',
         controlling_tty_active   => 'isctty',
         is_session_leader        => 'issleader',
-        status                   => 'stat',
+        process_status           => 'stat',
+        is_being_forked          => 'stat_1',
+        is_runnable              => 'stat_2',
+        is_sleeping_on_addr      => 'stat_3',
+        is_stopped               => 'stat_4',
+        is_a_zombie              => 'stat_5',
+        is_waiting_on_intr       => 'stat_6',
+        is_blocked               => 'stat_7',
         nice_priority            => 'nice',
         process_lock_count       => 'lock',
         run_queue_index          => 'rqindex',
@@ -94,7 +102,7 @@ BEGIN {
         number_of_swaps           => 'nswap',
         block_input_ops           => 'inblock',
         block_output_ops          => 'oublock',
-        messages_sent             => 'msgsnt',
+        messages_sent             => 'msgsnd',
         messages_received         => 'msgrcv',
         signals_received          => 'nsignals',
         voluntary_context_switch   => 'nvcsw',
@@ -110,7 +118,7 @@ BEGIN {
         number_of_swaps_ch         => 'nswap_ch',
         block_input_ops_ch         => 'inblock_ch',
         block_output_ops_ch        => 'oublock_ch',
-        messages_sent_ch           => 'msgsnt_ch',
+        messages_sent_ch           => 'msgsnd_ch',
         messages_received_ch       => 'msgrcv_ch',
         signals_received_ch        => 'nsignals_ch',
         voluntary_context_switch_ch   => 'nvcsw_ch',
@@ -280,8 +288,8 @@ process share the same pid (process id).
 
 =item parent_pid, ppid
 
-The pid of the parent process that spawned the current process. Many
-processes may share the same parent pid. Processes whose parents
+The pid of the parent process that spawned the current process.
+Many processes may share the same parent pid. Processes whose parents
 exit before they do are reparented to init (pid 1).
 
 =item process_group_id, pgid
@@ -293,18 +301,18 @@ same pgid.
 =item tty_process_group_id, tpgid
 
 Similarly, a number of processes belong to the same tty process
-group. This means that they were all originated from the same
-console login session or terminal window.
+group. This means that they were all originated from the same console
+login session or terminal window.
 
 =item process_session_id, sid
 
-Processes also belong to a session, identified by the process
-session id.
+Processes also belong to a session, identified by the process session
+id.
 
 =item terminal_session_id, tsid
 
-A process that has belongs to a tty process group will also have
-a terminal session id.
+A process that has belongs to a tty process group will also have a
+terminal session id.
 
 =item job_control_counter, jobc
 
@@ -370,83 +378,211 @@ Process accounting flags (TODO: decode them).
 
 =item percent_cpu, pctcpu
 
+Percentage of CPU time used by the process (for the duration of
+swtime, see below).
+
 =item estimated_cpu, estcpu
+
+Time averaged value of ki_cpticks. (as per the comment in user.h,
+purpose?)
 
 =item sleep_time, slptime
 
+Number of seconds since the process was last blocked.
+
 =item time_last_swap, swtime
+
+Number of seconds since the process was last swapped in or out.
 
 =item elapsed_time, runtime
 
+Real time used by the process, in microseconds.
+
 =item start_time, start
+
+Epoch time of the creation of the process.
 
 =item children_time, childtime
 
+Amount of real time used by the children processes (if any) of the
+process.
+
 =item process_flags, flag
+
+A bitmap of process flags (decoded in the following methods as 0
+or 1).
 
 =item posix_advisory_lock, advlock
 
+Flag indicating whether the process holds a POSIX advisory lock.
+
 =item has_controlling_terminal, controlt
+
+Flag indicating whether the process has a controlling terminal (if
+true, the terminal session id is stored in the C<tsid> attribute).
 
 =item is_kernel_thread, kthread
 
+Flag indicating whether the process is a kernel thread.
+
 =item no_loadavg_calc, noload
+
+Flag indicating whether the process contributes to the load average
+calculations of the system.
 
 =item parent_waiting, ppwait
 
+Flag indicating whether the parent is waiting for the process to
+exit.
+
 =item started_profiling, profil
+
+Flag indicating whether the process has started profiling.
 
 =item stopped_profiling, stopprof
 
+Flag indicating whether the process has a thread that has requesting
+profiling to stop.
+
 =item process_had_threads, hadthreads
+
+Flag indicating whether the process has had thresds.
 
 =item id_privs_set, sugid
 
+Flag indicating whether the process has set id privileges since
+last exec.
+
 =item system_process, system
+
+Flag indicating whether the process is a system process.
 
 =item single_exit_not_wait, single_exit
 
+Flag indicating that threads that are suspended should exit, not
+wait.
+
 =item traced_by_debugger, traced
+
+Flag indicating that the process is being traced by a debugger.
 
 =item waited_on_by_other, waited
 
+Flag indicating that another process is waiting for the process.
+
 =item working_on_exiting, wexit
+
+Flag indicating that the process is working on exiting.
 
 =item process_called_exec, exec
 
+Flag indicating that the process has called exec.
+
+=item kernel_session_flag, kiflag
+
+A bitmap described kernel session status of the process, described
+via the following attributes.
+
 =item is_locked, locked
+
+Flag indicating that the process is waiting on a lock (whose name
+may be obtained from the C<lock> attribute).
 
 =item controlling_tty_active, isctty
 
+Flag indicating that the vnode of the controlling tty is active.
+
 =item is_session_leader, issleader
 
-=item status, stat
+Flag indicating that the process is a session leader.
+
+=item process_status, stat
+
+Numeric value indicating the status of the process, decoded via the
+following attibutes.
+
+=item is_being_forked, stat_1
+
+=item is_runnable, stat_2
+
+Status indicates the process is runnable.
+
+=item is_sleeping_on_addr, stat_3
+
+Status indicates the process is sleeping on an address.
+
+=item is_stopped, stat_4
+
+Status indicates the process is stopped, either suspended or in a
+debugger.
+
+=item is_a_zombie, stat_5
+
+Status indicates the process is a zombie. It is waiting for its
+parent to collect its exit code.
+
+=item is_waiting_on_intr, stat_6
+
+Status indicates the process is waiting for an interrupt.
+
+=item is_blocked, stat_7
+
+Status indicates the process is blocked by a lock.
 
 =item nice_priority, nice
 
+The nice value of the process. The more positive the value, the
+nicer the process (that is, the less it seeks to sit on the CPU).
+
 =item process_lock_count, lock
+
+Process lock count. If locked, swapping is prevented.
 
 =item run_queue_index, rqindex
 
+When multiple processes are runnable, the run queue index shows the
+order in which the processes will be scheduled to run on the CPU.
+
 =item current_cpu, oncpu
+
+Identifies which CPU the process is running on.
 
 =item last_cpu, lastcpu
 
+Identifies the last CPU on which the process was running.
+
 =item old_command_name, ocomm
+
+The old command name.
 
 =item wchan_message, wmesg
 
+wchan message. (purpose?)
+
 =item setlogin_name, login
+
+Name of the user login process that launched the command.
 
 =item name_of_lock, lockname
 
+Name of the lock that the process is waiting on (if the process is
+waiting on a lock).
+
 =item command_name, comm
+
+Name of the command.
 
 =item emulation_name, emul
 
+Name of the emulation.
+
 =item process_jail_id, jid
 
+The process jail identifier
+
 =item number_of_threads, numthreads
+
+Number of threads in the process.
 
 =item priority_scheduling_class, pri_class
 
@@ -456,37 +592,84 @@ Process accounting flags (TODO: decode them).
 
 =item priority_user, pri_user
 
+The parameters pertaining to the scheduling of the process.
+
 =item user_time, utime
+
+Process resource usage information. The amount of time spent by the
+process in userland.
 
 =item system_time, stime
 
+Process resource usage information. The amount of time spent by the
+process in the kernel (system calls).
+
 =item max_resident_set_size, maxrss
+
+Process resource usage information. The maximum resident set size
+(the high-water mark of physical memory used) of the process.
 
 =item shared_memory_size, ixrss
 
+Process resource usage information. The size of shared memory.
+
 =item unshared_data_size, idrss
+
+Process resource usage information. The size of unshared memory.
 
 =item unshared_stack_size, isrss
 
+Process resource usage information. The size of unshared stack.
+
 =item page_reclaims, minflt
+
+Process resource usage information. Minor page faults, the number
+of page reclaims.
 
 =item page_faults, majflt
 
+Process resource usage information. Major page faults, the number
+of page faults.
+
 =item number_of_swaps, nswap
+
+Process resource usage information. The number of swaps the
+process has undergone.
 
 =item block_input_ops, inblock
 
+Process resource usage information. Total number of input block
+operations performed by the process.
+
 =item block_output_ops, oublock
 
-=item messages_sent, msgsnt
+Process resource usage information. Total number of output block
+operations performed by the process.
+
+=item messages_sent, msgsnd
+
+Process resource usage information. Number of messages sent by
+the process.
 
 =item messages_received, msgrcv
 
+Process resource usage information. Number of messages received by
+the process.
+
 =item signals_received, nsignals
+
+Process resource usage information. Number of signals received by
+the process.
 
 =item voluntary_context_switch, nvcsw
 
+Process resource usage information. Number of voluntary context
+switches performed by the process.
+
 =item involuntary_context_switch, nivcsw
+
+Process resource usage information. Number of involuntary context
+switches performed by the process.
 
 =item user_time_ch, utime_ch
 
@@ -510,7 +693,7 @@ Process accounting flags (TODO: decode them).
 
 =item block_output_ops_ch, oublock_ch
 
-=item messages_sent_ch, msgsnt_ch
+=item messages_sent_ch, msgsnd_ch
 
 =item messages_received_ch, msgrcv_ch
 
@@ -547,8 +730,7 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BSD-Process|rt.cpan.org>
 
 Make sure you include the output from the following two commands:
 
-  perl -MBSD::Process -le 'print BSD::Process::VERSION'
-  perl -V
+  perl -MBSD::Process -le 'print BSD::Process::VERSION' perl -V
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -560,10 +742,9 @@ David Landgren, copyright (C) 2006. All rights reserved.
 
 http://www.landgren.net/perl/
 
-If you (find a) use this module, I'd love to hear about it.
-If you want to be informed of updates, send me a note. You
-know my first name, you know my domain. Can you guess my
-e-mail address?
+If you (find a) use this module, I'd love to hear about it.  If you
+want to be informed of updates, send me a note. You know my first
+name, you know my domain. Can you guess my e-mail address?
 
 =head1 LICENSE
 

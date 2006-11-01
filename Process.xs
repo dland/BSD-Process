@@ -140,13 +140,22 @@ _info(int pid)
         hv_store(h, "exec",            4,
             newSViv((ki.ki_flag & P_EXEC) ? 1 : 0), 0);
 
+        hv_store(h, "kiflag",          6, newSViv(ki.ki_kiflag), 0);
         hv_store(h, "locked",          6,
             newSViv((ki.ki_kiflag & KI_LOCKBLOCK) ? 1 : 0), 0);
         hv_store(h, "isctty",          6,
             newSViv((ki.ki_kiflag & KI_CTTY) ? 1 : 0), 0);
         hv_store(h, "issleader",       9,
             newSViv((ki.ki_kiflag & KI_SLEADER) ? 1 : 0), 0);
-        hv_store(h, "stat",            4, newSViv(ki.ki_stat), 0);
+
+        hv_store(h, "stat",            4, newSViv((int)ki.ki_stat), 0);
+        hv_store(h, "stat_1",          6, newSViv((int)ki.ki_stat == 1 ? 1 : 0), 0);
+        hv_store(h, "stat_2",          6, newSViv((int)ki.ki_stat == 2 ? 1 : 0), 0);
+        hv_store(h, "stat_3",          6, newSViv((int)ki.ki_stat == 3 ? 1 : 0), 0);
+        hv_store(h, "stat_4",          6, newSViv((int)ki.ki_stat == 4 ? 1 : 0), 0);
+        hv_store(h, "stat_5",          6, newSViv((int)ki.ki_stat == 5 ? 1 : 0), 0);
+        hv_store(h, "stat_6",          6, newSViv((int)ki.ki_stat == 6 ? 1 : 0), 0);
+        hv_store(h, "stat_7",          6, newSViv((int)ki.ki_stat == 7 ? 1 : 0), 0);
         hv_store(h, "nice",            4, newSViv(ki.ki_nice), 0);
         hv_store(h, "lock",            4, newSViv(ki.ki_lock), 0);
         hv_store(h, "rqindex",         7, newSViv(ki.ki_rqindex), 0);
