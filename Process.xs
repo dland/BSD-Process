@@ -59,10 +59,14 @@ SV *
 _info(int pid)
     PREINIT:
         /* TODO: int pid should be pid_t pid */
-        struct kinfo_proc ki;
-        struct rusage *rp;
-        struct pargs  *pp;
         size_t len;
+        struct kinfo_proc ki;
+        kvm_t *kd;
+        char errbuf[_POSIX2_LINE_MAX];
+        const char *nlistf, *memf;
+        char **argv;
+        SV *argsv;
+        struct rusage *rp;
         HV *h;
 
     CODE:
@@ -79,14 +83,33 @@ _info(int pid)
             /* process identified by pid has probably exited */
             XSRETURN_UNDEF;
         }
+        nlistf = memf = PATH_DEV_NULL;
+        kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
+        argv = kvm_getargv(kd, &ki, 0);
+
+        /*
+        if( *argv ) {
+            len = strlen(*argv);
+            argsv = newSVpvn(*argv, len);
+            while (*++argv) {
+                sv_catpvn(argsv, " ", 1);
+                sv_catpvn(argsv, *argv, strlen(*argv));
+                len += strlen(*argv)+1;
+            }
+            warn( "%s\n", SvPVX(argsv) );
+            hv_store(h, "args", 4, newSVpvn(SvPVX(argsv), 0), 0);
+        }
+        else {
+            hv_store(h, "args", 4, newSVpvn("-", 1), 0);
+        }
+        */
+
         h = (HV *)sv_2mortal((SV *)newHV());
         RETVAL = newRV((SV *)h);
-        pp = ki.ki_args;
-        /*warn( "argref = %ud\n",  pp->ar_ref );*/
         hv_store(h, "pid",             3, newSViv(ki.ki_pid), 0);
         hv_store(h, "ppid",            4, newSViv(ki.ki_ppid), 0);
         hv_store(h, "pgid",            4, newSViv(ki.ki_pgid), 0);
-        hv_store(h, "tpgid",           4, newSViv(ki.ki_tpgid), 0);
+        hv_store(h, "tpgid",           5, newSViv(ki.ki_tpgid), 0);
         hv_store(h, "sid",             3, newSViv(ki.ki_sid), 0);
         hv_store(h, "tsid",            4, newSViv(ki.ki_tsid), 0);
         hv_store(h, "jobc",            4, newSViv(ki.ki_jobc), 0);

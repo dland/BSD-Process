@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 109;
+use Test::More tests => 110;
 
 use BSD::Process;
 
@@ -19,6 +19,8 @@ is( $info->{pid}, $$, "system says my pid is the same ($$)" );
 isnt( $info->{pid}, $info->{ppid}, 'I am not my parent' );
 
 # remove all attributes from object, should be none left over
+###ok( defined( delete $info->{args} ), 'attribute args');
+pass('foo');
 ok( defined( delete $info->{pid} ), 'attribute pid');
 ok( defined( delete $info->{ppid} ), 'attribute ppid');
 ok( defined( delete $info->{pgid} ), 'attribute pgid');
