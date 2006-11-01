@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA @EXPORTER);
 $VERSION = '0.01';
 @ISA = qw(Exporter Class::Accessor);
 
-@EXPORTER = ('process_info');
+@EXPORTER = (qw(process_info process_list));
 
 BEGIN {
     my %alias = (
@@ -240,6 +240,7 @@ sub info {
 }
 
 *process_info = *info;
+*process_list = *list;
 
 =head1 NAME
 
@@ -256,7 +257,7 @@ released 2006-mm-dd.
 
   my $proc = BSD::Process->new;
   print $proc->rssize, " resident set size\n";
-  print "This process has made $proc->{minflt}  page reclaims\n";
+  print "This process has made $proc->{minflt} page reclaims\n";
 
   print $proc->user_time, " seconds spent on the CPU\n";
   $proc->refresh;
@@ -266,6 +267,7 @@ released 2006-mm-dd.
 
 C<BSD::Process> retrieves information about running
 processes from the BSD kernel and stores them in an object.
+Flag-type attributes are decoded in full.
 
 =head1 FUNCTIONS
 
@@ -301,28 +303,29 @@ C<getgrgid> as appropriate.
 
 A reference to a hash is returned, which is basically a C<BSD::Process>
 object, without all the object-oriented fluff around it. The keys
-are documented below in the METHODS section. Only the short names
-exist, the longer descriptive names are not defined.
+are documented below in the METHODS section, however, only the short
+names are available, the longer descriptive names are not defined.
 
 If the pid does not (or does no longer) correspond to process, undef
 is returned.
 
-The function C<info> is not exportable (since many programs will
-no doubt already have a routine named C<info>). The alias C<process_info>
-is exportable.
+The routine C<info> is not exportable (since many programs will
+no doubt already have a routine named C<info>). Instead, it is
+exportable under the name C<process_info>.
 
-=item list
+=item list, process_list
 
-Returns an array of pids identifier) of all the running processes
-on the system. Note: fleet-footed processes may have
-disappeared between the time they are observed running and the time
-the information is acquired about them. If this is a problem, you
-should be looking at C<all()>, which will return an array of
-C<BSD::Process> objects. The list is not sorted.
+Returns an (unsorted) array of pids of all the running processes
+on the system. Note: fleet-footed processes may have disappeared
+between the time they are observed running and the time the information
+is acquired about them. If this is a problem, you should be looking
+at C<all()>, which will return an array of C<BSD::Process> objects.
 
 A C<BSD::Process> object is instantiated from a pid, hence the
-utility of this routine. Note: this routine is not exported, you
-have to call it by its fully-qualified name.
+utility of this routine. Note: the routine C<list> is not exportable,
+you have to call it by its fully-qualified name. Otherwise, you may
+export the C<process_list> routine into your namespace, which does
+the same thing.
 
   my @pid = BSD::Process::list;
   for my $p (@pid) {
@@ -376,8 +379,8 @@ NOT YET IMPLEMENTED.
 
 Returns the maximum number of groups to which a process may belong.
 This is probably not of direct importance to the average Perl
-programmer, but it makes the number of regression tests to be run
-easier to calculate in a cross-platform manner.
+programmer, but it eases calculating the number of regression tests
+to be run in a cross-platform manner.
 
 =back
 
@@ -388,8 +391,9 @@ easier to calculate in a cross-platform manner.
 =item new
 
 Creates a new C<BSD::Process> object. The caveats that apply
-to the input parameter for C<list> concerning the input parameter
-(the pid of the process to examine) also apply here.
+to the input parameters for C<list> concerning the input parameter
+(the pid of the process to examine, and a hashref to modify the
+behaviou) also apply here.
 
   my $init = BSD::Process->new(1); # get info about init
   print "children of init have taken $init->{childtime} seconds\n";
