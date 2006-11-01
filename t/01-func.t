@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 119;
+use Test::More tests => 125;
 
 use BSD::Process;
 
@@ -134,15 +134,58 @@ is( scalar(@$grouplist), $ngroups, "... of the expected size" )
 is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
     or diag( 'leftover: ' . join( ',', keys %$info ));
 
+my @all = BSD::Process::list();
+my $all_procs = @all;
+cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
+    or diag("proclist: (@all)");
+
+# processes owned by a uid
+{
+    # count the processes owned by each uid
+    my %uid;
+    for my $pid (@all) {
+        my $proc = BSD::Process->new($pid);
+        $uid{$proc->{uid}}++;
+    }
+
+    # now find the uids that own the most processes
+    my ($biggest, $bigger) = (sort {$uid{$b} <=> $uid{$a} || $a <=> $b} keys %uid )[0,1];
+
+    my @proc = BSD::Process::list( uid => $biggest );
+    cmp_ok( scalar(@proc), '<', $all_procs, "uid $biggest smaller than count of all processes" );
+
+    my $biggest_uid = @proc;
+    @proc = BSD::Process::list( effective_user_id => $bigger );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "uid $bigger smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<=', $biggest_uid, "uid $bigger smaller or equal to uid $biggest" );
+}
+
+# processes owned by a ruid
+{
+    # count the processes owned by each real uid
+    my %ruid;
+    for my $pid (@all) {
+        my $proc = BSD::Process->new($pid);
+        $ruid{$proc->{ruid}}++;
+    }
+
+    # now find the uids that own the most processes
+    my ($biggest, $bigger) = (sort {$ruid{$b} <=> $ruid{$a} || $a <=> $b} keys %ruid )[0,1];
+
+    my @proc = BSD::Process::list( ruid => $biggest );
+    cmp_ok( scalar(@proc), '<', $all_procs, "ruid $biggest smaller than count of all processes" );
+
+    my $biggest_ruid = @proc;
+    @proc = BSD::Process::list( real_user_id => $bigger );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "ruid $bigger smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<=', $biggest_ruid, "ruid $bigger smaller or equal to ruid $biggest" );
+}
+
 # process groups
 {
-    my @proc = BSD::Process::list();
-    cmp_ok( scalar(@proc), '>', 10, 'list of processes' )
-        or diag("proclist: (@proc)");
-
     # count the processes in each process group
     my %pgid;
-    for my $pid (@proc) {
+    for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
         $pgid{$proc->{pgid}}++;
     }
@@ -150,8 +193,7 @@ is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
     # now find the process groups with the most members
     my ($biggest, $bigger) = (sort {$pgid{$b} <=> $pgid{$a} || $a <=> $b} keys %pgid )[0,1];
 
-    my $all_procs = @proc;
-    @proc = BSD::Process::list( pgid => $biggest );
+    my @proc = BSD::Process::list( pgid => $biggest );
     cmp_ok( scalar(@proc), '<', $all_procs, "pgid $biggest smaller than count of all processes" );
 
     my $biggest_pgid = @proc;
@@ -162,20 +204,17 @@ is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
 
 # process sessions
 {
-    my @proc = BSD::Process::list();
-
     # count the processes in each process session
     my %sid;
-    for my $pid (@proc) {
+    for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $sid{$proc->{pgid}}++;
+        $sid{$proc->{sid}}++;
     }
 
     # now find the process groups with the most members
     my ($biggest, $bigger) = (sort {$sid{$b} <=> $sid{$a} || $a <=> $b} keys %sid )[0,1];
 
-    my $all_procs = @proc;
-    @proc = BSD::Process::list( sid => $biggest );
+    my @proc = BSD::Process::list( sid => $biggest );
     cmp_ok( scalar(@proc), '<', $all_procs, "sid $biggest smaller than count of all processes" );
 
     my $biggest_sid = @proc;

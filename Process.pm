@@ -173,7 +173,23 @@ sub list {
     my %arg = @_;
     my $request = 0;
     my $param   = 0;
-    if (exists $arg{pgid}) {
+    if (exists $arg{uid}) {
+        $request = 5;
+        $param   = $arg{uid};
+    }
+    elsif (exists $arg{effective_user_id}) {
+        $request = 5;
+        $param   = $arg{effective_user_id};
+    }
+    elsif (exists $arg{ruid}) {
+        $request = 6;
+        $param   = $arg{ruid};
+    }
+    elsif (exists $arg{real_user_id}) {
+        $request = 6;
+        $param   = $arg{real_user_id};
+    }
+    elsif (exists $arg{pgid}) {
         $request = 2;
         $param   = $arg{pgid};
     }
@@ -304,11 +320,18 @@ are available:
 
 =over 4
 
+=item uid, effective_user_id
+
+Return the list of pids that are owned by the specified effective
+user id.
+
+  my @uid_pid = BSD::Process::list( uid => 1001 );
+
 =item pgid, process_group_id
 
 Return the processes that belong to the specified process group.
 
-  my @pgid = BSD::Process::list( process_group_id => 378 );
+  my @pgid_pid = BSD::Process::list( process_group_id => 378 );
 
 =item sid, process_session_id
 

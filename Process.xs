@@ -65,6 +65,12 @@ _list(int request, int param)
         case 3:
             kip = kvm_getprocs(kd, KERN_PROC_SESSION, param, &nr);
             break;
+        case 5:
+            kip = kvm_getprocs(kd, KERN_PROC_UID, param, &nr);
+            break;
+        case 6:
+            kip = kvm_getprocs(kd, KERN_PROC_RUID, param, &nr);
+            break;
         default:
             kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
             break;
