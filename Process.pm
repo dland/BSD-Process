@@ -371,14 +371,22 @@ Return the processes that belong to the specified process session.
 
 =item all
 
-Return a list of C<BSD::Process> objects representing the
-current running processes.
+Return a references to a hash of C<BSD::Process> objects representing the
+current running processes. The hash keys are the pids of the prcoesses.
+The following program prints out the 10 processes that consume the most
+physical memory.
 
-  my @proc = BSD::Process::all;
-  for my $p (@proc) {
-    print $p->pid, ' ' $p->ppid, $/;
-    # or
-    print "$p->{pid} $p->{ppid}\n";
+use BSD::Process;
+
+  my $all = BSD::Process::all;
+  my $want = 10;
+  for my $pid (
+    sort {$all->{$b}{rssize} <=> $all->{$a}{rssize}}
+    keys %$all
+  ) {
+    my $proc = $all->{$pid};
+    print "$proc->{comm} $proc->{rssize}Kb owned by $proc->{login}\n";
+    last unless --$want;
   }
 
 This routine runs more slowly than C<list()>, since it has
