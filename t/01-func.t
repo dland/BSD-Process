@@ -156,7 +156,7 @@ is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
 
     my $biggest_pgid = @proc;
     @proc = BSD::Process::list( pgid => $bigger );
-    cmp_ok( scalar(@proc), '<',  $all_procs, "pgid $biggest smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "pgid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_pgid, "pgid $bigger smaller or equal to pgid $biggest" );
 }
 
@@ -180,6 +180,6 @@ is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
 
     my $biggest_sid = @proc;
     @proc = BSD::Process::list( process_session_id => $bigger );
-    cmp_ok( scalar(@proc), '<',  $all_procs, "sid $biggest smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "sid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_sid, "sid $bigger smaller or equal to sid $biggest" );
 }
