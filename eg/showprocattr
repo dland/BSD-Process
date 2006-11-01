@@ -46,6 +46,8 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
     push @line, [@out];
 }
 
+exit unless @line;
+
 my @header = ('process', @ARGV);
 for my $idx (0..$#header) {
     $width[$idx] = length($header[$idx])
