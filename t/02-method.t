@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 62;
+use Test::More tests => 69;
 
 use BSD::Process;
 
@@ -67,6 +67,13 @@ use BSD::Process;
     is($pe->minflt,     $pe->{minflt},     'method minflt');
     is($pe->majflt,     $pe->{majflt},     'method majflt');
     is($pe->nswap,      $pe->{nswap},      'method nswap');
+    is($pe->inblock,    $pe->{inblock},    'method inblock');
+    is($pe->oublock,    $pe->{oublock},    'method oublock');
+    is($pe->msgsnt,     $pe->{msgsnt},     'method msgsnt');
+    is($pe->msgrcv,     $pe->{msgrcv},     'method msgrcv');
+    is($pe->nsignals,   $pe->{nsignals},   'method nsignals');
+    is($pe->nvcsw,      $pe->{nvcsw},      'method nvcsw');
+    is($pe->nivcsw,     $pe->{nivcsw},     'method nivcsw');
 
     # longhand method names
     is($pi->parent_pid,       $pi->ppid, 'alias parent_pid');
@@ -83,5 +90,13 @@ use BSD::Process;
     cmp_ok( $pi->runtime, '>', $time, 'burnt some CPU time' );
 
     cmp_ok($pe->{start}, '<', time+1, 'method start');
+
+	my @junk = `du /home/david`;
+	$pe->refresh;
+
+diag( "$pe->{maxrss} $pe->{ixrss} $pe->{idrss} $pe->{isrss} $pe->{minflt} $pe->{majflt} $pe->{nswap} $pe->{inblock} $pe->{oublock} $pe->{msgsnd} $pe->{msgrcv} $pe->{nsignals} $pe->{nvcsw} $pe->{nivcsw}\n");
+
+diag("$pe->{maxrss_ch} $pe->{ixrss_ch} $pe->{idrss_ch} $pe->{isrss_ch} $pe->{minflt_ch} $pe->{majflt_ch} $pe->{nswap_ch} $pe->{inblock_ch} $pe->{oublock_ch} $pe->{msgsnd_ch} $pe->{msgrcv_ch} $pe->{nsignals_ch} $pe->{nvcsw_ch} $pe->{nivcsw_ch}\n");
+
 }
 

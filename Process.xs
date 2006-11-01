@@ -131,5 +131,31 @@ _info(int pid)
         hv_store(h, "minflt",          6, newSVnv(rp->ru_minflt), 0);
         hv_store(h, "majflt",          6, newSVnv(rp->ru_majflt), 0);
         hv_store(h, "nswap",           5, newSVnv(rp->ru_nswap), 0);
+        hv_store(h, "inblock",         7, newSVnv(rp->ru_inblock), 0);
+        hv_store(h, "oublock",         7, newSVnv(rp->ru_oublock), 0);
+        hv_store(h, "msgsnd",          6, newSVnv(rp->ru_msgsnd), 0);
+        hv_store(h, "msgrcv",          6, newSVnv(rp->ru_msgrcv), 0);
+        hv_store(h, "nsignals",        8, newSViv(rp->ru_nsignals), 0);
+        hv_store(h, "nvcsw",           5, newSViv(rp->ru_nvcsw), 0);
+        hv_store(h, "nivcsw",          6, newSViv(rp->ru_nivcsw), 0);
+
+        rp = &ki.ki_rusage_ch;
+        hv_store(h, "utime_ch",      3+5, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
+        hv_store(h, "stime_ch",      3+5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
+        hv_store(h, "maxrss_ch",     3+6, newSVnv(rp->ru_maxrss), 0);
+        hv_store(h, "ixrss_ch",      3+5, newSVnv(rp->ru_ixrss), 0);
+        hv_store(h, "idrss_ch",      3+5, newSVnv(rp->ru_idrss), 0);
+        hv_store(h, "isrss_ch",      3+5, newSVnv(rp->ru_isrss), 0);
+        hv_store(h, "minflt_ch",     3+6, newSVnv(rp->ru_minflt), 0);
+        hv_store(h, "majflt_ch",     3+6, newSVnv(rp->ru_majflt), 0);
+        hv_store(h, "nswap_ch",      3+5, newSVnv(rp->ru_nswap), 0);
+        hv_store(h, "inblock_ch",    3+7, newSVnv(rp->ru_inblock), 0);
+        hv_store(h, "oublock_ch",    3+7, newSVnv(rp->ru_oublock), 0);
+        hv_store(h, "msgsnd_ch",     3+6, newSVnv(rp->ru_msgsnd), 0);
+        hv_store(h, "msgrcv_ch",     3+6, newSVnv(rp->ru_msgrcv), 0);
+        hv_store(h, "nsignals_ch",   3+8, newSViv(rp->ru_nsignals), 0);
+        hv_store(h, "nvcsw_ch",      3+5, newSViv(rp->ru_nvcsw), 0);
+        hv_store(h, "nivcsw_ch",     3+6, newSViv(rp->ru_nivcsw), 0);
+
     OUTPUT:
         RETVAL
