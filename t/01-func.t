@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 140;
+use Test::More tests => 145;
 
 use BSD::Process;
 
@@ -308,8 +308,43 @@ $resolved = BSD::Process::info($info->{pid}, {resolve => 1});
 is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
 
 {
-	my $root = BSD::Process::all( uid => 'root' );
-	my $uid_root_count = 0;
-	$root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
-	is( $uid_root_count, scalar(keys %$root), q{counted all root's processes} );
+    my $root = BSD::Process::all( uid => 'root' );
+    my $uid_root_count = 0;
+    $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+    is( $uid_root_count, scalar(keys %$root), q{counted all uid root's processes} );
+}
+
+{
+    my $root = BSD::Process::all( effective_user_id => 'root' );
+    my $uid_root_count = 0;
+    $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+    is( $uid_root_count, scalar(keys %$root), q{counted all effective uid root's processes} );
+}
+
+{
+    my $root = BSD::Process::all( ruid => 'root' );
+    my $uid_root_count = 0;
+    $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+    is( $uid_root_count, scalar(keys %$root), q{counted all ruid root's processes} );
+}
+
+{
+    my $root = BSD::Process::all( real_user_id => 'root' );
+    my $uid_root_count = 0;
+    $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+    is( $uid_root_count, scalar(keys %$root), q{counted all real_user_id root's processes} );
+}
+
+{
+    my $wheel = BSD::Process::all( gid => 'wheel' );
+    my $gid_wheel_count = 0;
+    $wheel->{$_}->rgid == 0 and ++$gid_wheel_count for keys %$wheel;
+    is( $gid_wheel_count, scalar(keys %$wheel), q{counted all gid wheel's processes} );
+}
+
+{
+    my $wheel = BSD::Process::all( effective_group_id => 'wheel' );
+    my $gid_wheel_count = 0;
+    $wheel->{$_}->rgid == 0 and ++$gid_wheel_count for keys %$wheel;
+    is( $gid_wheel_count, scalar(keys %$wheel), q{counted all effective_group_id wheel's processes} );
 }
