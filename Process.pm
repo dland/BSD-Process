@@ -10,11 +10,17 @@ use warnings;
 
 use Exporter;
 use XSLoader;
-use Class::Accessor;
+use base qw(Class::Accessor);
 
-use vars qw/$VERSION @ISA/;
+BSD::Process->mk_ro_accessors( qw(
+	pid ppid pgid tpgid sid tsid jobc uid ruid svuid rgid svgid
+	ngroups size rssize swrss tsize dsize ssize xstat acflag
+	pctcpu estcpu slptime swtime runtime
+));
+
+use vars qw($VERSION @ISA);
 $VERSION = '0.01';
-@ISA = qw(Exporter);
+@ISA = qw(Exporter Class::Accessor);
 
 XSLoader::load __PACKAGE__, $VERSION;
 
