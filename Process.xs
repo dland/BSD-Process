@@ -80,6 +80,17 @@ _info(int pid)
         hv_store(h, "pid",             3, newSVnv(ki.ki_pid), 0);
         hv_store(h, "ppid",            4, newSVnv(ki.ki_ppid), 0);
         hv_store(h, "pgid",            4, newSVnv(ki.ki_pgid), 0);
+        hv_store(h, "tpgid",           5, newSVnv(ki.ki_tpgid), 0);
+        hv_store(h, "sid",             3, newSVnv(ki.ki_sid), 0);
+        hv_store(h, "tsid",            4, newSVnv(ki.ki_tsid), 0);
+        hv_store(h, "jobc",            4, newSVnv(ki.ki_jobc), 0);
+        hv_store(h, "uid",             3, newSVnv(ki.ki_uid), 0);
+        hv_store(h, "ruid",            4, newSVnv(ki.ki_ruid), 0);
+        hv_store(h, "svuid",           5, newSVnv(ki.ki_svuid), 0);
+        hv_store(h, "rgid",            4, newSVnv(ki.ki_rgid), 0);
+        hv_store(h, "svgid",           5, newSVnv(ki.ki_svgid), 0);
+        hv_store(h, "ngroups",         4, newSVnv(ki.ki_rgid), 0);
+        hv_store(h, "run_time",        8, newSVnv(ki.ki_runtime), 0);
 
     OUTPUT:
         RETVAL
