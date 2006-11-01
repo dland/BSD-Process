@@ -55,5 +55,5 @@ list()
 
 void
 _info(int pid)
-	PREINIT:
-	PPCODE:
+    PREINIT:
+    PPCODE:

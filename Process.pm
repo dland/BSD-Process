@@ -69,9 +69,9 @@ current running processes.
 
   my @proc = BSD::Process::all;
   for my $p (@proc) {
-	print $p->pid, ' ' $p->ppid, $/;
-	# or
-	print "$p->{pid} $p->{ppid}\n";
+    print $p->pid, ' ' $p->ppid, $/;
+    # or
+    print "$p->{pid} $p->{ppid}\n";
   }
 
 This routine runs more slowly than C<list()>, since it has
@@ -99,11 +99,11 @@ effect on the running process.
 
 sub new {
     my $class = shift;
-	my $pid = shift;
-	$pid = $$ unless defined $pid;
+    my $pid = shift;
+    $pid = $$ unless defined $pid;
     return bless {
-		_pid => $pid,
-		_info($pid),
+        _pid => $pid,
+        _info($pid),
     },
     $class;
 }
