@@ -77,32 +77,35 @@ _info(int pid)
         }
         h = (HV *)sv_2mortal((SV *)newHV());
         RETVAL = newRV((SV *)h);
-        hv_store(h, "pid",             3, newSVnv(ki.ki_pid), 0);
-        hv_store(h, "ppid",            4, newSVnv(ki.ki_ppid), 0);
-        hv_store(h, "pgid",            4, newSVnv(ki.ki_pgid), 0);
-        hv_store(h, "tpgid",           5, newSVnv(ki.ki_tpgid), 0);
-        hv_store(h, "sid",             3, newSVnv(ki.ki_sid), 0);
-        hv_store(h, "tsid",            4, newSVnv(ki.ki_tsid), 0);
-        hv_store(h, "jobc",            4, newSVnv(ki.ki_jobc), 0);
-        hv_store(h, "uid",             3, newSVnv(ki.ki_uid), 0);
-        hv_store(h, "ruid",            4, newSVnv(ki.ki_ruid), 0);
-        hv_store(h, "svuid",           5, newSVnv(ki.ki_svuid), 0);
-        hv_store(h, "rgid",            4, newSVnv(ki.ki_rgid), 0);
-        hv_store(h, "svgid",           5, newSVnv(ki.ki_svgid), 0);
-        hv_store(h, "ngroups",         7, newSVnv(ki.ki_ngroups), 0);
-        hv_store(h, "size",            4, newSVnv(ki.ki_size), 0);
-        hv_store(h, "rssize",          6, newSVnv(ki.ki_rssize), 0);
-        hv_store(h, "swrss",           5, newSVnv(ki.ki_swrss), 0);
-        hv_store(h, "tsize",           5, newSVnv(ki.ki_tsize), 0);
-        hv_store(h, "dsize",           5, newSVnv(ki.ki_dsize), 0);
-        hv_store(h, "ssize",           5, newSVnv(ki.ki_ssize), 0);
-        hv_store(h, "xstat",           5, newSVnv(ki.ki_xstat), 0);
-        hv_store(h, "acflag",          6, newSVnv(ki.ki_acflag), 0);
-        hv_store(h, "pctcpu",          6, newSVnv(ki.ki_pctcpu), 0);
-        hv_store(h, "estcpu",          6, newSVnv(ki.ki_estcpu), 0);
-        hv_store(h, "slptime",         7, newSVnv(ki.ki_slptime), 0);
-        hv_store(h, "swtime",          6, newSVnv(ki.ki_swtime), 0);
-        hv_store(h, "runtime",         7, newSVnv(ki.ki_runtime), 0);
+        hv_store(h, "pid",             3, newSViv(ki.ki_pid), 0);
+        hv_store(h, "ppid",            4, newSViv(ki.ki_ppid), 0);
+        hv_store(h, "pgid",            4, newSViv(ki.ki_pgid), 0);
+        hv_store(h, "tpgid",           5, newSViv(ki.ki_tpgid), 0);
+        hv_store(h, "sid",             3, newSViv(ki.ki_sid), 0);
+        hv_store(h, "tsid",            4, newSViv(ki.ki_tsid), 0);
+        hv_store(h, "jobc",            4, newSViv(ki.ki_jobc), 0);
+        hv_store(h, "uid",             3, newSViv(ki.ki_uid), 0);
+        hv_store(h, "ruid",            4, newSViv(ki.ki_ruid), 0);
+        hv_store(h, "svuid",           5, newSViv(ki.ki_svuid), 0);
+        hv_store(h, "rgid",            4, newSViv(ki.ki_rgid), 0);
+        hv_store(h, "svgid",           5, newSViv(ki.ki_svgid), 0);
+        hv_store(h, "ngroups",         7, newSViv(ki.ki_ngroups), 0);
+        hv_store(h, "size",            4, newSViv(ki.ki_size), 0);
+        hv_store(h, "rssize",          6, newSViv(ki.ki_rssize), 0);
+        hv_store(h, "swrss",           5, newSViv(ki.ki_swrss), 0);
+        hv_store(h, "tsize",           5, newSViv(ki.ki_tsize), 0);
+        hv_store(h, "dsize",           5, newSViv(ki.ki_dsize), 0);
+        hv_store(h, "ssize",           5, newSViv(ki.ki_ssize), 0);
+        hv_store(h, "xstat",           5, newSViv(ki.ki_xstat), 0);
+        hv_store(h, "acflag",          6, newSViv(ki.ki_acflag), 0);
+        hv_store(h, "pctcpu",          6, newSViv(ki.ki_pctcpu), 0);
+        hv_store(h, "estcpu",          6, newSViv(ki.ki_estcpu), 0);
+        hv_store(h, "slptime",         7, newSViv(ki.ki_slptime), 0);
+        hv_store(h, "swtime",          6, newSViv(ki.ki_swtime), 0);
+        hv_store(h, "runtime",         7, newSViv(ki.ki_runtime), 0);
+		/* ki_start starting time */
+		/* ki_childtime time used by children  */
+		/* ki_stat is a char */
 
     OUTPUT:
         RETVAL
