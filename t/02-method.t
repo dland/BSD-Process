@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 109;
+use Test::More tests => 116;
 
 use BSD::Process;
 
@@ -66,6 +66,13 @@ use BSD::Process;
     is($pe->isctty,    $pe->{isctty},    'method isctty');
     is($pe->issleader, $pe->{issleader}, 'method issleader');
     is($pe->stat,      $pe->{stat},      'method stat');
+    is($pe->stat_1,    $pe->{stat_1},    'method stat_1');
+    is($pe->stat_2,    $pe->{stat_2},    'method stat_2');
+    is($pe->stat_3,    $pe->{stat_3},    'method stat_3');
+    is($pe->stat_4,    $pe->{stat_4},    'method stat_4');
+    is($pe->stat_5,    $pe->{stat_5},    'method stat_5');
+    is($pe->stat_6,    $pe->{stat_6},    'method stat_6');
+    is($pe->stat_7,    $pe->{stat_7},    'method stat_7');
     is($pe->nice,      $pe->{nice},      'method nice');
     is($pe->lock,      $pe->{lock},      'method lock');
     is($pe->rqindex,   $pe->{rqindex},   'method rqindex');
@@ -129,9 +136,4 @@ use BSD::Process;
     $pi->refresh;
     cmp_ok($pi->{start}, '<', time+1, 'attribute start');
     cmp_ok( $pi->runtime, '>', $time, 'refresh updates counters' );
-
-    $time = $pi->runtime;
-    $pi->refresh;
-    my $diff = $pi->{runtime} - $time;
-    diag( "refresh takes $diff microseconds\n" );
 }
