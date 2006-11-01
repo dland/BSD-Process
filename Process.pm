@@ -12,11 +12,11 @@ use Exporter;
 use XSLoader;
 use base qw(Class::Accessor);
 
-use vars qw($VERSION @ISA @EXPORTER);
+use vars qw($VERSION @ISA @EXPORT_OK);
 $VERSION = '0.01';
 @ISA = qw(Exporter Class::Accessor);
 
-@EXPORTER = (qw(process_info process_list));
+@EXPORT_OK = (qw(process_info process_list));
 
 BEGIN {
     my %alias = (
