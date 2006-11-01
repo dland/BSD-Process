@@ -123,6 +123,13 @@ _info(int pid)
 
         rp = &ki.ki_rusage;
         hv_store(h, "utime",           5, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
-        hv_store(h, "utime",           5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
+        hv_store(h, "stime",           5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
+        hv_store(h, "maxrss",          6, newSVnv(rp->maxrss), 0);
+        hv_store(h, "ixrss",           5, newSVnv(rp->ru_ixrss), 0);
+        hv_store(h, "idrss",           5, newSVnv(rp->ru_idrss), 0);
+        hv_store(h, "isrss",           5, newSVnv(rp->ru_isrss), 0);
+        hv_store(h, "minflt",          6, newSVnv(rp->ru_minflt), 0);
+        hv_store(h, "majflt",          6, newSVnv(rp->ru_majflt), 0);
+        hv_store(h, "nswap",           5, newSVnv(rp->ru_nswap), 0);
     OUTPUT:
         RETVAL

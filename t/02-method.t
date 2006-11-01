@@ -61,6 +61,14 @@ use BSD::Process;
     is($pe->utime,      $pe->{utime},      'method utime');
     is($pe->stime,      $pe->{stime},      'method stime');
 
+    is($pe->maxrss,     $pe->{maxrss},     'method maxrss');
+    is($pe->ixrss,      $pe->{ixrss},      'method ixrss');
+    is($pe->idrss,      $pe->{idrss},      'method idrss');
+    is($pe->isrss,      $pe->{isrss},      'method isrss');
+    is($pe->minflt,     $pe->{minflt},     'method minflt');
+    is($pe->majflt,     $pe->{majflt},     'method majflt');
+    is($pe->nswap,      $pe->{nswap},      'method nswap');
+
     # longhand method names
     is($pi->parent_pid,       $pi->ppid, 'alias parent_pid');
     is($pi->process_group_id, $pi->pgid, 'alias process_group_id');
