@@ -1,8 +1,8 @@
 Changes
 MANIFEST
+MANIFEST.SKIP
 Makefile.PL
 README
 Process.pm
 Process.xs
 t/00-basic.t
-t/01-method.t
