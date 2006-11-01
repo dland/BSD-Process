@@ -181,30 +181,37 @@ sub _request {
     elsif (exists $arg{effective_user_id}) {
         $request = 5;
         $param   = $arg{effective_user_id};
+        $param =~ /\D/ and $param = scalar(getpwnam($param));
     }
     elsif (exists $arg{ruid}) {
         $request = 6;
         $param   = $arg{ruid};
+        $param =~ /\D/ and $param = scalar(getpwnam($param));
     }
     elsif (exists $arg{real_user_id}) {
         $request = 6;
         $param   = $arg{real_user_id};
+        $param =~ /\D/ and $param = scalar(getpwnam($param));
     }
     elsif (exists $arg{gid}) {
         $request = 11;
         $param   = $arg{gid};
+        $param =~ /\D/ and $param = scalar(getgrnam($param));
     }
     elsif (exists $arg{effective_group_id}) {
         $request = 11;
         $param   = $arg{effective_group_id};
+        $param =~ /\D/ and $param = scalar(getgrnam($param));
     }
     elsif (exists $arg{rgid}) {
         $request = 10;
         $param   = $arg{rgid};
+        $param =~ /\D/ and $param = scalar(getgrnam($param));
     }
     elsif (exists $arg{real_group_id}) {
         $request = 10;
         $param   = $arg{real_group_id};
+        $param =~ /\D/ and $param = scalar(getgrnam($param));
     }
     elsif (exists $arg{pgid}) {
         $request = 2;
@@ -368,9 +375,10 @@ are available:
 =item uid, effective_user_id
 
 Return the list of pids that are owned by the specified effective
-user id.
+user id. The uid may be specified in the symbolic or numeric form.
 
-  my @uid_pid = BSD::Process::list( uid => 1001 );
+  my @uid_pid  = BSD::Process::list( uid => 1001 );
+  my @root_pid = BSD::Process::list( uid => 'root' );
 
 =item pgid, process_group_id
 
@@ -514,6 +522,9 @@ The user id under which the process is running. A program with the
 setuid bit set can be launched by any user, and the effective user
 id will be that of the program itself, rather than that of the user.
 
+The symbolic name of the uid will be returned if the constructor
+had the C<resolve> attribute set.
+
 =item real_user_id, ruid
 
 The user id of the user that launched the process.
@@ -525,6 +536,9 @@ The saved effective user id of the process. (purpose?)
 =item real_group_id, rgid
 
 The primary group id of the user that launched the process.
+
+The symbolic name of the gid will be returned if the constructor
+had the C<resolve> attribute set.
 
 =item saved_effective_group_id, svgid
 

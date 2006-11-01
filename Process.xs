@@ -318,7 +318,7 @@ _info(int pid, int resolve)
         if (proc_info_mib[0] == -1) {
             len = sizeof(proc_info_mib)/sizeof(proc_info_mib[0]);
             if (sysctlnametomib("kern.proc.pid", proc_info_mib, &len) == -1) {
-                warn( "kern.proc.pid is insane\n");
+                warn( "kern.proc.pid is corrupt\n");
                 XSRETURN_UNDEF;
             }
         }
@@ -354,7 +354,7 @@ _list(int request, int param)
             kvm_close(kd);
         }
         else {
-            warn("list() failed: %s\n", kvm_geterr(kd));
+            warn("kvm error in list(): %s\n", kvm_geterr(kd));
             XSRETURN_UNDEF;
         }
         XSRETURN(nr);
@@ -369,7 +369,7 @@ _all(int resolve, int request, int param)
         char pidbuf[16];
         const char *nlistf, *memf;
         HV *h;
-		HV *package;
+        HV *package;
         HV *out;
         int p;
 
@@ -379,22 +379,22 @@ _all(int resolve, int request, int param)
         kip = _proc_request(kd, request, param, &nr);
 
         if (!kip) {
-            warn("all() failed: %s\n", kvm_geterr(kd));
+            warn("kvm error in all(): %s\n", kvm_geterr(kd));
             XSRETURN_UNDEF;
         }
 
         out = (HV *)sv_2mortal((SV *)newHV());
-		package = gv_stashpv("BSD::Process", 0);
+        package = gv_stashpv("BSD::Process", 0);
 
         RETVAL = out;
         for (p = 0; p < nr; ++kip, ++p) {
             h = _procinfo( kip, resolve );
-    		hv_store(h, "_pid",     4, newSViv(kip->ki_pid), 0);
-    		hv_store(h, "_resolve", 8, newSViv(resolve), 0);
+            hv_store(h, "_pid",     4, newSViv(kip->ki_pid), 0);
+            hv_store(h, "_resolve", 8, newSViv(resolve), 0);
 
             sprintf( pidbuf, "%d", kip->ki_pid );
             hv_store(out, pidbuf, strlen(pidbuf),
-				sv_bless(newRV((SV *)h), package), 0);
+                sv_bless(newRV((SV *)h), package), 0);
         }
         kvm_close(kd);
 

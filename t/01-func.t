@@ -195,7 +195,7 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     my $blessed  = 0;
     for my $proc (keys %$all_ruid) {
         ++$same_uid if scalar(getpwnam($all_ruid->{$proc}{ruid})) == $bigger;
-        ++$blessed if ref($all_ruid->{proc}) eq 'BSD::Process';
+        ++$blessed if ref($all_ruid->{$proc}) eq 'BSD::Process';
     }
     is ($total, $same_uid, "same number of processes for ruid $bigger" )
         or do {
