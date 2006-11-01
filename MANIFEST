@@ -7,4 +7,4 @@ Process.pm
 Process.xs
 t/00-basic.t
 t/01-func.t
-t/01-method.t
+t/02-method.t
