@@ -58,8 +58,15 @@ BEGIN {
         priority_level            => 'pri_level',
         priority_native           => 'pri_native',
         priority_user             => 'pri_user',
-		user_time                 => 'utime',
-		system_time               => 'stime',
+        user_time                 => 'utime',
+        system_time               => 'stime',
+        max_resident_set_size     => 'maxrss',
+        shared_memory_size        => 'ixrss',
+        unshared_data_size        => 'idrss',
+        unshared_stack_size       => 'isrss',
+        page_reclaims             => 'minflt',
+        page_faults               => 'majflt',
+        number_of_swaps           => 'nswap',
     );
 
     # make some shorthand accessors

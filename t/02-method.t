@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 55;
+use Test::More tests => 62;
 
 use BSD::Process;
 
@@ -60,7 +60,6 @@ use BSD::Process;
     is($pe->pri_user,   $pe->{pri_user},   'method pri_user');
     is($pe->utime,      $pe->{utime},      'method utime');
     is($pe->stime,      $pe->{stime},      'method stime');
-
     is($pe->maxrss,     $pe->{maxrss},     'method maxrss');
     is($pe->ixrss,      $pe->{ixrss},      'method ixrss');
     is($pe->idrss,      $pe->{idrss},      'method idrss');
