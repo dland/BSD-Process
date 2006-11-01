@@ -122,19 +122,7 @@ _info(int pid)
         hv_store(h, "pri_user",        8, newSViv(ki.ki_pri.pri_user), 0);
 
         rp = &ki.ki_rusage;
-        hv_store(h, "utime",           5,
-            newSVnv(
-                (double)rp->ru_utime.tv_sec
-                + (double)rp->ru_utime.tv_usec/1000000
-            ),
-            0
-        );
-        hv_store(h, "stime",           5,
-            newSVnv(
-                (double)rp->ru_stime.tv_sec
-                + (double)rp->ru_stime.tv_usec/1000000
-            ),
-            0
-        );
+        hv_store(h, "utime",           5, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
+        hv_store(h, "utime",           5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
     OUTPUT:
         RETVAL
