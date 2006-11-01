@@ -108,6 +108,18 @@ sub new {
     $class;
 }
 
+=item info
+
+Returns the process information specified by a pid. A numeric value
+is expected. If garbage is passed, the process information of process
+0 will be returned.
+
+=cut
+
+sub info {
+	return _info(0+$_[0]);
+}
+
 =back
 
 =head1 DIAGNOSTICS
