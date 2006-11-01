@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 136;
+use Test::More tests => 138;
 
 use BSD::Process;
 
@@ -155,6 +155,18 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     @proc = BSD::Process::list( effective_user_id => $bigger );
     cmp_ok( scalar(@proc), '<',  $all_procs, "uid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_uid, "uid $bigger smaller or equal to uid $biggest" );
+
+	my $all_uid = BSD::Process::all( uid => $biggest );
+	my $total = scalar(keys %$all_uid);
+	my $same_uid = 0;
+	for my $proc (keys %$all_uid) {
+		++$same_uid if $all_uid->{$proc}{uid} == $biggest;
+	}
+	is ($total, $same_uid, "same number of processes for uid $biggest" )
+		or do {
+			diag( "pid: $_ uid: all_uid->{$_}{uid}" )
+				for keys %$all_uid;
+		};
 }
 
 # processes owned by a ruid
@@ -176,6 +188,18 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     @proc = BSD::Process::list( real_user_id => $bigger );
     cmp_ok( scalar(@proc), '<',  $all_procs, "ruid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_ruid, "ruid $bigger smaller or equal to ruid $biggest" );
+
+	my $all_ruid = BSD::Process::all( resolve => 1, ruid => $bigger );
+	my $total = keys %$all_ruid;
+	my $same_uid = 0;
+	for my $proc (keys %$all_ruid) {
+		++$same_uid if scalar(getpwnam($all_ruid->{$proc}{ruid})) == $bigger;
+	}
+	is ($total, $same_uid, "same number of processes for ruid $bigger" )
+		or do {
+			diag( "pid: $_ uid: $all_ruid->{$_}{uid}" )
+				for keys %$all_ruid;
+		};
 }
 
 # processes owned by an effective gid

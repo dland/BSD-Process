@@ -306,29 +306,6 @@ max_kernel_groups()
     OUTPUT:
         RETVAL
 
-void
-_list(int request, int param)
-    PREINIT:
-        struct kinfo_proc *kip;
-        kvm_t *kd;
-        int nr;
-        char errbuf[_POSIX2_LINE_MAX];
-        const char *nlistf, *memf;
-    PPCODE:
-        nlistf = memf = PATH_DEV_NULL;
-        kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
-        kip = _proc_request(kd, request, param, &nr);
-        if (kip) {
-            int p;
-            for (p = 0; p < nr; ++kip, ++p)
-                mPUSHi(kip->ki_pid);
-        }
-        else {
-            warn("list() failed: %s\n", kvm_geterr(kd));
-            XSRETURN_UNDEF;
-        }
-        XSRETURN(nr);
-
 SV *
 _info(int pid, int resolve)
     PREINIT:
@@ -353,6 +330,66 @@ _info(int pid, int resolve)
         }
         h = _procinfo( &ki, resolve );
         RETVAL = newRV((SV *)h);
+
+    OUTPUT:
+        RETVAL
+
+void
+_list(int request, int param)
+    PREINIT:
+        struct kinfo_proc *kip;
+        kvm_t *kd;
+        int nr;
+        char errbuf[_POSIX2_LINE_MAX];
+        const char *nlistf, *memf;
+    PPCODE:
+        nlistf = memf = PATH_DEV_NULL;
+        kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
+        kip = _proc_request(kd, request, param, &nr);
+        if (kip) {
+            int p;
+            for (p = 0; p < nr; ++kip, ++p) {
+                mPUSHi(kip->ki_pid);
+            }
+            kvm_close(kd);
+        }
+        else {
+            warn("list() failed: %s\n", kvm_geterr(kd));
+            XSRETURN_UNDEF;
+        }
+        XSRETURN(nr);
+
+HV *
+_all(int resolve, int request, int param)
+    PREINIT:
+        struct kinfo_proc *kip;
+        kvm_t *kd;
+        int nr;
+        char errbuf[_POSIX2_LINE_MAX];
+        char pidbuf[16];
+        const char *nlistf, *memf;
+        HV *h;
+        HV *out;
+        int p;
+
+    CODE:
+        nlistf = memf = PATH_DEV_NULL;
+        kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
+        kip = _proc_request(kd, request, param, &nr);
+
+        if (!kip) {
+            warn("all() failed: %s\n", kvm_geterr(kd));
+            XSRETURN_UNDEF;
+        }
+
+        out = (HV *)sv_2mortal((SV *)newHV());
+        RETVAL = out;
+        for (p = 0; p < nr; ++kip, ++p) {
+            h = _procinfo( kip, resolve );
+            sprintf( pidbuf, "%d", kip->ki_pid );
+            hv_store(out, pidbuf, strlen(pidbuf), newRV((SV *)h), 0);
+        }
+        kvm_close(kd);
 
     OUTPUT:
         RETVAL

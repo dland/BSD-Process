@@ -230,7 +230,9 @@ sub list {
 }
 
 sub all {
-    return _all(_request(@_));
+    my %args = @_;
+    my $resolve = exists $args{resolve} ? delete($args{resolve}) : 0;
+    return _all($resolve, _request(%args));
 }
 
 sub info {
@@ -898,8 +900,8 @@ None.
 
 =head1 BUGS
 
-The process arguments are concatenated into a string. It might be
-more useful to return them as an array of arguments.
+Process arguments are not handled (current attempts result in
+coredumps).
 
 Please report all bugs at
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BSD-Process|rt.cpan.org>
