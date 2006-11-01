@@ -46,6 +46,9 @@ use BSD::Process;
     is($pe->runtime,   $pe->{runtime}, 'method runtime');
     is($pe->xstat,     $pe->{xstat},   'method xstat');
 	is($pe->childtime, $pe->{childtime}, 'method childtime');
+    is($pe->nice,      $pe->{nice},    'method nice');
+    is($pe->ocomm,     $pe->{ocomm},   'method ocomm');
+    is($pe->comm,      $pe->{comm},    'method comm');
 
     # longhand method names
     is($pi->parent_pid,         $pi->ppid,  'alias parent_pid');
