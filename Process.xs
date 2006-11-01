@@ -45,7 +45,7 @@ max_kernel_groups()
         RETVAL
 
 void
-list()
+_list(int request, int param)
     PREINIT:
         struct kinfo_proc *kip;
         kvm_t *kd;
@@ -55,7 +55,6 @@ list()
     PPCODE:
         nlistf = memf = PATH_DEV_NULL;
         kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
-        /*
         switch(request) {
         case 0:
             kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
@@ -70,12 +69,9 @@ list()
             kip = kvm_getprocs(kd, KERN_PROC_SESSION, param, &nr);
             break;
         default:
-            proclist = KERN_PROC_ALL;
             kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
             break;
         }
-        */
-        kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
         if (kip) {
             int p;
             for (p = 0; p < nr; ++kip, ++p)

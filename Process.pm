@@ -169,6 +169,21 @@ sub refresh {
     return $self;
 }
 
+sub list {
+	my %arg = @_;
+	my $request = 0;
+	my $param   = 0;
+	if (exists $arg{pgid}) {
+		$request = 2;
+		$param   = $arg{pgid};
+	}
+	elsif (exists $arg{process_group_id}) {
+		$request = 2;
+		$param   = $arg{process_group_id};
+	}
+	return _list($request, $param);
+}
+
 sub info {
     my $pid = shift;
     my $args;
