@@ -156,7 +156,7 @@ is($max_len, BSD::Process::attr_len, 'length of longest attribute');
 is($exists, scalar(@attribute), "all lookups exist");
 is(scalar(grep {!/^_/} keys %$proc), 0, 'nothing left to look up');
 
-is(scalar(@attribuscalar(BSD::Process::attr_alias), 'attributes and aliases');
+is(scalar(@attribute), scalar(BSD::Process::attr_alias), 'attributes and aliases');
 
 my @all = BSD::Process::list();
 my $all_procs = @all;
