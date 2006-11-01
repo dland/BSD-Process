@@ -9,7 +9,7 @@ use Test::More tests => 4;
 my $fixed = 'The scalar remains the same';
 $_ = $fixed;
 
-BEGIN { use_ok('BSD::process'); }
+BEGIN { use_ok('BSD::Process'); }
 
 SKIP: {
     skip( 'Test::Pod not installed on this system', 1 )
