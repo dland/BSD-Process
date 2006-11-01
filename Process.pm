@@ -46,12 +46,37 @@ BEGIN {
         elapsed_time             => 'runtime',
         start_time               => 'start',
         children_time            => 'childtime',
+        process_flags            => 'flag',
+        posix_advisory_lock      => 'advlock',
+        has_controlling_terminal => 'controlt',
+        is_kernel_thread         => 'kthread',
+        no_loadavg_calc          => 'noload',
+        parent_waiting           => 'ppwait',
+        started_profiling        => 'profil',
+        stopped_profiling        => 'stopprof',
+        process_had_threads      => 'hadthreads',
+        id_privs_set             => 'sugid',
+        system_process           => 'system',
+        single_exit_not_wait     => 'single_exit',
+        traced_by_debugger       => 'traced',
+        waited_on_by_other       => 'waited',
+        working_on_exiting       => 'wexit',
+        process_called_exec      => 'exec',
+        is_locked                => 'locked',
+        controlling_tty_active   => 'isctty',
+        is_session_leader        => 'issleader',
         status                   => 'stat',
         nice_priority            => 'nice',
+        process_lock_count       => 'lock',
+        run_queue_index          => 'rqindex',
+        current_cpu              => 'oncpu',
+        last_cpu                 => 'lastcpu',
         old_command_name         => 'ocomm',
-        command_name             => 'comm',
         wchan_message            => 'wmesg',
         setlogin_name            => 'login',
+        name_of_lock             => 'lockname',
+        command_name             => 'comm',
+        emulation_name           => 'emul',
         process_jail_id          => 'jid',
         number_of_threads        => 'numthreads',
         priority_scheduling_class => 'pri_class',
@@ -230,6 +255,217 @@ of measuring elapsed CPU time:
   $proc->refresh;
   my $elapsed = $proc->runtime - $begin;
   print "that took $elapsed microseconds of CPU time\n";
+
+=back
+
+The following methods may be called on a C<BSD::Process>
+object. Each process attribute may be accessed via a longer,
+descriptive method, or a terse method. Furthermore, you may
+also interpolate the attribute directly into a string.
+
+The following three statements are equivalent:
+
+  print "rss=", $p->resident_set_size;
+  print "rss=", $p->rssize;
+  print "rss=$p->{rssize};
+
+The attribute name is the same as the terse method name.
+
+=over 8
+
+=item process_pid, pid
+
+=item parent_pid, ppid
+
+=item process_group_id, pgid
+
+=item tty_process_group_id, tpgid
+
+=item process_session_id, sid
+
+=item terminal_session_id, tsid
+
+=item job_control_counter, jobc
+
+=item effective_user_id, uid
+
+=item real_user_id, ruid
+
+=item saved_effective_user_id, svuid
+
+=item real_group_id, rgid
+
+=item saved_effective_group_id, svgid
+
+=item number_of_groups, ngroups
+
+=item virtual_size, size
+
+=item resident_set_size, rssize
+
+=item rssize_before_swap, swrss
+
+=item text_size, tsize
+
+=item data_size, dsize
+
+=item stack_size, ssize
+
+=item exit_status, xstat
+
+=item accounting_flags, acflag
+
+=item percent_cpu, pctcpu
+
+=item estimated_cpu, estcpu
+
+=item sleep_time, slptime
+
+=item time_last_swap, swtime
+
+=item elapsed_time, runtime
+
+=item start_time, start
+
+=item children_time, childtime
+
+=item process_flags, flag
+
+=item posix_advisory_lock, advlock
+
+=item has_controlling_terminal, controlt
+
+=item is_kernel_thread, kthread
+
+=item no_loadavg_calc, noload
+
+=item parent_waiting, ppwait
+
+=item started_profiling, profil
+
+=item stopped_profiling, stopprof
+
+=item process_had_threads, hadthreads
+
+=item id_privs_set, sugid
+
+=item system_process, system
+
+=item single_exit_not_wait, single_exit
+
+=item traced_by_debugger, traced
+
+=item waited_on_by_other, waited
+
+=item working_on_exiting, wexit
+
+=item process_called_exec, exec
+
+=item is_locked, locked
+
+=item controlling_tty_active, isctty
+
+=item is_session_leader, issleader
+
+=item status, stat
+
+=item nice_priority, nice
+
+=item process_lock_count, lock
+
+=item run_queue_index, rqindex
+
+=item current_cpu, oncpu
+
+=item last_cpu, lastcpu
+
+=item old_command_name, ocomm
+
+=item wchan_message, wmesg
+
+=item setlogin_name, login
+
+=item name_of_lock, lockname
+
+=item command_name, comm
+
+=item emulation_name, emul
+
+=item process_jail_id, jid
+
+=item number_of_threads, numthreads
+
+=item priority_scheduling_class, pri_class
+
+=item priority_level, pri_level
+
+=item priority_native, pri_native
+
+=item priority_user, pri_user
+
+=item user_time, utime
+
+=item system_time, stime
+
+=item max_resident_set_size, maxrss
+
+=item shared_memory_size, ixrss
+
+=item unshared_data_size, idrss
+
+=item unshared_stack_size, isrss
+
+=item page_reclaims, minflt
+
+=item page_faults, majflt
+
+=item number_of_swaps, nswap
+
+=item block_input_ops, inblock
+
+=item block_output_ops, oublock
+
+=item messages_sent, msgsnt
+
+=item messages_received, msgrcv
+
+=item signals_received, nsignals
+
+=item voluntary_context_switch, nvcsw
+
+=item involuntary_context_switch, nivcsw
+
+=item user_time_ch, utime_ch
+
+=item system_time_ch, stime_ch
+
+=item max_resident_set_size_ch, maxrss_ch
+
+=item shared_memory_size_ch, ixrss_ch
+
+=item unshared_data_size_ch, idrss_ch
+
+=item unshared_stack_size_ch, isrss_ch
+
+=item page_reclaims_ch, minflt_ch
+
+=item page_faults_ch, majflt_ch
+
+=item number_of_swaps_ch, nswap_ch
+
+=item block_input_ops_ch, inblock_ch
+
+=item block_output_ops_ch, oublock_ch
+
+=item messages_sent_ch, msgsnt_ch
+
+=item messages_received_ch, msgrcv_ch
+
+=item signals_received_ch, nsignals_ch
+
+=item voluntary_context_switch_ch, nvcsw_ch
+
+=item involuntary_context_switch_ch => 'nivcsw_ch
 
 =back
 

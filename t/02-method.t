@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 69;
+use Test::More tests => 109;
 
 use BSD::Process;
 
@@ -46,12 +46,36 @@ use BSD::Process;
     is($pe->runtime,   $pe->{runtime},   'method runtime');
     is($pe->xstat,     $pe->{xstat},     'method xstat');
     is($pe->childtime, $pe->{childtime}, 'method childtime');
-    is($pe->nice,      $pe->{nice},      'method nice');
+    is($pe->flag,      $pe->{flag},      'method flag');
+    is($pe->advlock,   $pe->{advlock},   'method advlock');
+    is($pe->controlt,  $pe->{controlt},  'method controlt');
+    is($pe->kthread,   $pe->{kthread},   'method kthread');
+	is($pe->noload,    $pe->{noload},    'method noload');
+	is($pe->ppwait,    $pe->{ppwait},    'method ppwait');
+	is($pe->profil,    $pe->{profil},    'method profil');
+    is($pe->stopprof,  $pe->{stopprof},  'method stopprof');
+    is($pe->hadthreads, $pe->{hadthreads}, 'method hadthreads');
+    is($pe->sugid,     $pe->{sugid},     'method sugid');
+	is($pe->system,    $pe->{system},    'method system');
+	is($pe->single_exit, $pe->{single_exit}, 'method single_exit');
+	is($pe->traced,    $pe->{traced},    'method traced');
+	is($pe->waited,    $pe->{waited},    'method waited');
+    is($pe->wexit,     $pe->{wexit},     'method wexit');
+    is($pe->exec,      $pe->{exec},      'method exec');
+    is($pe->locked,    $pe->{locked},    'method locked');
+    is($pe->isctty,    $pe->{isctty},    'method isctty');
+    is($pe->issleader, $pe->{issleader}, 'method issleader');
     is($pe->stat,      $pe->{stat},      'method stat');
+    is($pe->nice,      $pe->{nice},      'method nice');
+    is($pe->lock,      $pe->{lock},      'method lock');
+    is($pe->rqindex,   $pe->{rqindex},   'method rqindex');
+    is($pe->oncpu,     $pe->{oncpu},     'method oncpu');
+    is($pe->lastcpu,   $pe->{lastcpu},   'method lastcpu');
     is($pe->ocomm,     $pe->{ocomm},     'method ocomm');
-    is($pe->comm,      $pe->{comm},      'method comm');
     is($pe->wmesg,     $pe->{wmesg},     'method wmesg');
     is($pe->login,     $pe->{login},     'method login');
+    is($pe->lockname,  $pe->{lockname},  'method lockname');
+    is($pe->comm,      $pe->{comm},      'method comm');
     is($pe->jid,       $pe->{jid},       'method jid');
     is($pe->numthreads, $pe->{numthreads}, 'method numthreads');
     is($pe->pri_class,  $pe->{pri_class},  'method pri_class');
@@ -74,6 +98,22 @@ use BSD::Process;
     is($pe->nsignals,   $pe->{nsignals},   'method nsignals');
     is($pe->nvcsw,      $pe->{nvcsw},      'method nvcsw');
     is($pe->nivcsw,     $pe->{nivcsw},     'method nivcsw');
+    is($pe->utime_ch,    $pe->{utime_ch},    'method utime');
+    is($pe->stime_ch,    $pe->{stime_ch},    'method stime');
+    is($pe->maxrss_ch,   $pe->{maxrss_ch},   'method maxrss');
+    is($pe->ixrss_ch,    $pe->{ixrss_ch},    'method ixrss');
+    is($pe->idrss_ch,    $pe->{idrss_ch},    'method idrss');
+    is($pe->isrss_ch,    $pe->{isrss_ch},    'method isrss');
+    is($pe->minflt_ch,   $pe->{minflt_ch},   'method minflt');
+    is($pe->majflt_ch,   $pe->{majflt_ch},   'method majflt');
+    is($pe->nswap_ch,    $pe->{nswap_ch},    'method nswap');
+    is($pe->inblock_ch,  $pe->{inblock_ch},  'method inblock');
+    is($pe->oublock_ch,  $pe->{oublock_ch},  'method oublock');
+    is($pe->msgsnt_ch,   $pe->{msgsnt_ch},   'method msgsnt');
+    is($pe->msgrcv_ch,   $pe->{msgrcv_ch},   'method msgrcv');
+    is($pe->nsignals_ch, $pe->{nsignals_ch}, 'method nsignals');
+    is($pe->nvcsw_ch,    $pe->{nvcsw_ch},    'method nvcsw');
+    is($pe->nivcsw_ch,   $pe->{nivcsw_ch},   'method nivcsw');
 
     # longhand method names
     is($pi->parent_pid,       $pi->ppid, 'alias parent_pid');
@@ -87,16 +127,11 @@ use BSD::Process;
 
     my $time = $pi->runtime;
     $pi->refresh;
-    cmp_ok( $pi->runtime, '>', $time, 'burnt some CPU time' );
+    cmp_ok($pi->{start}, '<', time+1, 'attribute start');
+    cmp_ok( $pi->runtime, '>', $time, 'refresh updates counters' );
 
-    cmp_ok($pe->{start}, '<', time+1, 'method start');
-
-	my @junk = `du /home/david`;
-	$pe->refresh;
-
-diag( "$pe->{maxrss} $pe->{ixrss} $pe->{idrss} $pe->{isrss} $pe->{minflt} $pe->{majflt} $pe->{nswap} $pe->{inblock} $pe->{oublock} $pe->{msgsnd} $pe->{msgrcv} $pe->{nsignals} $pe->{nvcsw} $pe->{nivcsw}\n");
-
-diag("$pe->{maxrss_ch} $pe->{ixrss_ch} $pe->{idrss_ch} $pe->{isrss_ch} $pe->{minflt_ch} $pe->{majflt_ch} $pe->{nswap_ch} $pe->{inblock_ch} $pe->{oublock_ch} $pe->{msgsnd_ch} $pe->{msgrcv_ch} $pe->{nsignals_ch} $pe->{nvcsw_ch} $pe->{nivcsw_ch}\n");
-
+    $time = $pi->runtime;
+    $pi->refresh;
+    my $diff = $pi->{runtime} - $time;
+    diag( "refresh takes $diff microseconds\n" );
 }
-

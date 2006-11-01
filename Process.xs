@@ -108,12 +108,56 @@ _info(int pid)
         hv_store(h, "runtime",         7, newSViv(ki.ki_runtime), 0);
         hv_store(h, "start",           5, newSVnv(TIME_FRAC(ki.ki_start)), 0);
         hv_store(h, "childtime",       9, newSVnv(TIME_FRAC(ki.ki_childtime)), 0);
+        hv_store(h, "flag",            4, newSViv(ki.ki_flag), 0);
+        hv_store(h, "advlock",         7,
+            newSViv((ki.ki_flag & P_ADVLOCK) ? 1 : 0), 0);
+        hv_store(h, "controlt",        8,
+            newSViv((ki.ki_flag & P_CONTROLT) ? 1 : 0), 0);
+        hv_store(h, "kthread",         7,
+            newSViv((ki.ki_flag & P_KTHREAD) ? 1 : 0), 0);
+        hv_store(h, "noload",          6,
+            newSViv((ki.ki_flag & P_NOLOAD) ? 1 : 0), 0);
+        hv_store(h, "ppwait",          6,
+            newSViv((ki.ki_flag & P_PPWAIT) ? 1 : 0), 0);
+        hv_store(h, "profil",          6,
+            newSViv((ki.ki_flag & P_PROFIL) ? 1 : 0), 0);
+        hv_store(h, "stopprof",        8,
+            newSViv((ki.ki_flag & P_STOPPROF) ? 1 : 0), 0);
+        hv_store(h, "hadthreads",     10,
+            newSViv((ki.ki_flag & P_HADTHREADS) ? 1 : 0), 0);
+        hv_store(h, "sugid",           5,
+            newSViv((ki.ki_flag & P_SUGID) ? 1 : 0), 0);
+        hv_store(h, "system",          6,
+            newSViv((ki.ki_flag & P_SYSTEM) ? 1 : 0), 0);
+        hv_store(h, "single_exit",    11,
+            newSViv((ki.ki_flag & P_SINGLE_EXIT) ? 1 : 0), 0);
+        hv_store(h, "traced",          6,
+            newSViv((ki.ki_flag & P_TRACED) ? 1 : 0), 0);
+        hv_store(h, "waited",          6,
+            newSViv((ki.ki_flag & P_WAITED) ? 1 : 0), 0);
+        hv_store(h, "wexit",           5,
+            newSViv((ki.ki_flag & P_WEXIT) ? 1 : 0), 0);
+        hv_store(h, "exec",            4,
+            newSViv((ki.ki_flag & P_EXEC) ? 1 : 0), 0);
+
+        hv_store(h, "locked",          6,
+            newSViv((ki.ki_kiflag & KI_LOCKBLOCK) ? 1 : 0), 0);
+        hv_store(h, "isctty",          6,
+            newSViv((ki.ki_kiflag & KI_CTTY) ? 1 : 0), 0);
+        hv_store(h, "issleader",       9,
+            newSViv((ki.ki_kiflag & KI_SLEADER) ? 1 : 0), 0);
         hv_store(h, "stat",            4, newSViv(ki.ki_stat), 0);
         hv_store(h, "nice",            4, newSViv(ki.ki_nice), 0);
+        hv_store(h, "lock",            4, newSViv(ki.ki_lock), 0);
+        hv_store(h, "rqindex",         7, newSViv(ki.ki_rqindex), 0);
+        hv_store(h, "oncpu",           5, newSViv(ki.ki_oncpu), 0);
+        hv_store(h, "lastcpu",         7, newSViv(ki.ki_lastcpu), 0);
         hv_store(h, "ocomm",           5, newSVpv(ki.ki_ocomm, 0), 0);
-        hv_store(h, "comm",            4, newSVpv(ki.ki_comm, 0), 0);
         hv_store(h, "wmesg",           5, newSVpv(ki.ki_wmesg, 0), 0);
         hv_store(h, "login",           5, newSVpv(ki.ki_login, 0), 0);
+        hv_store(h, "lockname",        8, newSVpv(ki.ki_lockname, 0), 0);
+        hv_store(h, "comm",            4, newSVpv(ki.ki_comm, 0), 0);
+        hv_store(h, "emul",            4, newSVpv(ki.ki_emul, 0), 0);
         hv_store(h, "jid",             3, newSViv(ki.ki_jid), 0);
         hv_store(h, "numthreads",     10, newSViv(ki.ki_numthreads), 0);
         hv_store(h, "pri_class",       9, newSViv(ki.ki_pri.pri_class), 0);
