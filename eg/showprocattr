@@ -38,12 +38,6 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
         next PROC unless $keep;
     }
 
-    if (@ARGV > 1) {
-        for my $idx (0..$#ARGV) {
-            $out[$idx] = "$ARGV[$idx]:$out[$idx]";
-        }
-    }
-
     unshift @out, $id;
     for my $idx (0..$#out) {
         $width[$idx] = length($out[$idx])
@@ -52,7 +46,14 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
     push @line, [@out];
 }
 
+my @header = ('process', @ARGV);
+for my $idx (0..$#header) {
+    $width[$idx] = length($header[$idx])
+        if $width[$idx] < length($header[$idx]);
+}
+
 my $fmt = join( ' ', map {'%' . -$_ . 's'} @width) . "\n";
+printf $fmt, @header;
 for my $ln (@line) {
     printf $fmt, @$ln;
 }

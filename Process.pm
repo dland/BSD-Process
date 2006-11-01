@@ -97,6 +97,7 @@ BEGIN {
         priority_user             => 'pri_user',
         user_time                 => 'utime',
         system_time               => 'stime',
+        total_time                => 'time',
         max_resident_set_size     => 'maxrss',
         shared_memory_size        => 'ixrss',
         unshared_data_size        => 'idrss',
@@ -113,6 +114,7 @@ BEGIN {
         involuntary_context_switch => 'nivcsw',
         user_time_ch               => 'utime_ch',
         system_time_ch             => 'stime_ch',
+        total_time_ch              => 'time_ch',
         max_resident_set_size_ch   => 'maxrss_ch',
         shared_memory_size_ch      => 'ixrss_ch',
         unshared_data_size_ch      => 'idrss_ch',
@@ -278,9 +280,9 @@ released 2006-mm-dd.
   print $proc->rssize, " resident set size\n";
   print "This process has made $proc->{minflt} page reclaims\n";
 
-  print $proc->user_time, " seconds spent on the CPU\n";
+  print $proc->time, " seconds spent on the CPU (user+system)\n";
   $proc->refresh;
-  print "And now $proc->{utime} seconds\n";
+  print "And now $proc->{time} seconds\n";
 
 =head1 DESCRIPTION
 
@@ -818,6 +820,13 @@ process in userland.
 Process resource usage information. The amount of time spent by the
 process in the kernel (system calls).
 
+=item total_time, time
+
+The sum of the user and system times of the process.
+
+Process resource usage information. The amount of time spent by the
+process in the kernel (system calls).
+
 =item max_resident_set_size, maxrss
 
 Process resource usage information. The maximum resident set size
@@ -889,6 +898,8 @@ switches performed by the process.
 
 =item system_time_ch, stime_ch
 
+=item total_time_ch, time_ch
+
 =item max_resident_set_size_ch, maxrss_ch
 
 =item shared_memory_size_ch, ixrss_ch
@@ -915,18 +926,22 @@ switches performed by the process.
 
 =item voluntary_context_switch_ch, nvcsw_ch
 
-=item involuntary_context_switch_ch => 'nivcsw_ch
+=item involuntary_context_switch_ch => nivcsw_ch
 
 These attributes store the resource usage of the child processes
 spawned by this process. Currently, the kernel only fills in the
-information for the the C<utime_ch> and C<stime_ch> fields.
+information for the the C<utime_ch> and C<stime_ch> fields (and
+hence the C<time_ch> value is derived from them).
+
+In theory (and in practice as far as I can tell) C<time_ch> is
+equal to C<childtime>.
 
 =back
 
 =head1 DIAGNOSTICS
 
 B<kern.proc.pid is corrupt>: a "can't happen" error when
-attempting to retrieve the information about a process. If this
+attempting to retrieve the information of a process. If this
 occurs, I'd like to know how you managed it.
 
 B<kvm error in all()/list()>: another "can't happen" error when
@@ -952,7 +967,8 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BSD-Process|rt.cpan.org>
 
 Make sure you include the output from the following two commands:
 
-  perl -MBSD::Process -le 'print BSD::Process::VERSION' perl -V
+  perl -MBSD::Process -le 'print BSD::Process::VERSION'
+  perl -V
 
 =head1 ACKNOWLEDGEMENTS
 

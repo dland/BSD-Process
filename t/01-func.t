@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 145;
+use Test::More tests => 147;
 
 use BSD::Process;
 
@@ -88,6 +88,7 @@ ok( defined( delete $info->{pri_native} ), 'attribute pri_native');
 ok( defined( delete $info->{pri_user} ), 'attribute pri_user');
 ok( defined( delete $info->{utime} ), 'attribute utime');
 ok( defined( delete $info->{stime} ), 'attribute stime');
+ok( defined( delete $info->{time} ), 'attribute time (utime+stime)');
 ok( defined( delete $info->{maxrss} ), 'attribute maxrss');
 ok( defined( delete $info->{ixrss} ), 'attribute ixrss');
 ok( defined( delete $info->{idrss} ), 'attribute idrss');
@@ -104,6 +105,7 @@ ok( defined( delete $info->{nvcsw} ), 'attribute nvcsw');
 ok( defined( delete $info->{nivcsw} ), 'attribute nivcsw');
 ok( defined( delete $info->{utime_ch} ), 'attribute utime_ch');
 ok( defined( delete $info->{stime_ch} ), 'attribute stime_ch');
+ok( defined( delete $info->{time_ch} ), 'attribute time_ch (utime_ch+stime_ch)');
 ok( defined( delete $info->{maxrss_ch} ), 'attribute maxrss_ch');
 ok( defined( delete $info->{ixrss_ch} ), 'attribute ixrss_ch');
 ok( defined( delete $info->{idrss_ch} ), 'attribute idrss_ch');

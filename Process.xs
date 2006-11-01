@@ -259,6 +259,8 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     rp = &kp->ki_rusage;
     hv_store(h, "utime",    5, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
     hv_store(h, "stime",    5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
+    hv_store(h, "time",     4, newSVnv(
+        TIME_FRAC(rp->ru_utime)+TIME_FRAC(rp->ru_stime)), 0);
     hv_store(h, "maxrss",   6, newSVnv(rp->ru_maxrss), 0);
     hv_store(h, "ixrss",    5, newSVnv(rp->ru_ixrss), 0);
     hv_store(h, "idrss",    5, newSVnv(rp->ru_idrss), 0);
@@ -277,6 +279,8 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     rp = &kp->ki_rusage_ch;
     hv_store(h, "utime_ch",    3+5, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
     hv_store(h, "stime_ch",    3+5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
+    hv_store(h, "time_ch",       7, newSVnv(
+        TIME_FRAC(rp->ru_utime)+TIME_FRAC(rp->ru_stime)), 0);
     hv_store(h, "maxrss_ch",   3+6, newSVnv(rp->ru_maxrss), 0);
     hv_store(h, "ixrss_ch",    3+5, newSVnv(rp->ru_ixrss), 0);
     hv_store(h, "idrss_ch",    3+5, newSVnv(rp->ru_idrss), 0);
@@ -315,6 +319,9 @@ _info(int pid, int resolve)
         HV *h;
 
     CODE:
+        /* use the sysctl approach instead of using a kernel
+         * descriptor, makes for a bit less housekeeping.
+         */
         if (proc_info_mib[0] == -1) {
             len = sizeof(proc_info_mib)/sizeof(proc_info_mib[0]);
             if (sysctlnametomib("kern.proc.pid", proc_info_mib, &len) == -1) {
