@@ -45,6 +45,11 @@ USAGE
     $proc->refresh;
     print "And now $proc->{utime} seconds\n";
 
+There are a few useful programs bundled with the distribution that
+won't be installed. If you can't find them on your system, have a
+look at the online versions, available at http://search.cpan.org
+and/or http://kobesearch.cpan.org .
+
 HELPING
 
 Patches welcome!
