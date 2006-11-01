@@ -11,8 +11,18 @@ getopts( 'nrV', \my %opt );
 
 print "$VERSION\n" and exit if $opt{V};
 
+my @attr;
+for my $attr (@ARGV) {
+    if (BSD::Process->can($attr)) {
+        push @attr, $attr;
+    }
+    else {
+        warn "ignoring unknown attribute $attr.\n";
+    }
+}
+
 my @line;
-my @width = (0) x (1 + @ARGV);
+my @width = (0) x (1 + @attr);
 
 PROC:
 for my $pid (sort {$a <=> $b} BSD::Process::list) {
@@ -23,9 +33,7 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
         }
     );
     my $id = "$proc->{comm}($proc->{pid})";
-    my @out =
-        map { defined $proc->{$_} ? $proc->{$_} : '' }
-        @ARGV;
+    my @out = map {$proc->{$_}} @attr;
 
     if ($opt{n}) {
         my $keep = 0;
@@ -48,7 +56,7 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
 
 exit unless @line;
 
-my @header = ('process', @ARGV);
+my @header = ('process', @attr);
 for my $idx (0..$#header) {
     $width[$idx] = length($header[$idx])
         if $width[$idx] < length($header[$idx]);

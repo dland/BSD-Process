@@ -302,9 +302,11 @@ released 2006-mm-dd.
 
 =head1 DESCRIPTION
 
-C<BSD::Process> retrieves information about running
-processes from the BSD kernel and stores them in an object.
-Flag-type attributes are decoded in full.
+C<BSD::Process> renders the information the kernel maintains
+about current processes as Perl objects. These may then be
+queried, extracted and reported upon. This allows a more
+natural style of programming (as opposed to scraping the
+output of ps(1)).
 
 =head1 FUNCTIONS
 
@@ -459,9 +461,10 @@ object. You can use this to pretty-print an object:
 =item attr_len
 
 The problem with the above program is that on different platforms
-and versions, the length of the longest attribute might not be 11.
-In this case, one may employ C<attr_len> to obtain the length of
-the longest attribute name. The above program then becomes:
+and operating system versions, the length of the longest attribute
+might not be 11.  In this case, one may employ C<attr_len> to obtain
+the length of the longest attribute name. The above program then
+becomes:
 
   my $len = BSD::Process::attr_len;
   my $self = BSD::Process->new;
@@ -992,11 +995,19 @@ asking the system to return the information about a process.
 
 =head1 NOTES
 
+Currently, only FreeBSD version 6 is supported. Support for earlier
+versions of FreeBSD and versions of NetBSD and OpenBSD will be added
+in future versions.
+
 =head1 SEE ALSO
 
 =over 4
 
 =item L<BSD::Sysctl>
+
+Read and write kernel variables. With these two modules, there
+should be much less need for writing shell scripts that scrape
+the output of ps(1) and sysctl(8).
 
 =back
 
@@ -1004,6 +1015,10 @@ asking the system to return the information about a process.
 
 Process arguments are not handled (current attempts result in
 coredumps).
+
+Not all of the ps(1) keywords are implemented. At the worst,
+this (currently) means that you could not rewrite it in Perl.
+This may be addressed in a future release.
 
 Please report all bugs at
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BSD-Process|rt.cpan.org>

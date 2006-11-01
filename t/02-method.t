@@ -8,7 +8,9 @@ use Test::More;
 
 use BSD::Process;
 
-plan tests => 242 + BSD::Process::max_kernel_groups;
+plan tests => 242
+    + BSD::Process::max_kernel_groups
+    + scalar(BSD::Process::attr_alias);
 
 {
     my $pi = BSD::Process->new();   # implicit pid
@@ -264,6 +266,11 @@ plan tests => 242 + BSD::Process::max_kernel_groups;
 
     my $time = $pi->runtime;
     cmp_ok( $pi->refresh->runtime, '>', $time, 'refresh updates counters' );
+
+    $pe->refresh;
+    for my $method (BSD::Process::attr_alias) {
+        ok($pe->can($method), "can $method");
+    }
 }
 
 {

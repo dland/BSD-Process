@@ -8,7 +8,7 @@ use Test::More;
 
 use BSD::Process;
 
-plan tests => 150 + scalar(BSD::Process::attr);
+plan tests => 151 + scalar(BSD::Process::attr);
 
 my $info = BSD::Process::info();
 
@@ -155,6 +155,8 @@ for my $attr (@attribute) {
 is($max_len, BSD::Process::attr_len, 'length of longest attribute');
 is($exists, scalar(@attribute), "all lookups exist");
 is(scalar(grep {!/^_/} keys %$proc), 0, 'nothing left to look up');
+
+is(scalar(@attribuscalar(BSD::Process::attr_alias), 'attributes and aliases');
 
 my @all = BSD::Process::list();
 my $all_procs = @all;
