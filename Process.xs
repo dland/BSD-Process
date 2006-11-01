@@ -59,9 +59,6 @@ _list(int request, int param)
         case 0:
             kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
             break;
-        case 1:
-            kip = kvm_getprocs(kd, KERN_PROC_PID, param, &nr);
-            break;
         case 2:
             kip = kvm_getprocs(kd, KERN_PROC_PGRP, param, &nr);
             break;
