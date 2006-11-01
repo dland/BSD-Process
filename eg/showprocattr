@@ -4,7 +4,12 @@ use strict;
 use BSD::Process;
 use Getopt::Std;
 
-getopts( 'nr', \my %opt );
+use vars '$VERSION';
+$VERSION = '0.1';
+
+getopts( 'nrV', \my %opt );
+
+print "$VERSION\n" and exit if $opt{V};
 
 my @line;
 my @width = (0) x (1 + @ARGV);
@@ -51,3 +56,48 @@ my $fmt = join( ' ', map {'%' . -$_ . 's'} @width) . "\n";
 for my $ln (@line) {
     printf $fmt, @$ln;
 }
+
+=head1 NAME
+
+showprocattr - Show attributes of current processes
+
+=head1 SYNOPSIS
+
+B<showprocattr> [B<-nrv>] attr [...]
+
+=head1 DESCRIPTION
+
+Display one or more attributes for all processes currently running
+on the system.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n>
+
+Non-zero. Only display the process if all attributes are non-zero.
+
+=item B<-r>
+
+Resolve. Display uids and gids as names, rather than their numerical
+values.
+
+=item B<-V>
+
+Print the version of this program and exit.
+
+=back
+
+=head1 SEE ALSO
+
+L<BSD::Process>
+
+=head1 AUTHOR
+
+David Landgren, copyright (C) 2006. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.
