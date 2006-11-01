@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 216;
+use Test::More tests => 221;
 
 use BSD::Process;
 
@@ -243,4 +243,16 @@ use BSD::Process;
 
     my $time = $pi->runtime;
     cmp_ok( $pi->refresh->runtime, '>', $time, 'refresh updates counters' );
+}
+
+{
+    # check symbolic uids and gids
+    my $num = BSD::Process->new();
+    my $sym = BSD::Process->new( {resolve => 1} );
+
+    is( $num->uid,   scalar(getpwnam($sym->uid)),   'resolve uid' );
+    is( $num->ruid,  scalar(getpwnam($sym->ruid)),  'resolve ruid' );
+    is( $num->svuid, scalar(getpwnam($sym->svuid)), 'resolve svuid' );
+    is( $num->rgid,  scalar(getgrnam($sym->rgid)),  'resolve rgid' );
+    is( $num->svgid, scalar(getgrnam($sym->svgid)), 'resolve svgid' );
 }
