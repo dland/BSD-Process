@@ -139,6 +139,22 @@ BEGIN {
     for my $long (keys %alias) {
         *{$long} = *{$alias{$long}};
     }
+
+    sub attr {
+        return values(%alias);
+    }
+
+    sub attr_len {
+        my $len = 0;
+        for my $attr(values %alias) {
+            $len = length($attr) if $len < length($attr);
+        }
+        return $len;
+    }
+
+    sub attr_alias {
+        return keys(%alias);
+    }
 }
 
 XSLoader::load __PACKAGE__, $VERSION;
@@ -429,6 +445,33 @@ should be represented as symbolic names rather than numeric values.
   my @own = BSD::Process::all( uid => 1000 );
 
   my @session = BSD::Process::all( sid => 632, resolve => 1 );
+
+=item attr
+
+Returns the list of available attributes of a C<BSD::Process>
+object. You can use this to pretty-print an object:
+
+  my $self = BSD::Process->new;
+  for my $attr (BSD::Process::attr) {
+    printf "%11s %s\n", $attr, $self->{$attr};
+  }
+
+=item attr_len
+
+The problem with the above program is that on different platforms
+and versions, the length of the longest attribute might not be 11.
+In this case, one may employ C<attr_len> to obtain the length of
+the longest attribute name. The above program then becomes:
+
+  my $len = BSD::Process::attr_len;
+  my $self = BSD::Process->new;
+  for my $attr (BSD::Process::attr) {
+    printf "$*s %s\n", $len, $attr, $self->{$attr};
+  }
+
+=item attr_alias
+
+Returns the list of long aliases of the attributes.
 
 =item max_kernel_groups
 

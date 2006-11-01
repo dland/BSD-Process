@@ -4,9 +4,11 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 147;
+use Test::More;
 
 use BSD::Process;
+
+plan tests => 150 + scalar(BSD::Process::attr);
 
 my $info = BSD::Process::info();
 
@@ -132,6 +134,27 @@ is( scalar(@$grouplist), $ngroups, "... of the expected size" )
 # check for typos in hv_store calls in Process.xs
 is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
     or diag( 'leftover: ' . join( ',', keys %$info ));
+
+my @attribute = BSD::Process::attr;
+my $max_len = 0;
+my $proc    = BSD::Process::info();
+my $exists  = 0;
+for my $attr (@attribute) {
+    if ($max_len < length($attr)) {
+        $max_len = length($attr);
+    }
+    if (exists $proc->{$attr}) {
+        pass("lookup $attr");
+        delete $proc->{$attr};
+        ++$exists;
+    }
+    else {
+        fail("lookup $attr");
+    }
+}
+is($max_len, BSD::Process::attr_len, 'length of longest attribute');
+is($exists, scalar(@attribute), "all lookups exist");
+is(scalar(grep {!/^_/} keys %$proc), 0, 'nothing left to look up');
 
 my @all = BSD::Process::list();
 my $all_procs = @all;
