@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 4;
+use Test::More tests => 5;
 
 my $fixed = 'The scalar remains the same';
 $_ = $fixed;
@@ -12,12 +12,13 @@ $_ = $fixed;
 BEGIN { use_ok('BSD::Process'); }
 
 SKIP: {
-    skip( 'Test::Pod not installed on this system', 1 )
+    skip( 'Test::Pod not installed on this system', 2 )
         unless do {
             eval { require Test::Pod; import Test::Pod };
             $@ ? 0 : 1;
         };
     pod_file_ok( 'Process.pm' );
+    pod_file_ok( 'eg/showprocattr' );
 };
 
 SKIP: {
