@@ -45,7 +45,7 @@ BEGIN {
         time_last_swap           => 'swtime',
         elapsed_time             => 'runtime',
         start_time               => 'start',
-        children_time            => 'chiltime',
+        children_time            => 'childtime',
         nice_priority            => 'nice',
         old_command_name         => 'ocomm',
         command_name             => 'comm',

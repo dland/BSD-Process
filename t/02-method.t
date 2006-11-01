@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 23;
+use Test::More tests => 35;
 
 use BSD::Process;
 
@@ -32,6 +32,20 @@ use BSD::Process;
     is($pe->rgid,    $pe->{rgid},    'method rgid');
     is($pe->svgid,   $pe->{svgid},   'method svgid');
     is($pe->ngroups, $pe->{ngroups}, 'method ngroups');
+    is($pe->size,    $pe->{size},    'method size');
+    is($pe->rssize,  $pe->{rssize},  'method rssize');
+    is($pe->tsize,   $pe->{tsize},   'method tsize');
+    is($pe->dsize,   $pe->{dsize},   'method dsize');
+    is($pe->ssize,   $pe->{ssize},   'method ssize');
+    is($pe->xstat,   $pe->{xstat},   'method xstat');
+    is($pe->acflag,  $pe->{acflag},  'method acflag');
+    is($pe->pctcpu,  $pe->{pctcpu},  'method pctcpu');
+    is($pe->estcpu,  $pe->{estcpu},  'method estcpu');
+    is($pe->slptime, $pe->{slptime}, 'method slptime');
+    is($pe->swtime,  $pe->{swtime},  'method swtime');
+    is($pe->runtime, $pe->{runtime}, 'method runtime');
+    is($pe->xstat,   $pe->{xstat},   'method xstat');
+	is($pe->childtime, $pe->{childtime}, 'method childtime');
 
     # longhand method names
     is($pi->parent_pid,         $pi->ppid,  'alias parent_pid');
