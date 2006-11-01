@@ -61,6 +61,7 @@ _info(int pid)
         /* TODO: int pid should be pid_t pid */
         struct kinfo_proc ki;
         struct rusage *rp;
+        struct pargs  *pp;
         size_t len;
         HV *h;
 
@@ -80,10 +81,12 @@ _info(int pid)
         }
         h = (HV *)sv_2mortal((SV *)newHV());
         RETVAL = newRV((SV *)h);
+        pp = ki.ki_args;
+        /*warn( "argref = %ud\n",  pp->ar_ref );*/
         hv_store(h, "pid",             3, newSViv(ki.ki_pid), 0);
         hv_store(h, "ppid",            4, newSViv(ki.ki_ppid), 0);
         hv_store(h, "pgid",            4, newSViv(ki.ki_pgid), 0);
-        hv_store(h, "tpgid",           5, newSViv(ki.ki_tpgid), 0);
+        hv_store(h, "tpgid",           4, newSViv(ki.ki_tpgid), 0);
         hv_store(h, "sid",             3, newSViv(ki.ki_sid), 0);
         hv_store(h, "tsid",            4, newSViv(ki.ki_tsid), 0);
         hv_store(h, "jobc",            4, newSViv(ki.ki_jobc), 0);
