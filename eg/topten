@@ -7,8 +7,8 @@ use vars '$VERSION';
 $VERSION = '0.1';
 
 if ($ARGV[0] eq '-V') {
-	print $VERSION, $/;
-	exit;
+    print $VERSION, $/;
+    exit;
 }
 
 my $attr = shift || 'rssize';
@@ -17,10 +17,10 @@ my $want = shift || 10;
 my $all = BSD::Process::all;
 for my $pid (
     sort {
-		$all->{$b}{$attr} <=> $all->{$a}{$attr}
-			||
-		$all->{$a}{start} <=> $all->{$b}{start}
-	}
+        $all->{$b}{$attr} <=> $all->{$a}{$attr}
+            ||
+        $all->{$a}{start} <=> $all->{$b}{start}
+    }
     keys %$all
 ) {
     my $proc = $all->{$pid};
