@@ -37,6 +37,13 @@ MODULE = BSD::Process   PACKAGE = BSD::Process
 
 PROTOTYPES: ENABLE
 
+short
+max_kernel_groups()
+    CODE:
+        RETVAL = KI_NGROUPS;
+    OUTPUT:
+        RETVAL
+
 void
 list()
     PREINIT:
@@ -48,13 +55,34 @@ list()
     PPCODE:
         nlistf = memf = PATH_DEV_NULL;
         kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
-        if(kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr)) {
+        /*
+        switch(request) {
+        case 0:
+            kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
+            break;
+        case 1:
+            kip = kvm_getprocs(kd, KERN_PROC_PID, param, &nr);
+            break;
+        case 2:
+            kip = kvm_getprocs(kd, KERN_PROC_PGRP, param, &nr);
+            break;
+        case 3:
+            kip = kvm_getprocs(kd, KERN_PROC_SESSION, param, &nr);
+            break;
+        default:
+            proclist = KERN_PROC_ALL;
+            kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
+            break;
+        }
+        */
+        kip = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nr);
+        if (kip) {
             int p;
             for (p = 0; p < nr; ++kip, ++p)
                 mPUSHi(kip->ki_pid);
         }
         else {
-            warn("%s\n", kvm_geterr(kd));
+            warn("list() failed: %s\n", kvm_geterr(kd));
             XSRETURN_UNDEF;
         }
         XSRETURN(nr);
@@ -72,6 +100,8 @@ _info(int pid, int resolve)
         SV *argsv;
         struct passwd *pw;
         struct group *gr;
+        short g;
+        AV *grlist;
         struct rusage *rp;
         HV *h;
 
@@ -187,6 +217,18 @@ _info(int pid, int resolve)
                 hv_store(h, "svgid", 5, newSViv(ki.ki_svgid), 0);
             }
         }
+
+        # deal with groups array
+        grlist = (AV *)sv_2mortal((SV *)newAV());
+        for (g = 0; g < ki.ki_ngroups; ++g) {
+            if (resolve && (gr = getgrgid(ki.ki_groups[g]))) {
+                av_push(grlist, newSVpvn(gr->gr_name, strlen(gr->gr_name)));
+            }
+            else {
+                av_push(grlist, newSViv(ki.ki_groups[g]));
+            }
+        }
+        hv_store(h, "groups", 6, newRV((SV *)grlist), 0);
 
         hv_store(h, "ngroups",   7, newSViv(ki.ki_ngroups), 0);
         hv_store(h, "size",      4, newSViv(ki.ki_size), 0);

@@ -4,9 +4,11 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 221;
+use Test::More;
 
 use BSD::Process;
+
+plan tests => 231 + BSD::Process::max_kernel_groups;
 
 {
     my $pi = BSD::Process->new();   # implicit pid
@@ -15,8 +17,6 @@ use BSD::Process;
     is( $pi->{pid}, $pe->{pid}, 'attribute pid' );
     is( $pi->{sid}, $pe->{sid}, 'attribute sid' );
     is( $pi->{tsid}, $pe->{tsid}, 'attribute tsid' );
-
-    my $pid_save = $pe->pid; # will need to restore it for the refresh below
 
     is($pe->pid,         delete $pe->{pid},         'method pid' );
     is($pe->ppid,        delete $pe->{ppid},        'method ppid');
@@ -30,7 +30,8 @@ use BSD::Process;
     is($pe->svuid,       delete $pe->{svuid},       'method svuid');
     is($pe->rgid,        delete $pe->{rgid},        'method rgid');
     is($pe->svgid,       delete $pe->{svgid},       'method svgid');
-    is($pe->ngroups,     delete $pe->{ngroups},     'method ngroups');
+    my $ngroups;
+    is($pe->ngroups,     $ngroups = delete $pe->{ngroups}, 'method ngroups');
     is($pe->size,        delete $pe->{size},        'method size');
     is($pe->rssize,      delete $pe->{rssize},      'method rssize');
     is($pe->swrss,       delete $pe->{swrss},       'method swrss');
@@ -123,6 +124,13 @@ use BSD::Process;
     is($pe->nsignals_ch, delete $pe->{nsignals_ch}, 'method nsignals');
     is($pe->nvcsw_ch,    delete $pe->{nvcsw_ch},    'method nvcsw');
     is($pe->nivcsw_ch,   delete $pe->{nivcsw_ch},   'method nivcsw');
+
+    my $grouplist = $pe->groups;
+    delete $pe->{groups};
+    ok( defined($grouplist), 'method groups' );
+    is( ref($grouplist), 'ARRAY', q{... it's a list} );
+    is( scalar(@$grouplist), $ngroups, "... of the expected size" )
+        or diag("grouplist = (@$grouplist)");
 
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all methods have been accounted for' )
@@ -237,6 +245,13 @@ use BSD::Process;
     is($pe->voluntary_context_switch_ch,   delete $pe->{nvcsw_ch},    'alias voluntary_context_switch');
     is($pe->involuntary_context_switch_ch, delete $pe->{nivcsw_ch},   'alias involuntary_context_switch');
 
+    $grouplist = $pe->group_list;
+    delete $pe->{groups};
+    ok( defined($grouplist), 'alias group_list' );
+    is( ref($grouplist), 'ARRAY', q{... it's also a list} );
+    is( scalar(@$grouplist), $ngroups, "... also of the expected size" )
+        or diag("grouplist = (@$grouplist)");
+
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all aliases have been accounted for' )
         or diag( 'leftover: ' . join( ',', grep {!/^_/} keys %$pe ));
@@ -255,4 +270,20 @@ use BSD::Process;
     is( $num->svuid, scalar(getpwnam($sym->svuid)), 'resolve svuid' );
     is( $num->rgid,  scalar(getgrnam($sym->rgid)),  'resolve rgid' );
     is( $num->svgid, scalar(getgrnam($sym->svgid)), 'resolve svgid' );
+
+    my $num_grouplist = $num->groups;
+    my $sym_grouplist = $sym->group_list;
+
+    is( ref($num_grouplist), 'ARRAY', 'numeric grouplist is an ARRAY' );
+    is( ref($sym_grouplist), 'ARRAY', 'symbolic grouplist is an ARRAY' );
+
+    is( scalar(@$num_grouplist), scalar(@$sym_grouplist), 'groups counts' );
+    for my $gid (0..BSD::Process::max_kernel_groups) {
+        if ($gid < @$num_grouplist) {
+            is( $num_grouplist->[$gid],  scalar(getgrnam($sym_grouplist->[$gid])), "resolve group $gid" );
+        }
+        else {
+            pass( "resolve group $gid (undefined)" );
+        }
+    }
 }

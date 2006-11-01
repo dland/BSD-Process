@@ -33,6 +33,7 @@ BEGIN {
         real_group_id            => 'rgid',
         saved_effective_group_id => 'svgid',
         number_of_groups         => 'ngroups',
+        group_list               => 'groups',
         virtual_size             => 'size',
         resident_set_size        => 'rssize',
         rssize_before_swap       => 'swrss',
@@ -291,6 +292,13 @@ This routine runs more slowly than C<list()>, since it has
 to instantiate the process objects.
 
 NOT YET IMPLEMENTED.
+
+=item max_kernel_groups
+
+Returns the maximum number of groups to which a process may belong.
+This is probably not of direct importance to the average Perl
+programmer, but it makes the number of regression tests to be run
+easier to calculate in a cross-platform manner.
 
 =back
 
