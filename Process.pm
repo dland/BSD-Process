@@ -44,6 +44,11 @@ BEGIN {
         sleep_time               => 'slptime',
         time_last_swap           => 'swtime',
         elapsed_time             => 'runtime',
+        start_time               => 'start',
+        children_time            => 'chiltime',
+        nice_priority            => 'nice',
+        old_command_name         => 'ocomm',
+        command_name             => 'comm',
     );
 
     # make some shorthand accessors

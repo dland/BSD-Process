@@ -103,9 +103,24 @@ _info(int pid)
         hv_store(h, "slptime",         7, newSViv(ki.ki_slptime), 0);
         hv_store(h, "swtime",          6, newSViv(ki.ki_swtime), 0);
         hv_store(h, "runtime",         7, newSViv(ki.ki_runtime), 0);
-		/* ki_start starting time */
-		/* ki_childtime time used by children  */
-		/* ki_stat is a char */
+        hv_store(h, "start",           5,
+            newSVnv(
+                (double)ki.ki_start.tv_sec
+                + (double)ki.ki_start.tv_usec/1000000
+            ),
+            0
+        );
+        hv_store(h, "childtime",       9,
+            newSVnv(
+                (double)ki.ki_childtime.tv_sec
+                + (double)ki.ki_childtime.tv_usec/1000000
+            ),
+            0
+        );
+        /* ki_stat is a char */
+        hv_store(h, "nice",            4, newSViv(ki.ki_nice), 0);
+        hv_store(h, "ocomm",           5, newSVpv(ki.ki_ocomm, 0), 0);
+        hv_store(h, "comm",            4, newSVpv(ki.ki_comm, 0), 0);
 
     OUTPUT:
         RETVAL

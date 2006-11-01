@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 18;
+use Test::More tests => 23;
 
 use BSD::Process;
 
@@ -16,9 +16,8 @@ use BSD::Process;
     is( $pi->{sid}, $pe->{sid}, 'attribute sid' );
     is( $pi->{tsid}, $pe->{tsid}, 'attribute tsid' );
 
-    my $time = $pi->runtime;
-    $pi->refresh;
-    cmp_ok( $pi->runtime, '>', $time, 'burnt some CPU time' );
+    ok(defined($pe->{start}), 'attribute start (coalesced struct timeval)' );
+    ok(defined($pe->{childtime}), 'attribute childtime (coalesced struct timeval)');
 
     is($pe->pid,   $pe->{pid},   'method pid' );
     is($pe->ppid,  $pe->{ppid},  'method ppid');
@@ -36,5 +35,14 @@ use BSD::Process;
     # longhand method names
     is($pi->parent_pid,         $pi->ppid,  'alias parent_pid');
     is($pi->process_group_id,   $pi->pgid,  'alias process_group_id');
+
+    cmp_ok(length($pi->command_name), '>', 0, 'alias command_name');
+    cmp_ok(length($pi->old_command_name), '>', 0, 'alias old_command_name');
+
+    my $time = $pi->runtime;
+    $pi->refresh;
+    cmp_ok( $pi->runtime, '>', $time, 'burnt some CPU time' );
+
+    cmp_ok($pe->{start}, '<', time+1, 'method start');
 }
 
