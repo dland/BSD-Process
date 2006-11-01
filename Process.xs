@@ -90,7 +90,19 @@ _info(int pid)
         hv_store(h, "rgid",            4, newSVnv(ki.ki_rgid), 0);
         hv_store(h, "svgid",           5, newSVnv(ki.ki_svgid), 0);
         hv_store(h, "ngroups",         4, newSVnv(ki.ki_rgid), 0);
-        hv_store(h, "run_time",        8, newSVnv(ki.ki_runtime), 0);
+        hv_store(h, "size",            4, newSVnv(ki.ki_size), 0);
+        hv_store(h, "rssize",          6, newSVnv(ki.ki_rssize), 0);
+        hv_store(h, "swrss",           5, newSVnv(ki.ki_swrss), 0);
+        hv_store(h, "tsize",           5, newSVnv(ki.ki_tsize), 0);
+        hv_store(h, "dsize",           5, newSVnv(ki.ki_dsize), 0);
+        hv_store(h, "ssize",           5, newSVnv(ki.ki_ssize), 0);
+        hv_store(h, "xstat",           5, newSVnv(ki.ki_xstat), 0);
+        hv_store(h, "acflag",          6, newSVnv(ki.ki_acflag), 0);
+        hv_store(h, "pctcpu",          6, newSVnv(ki.ki_pctcpu), 0);
+        hv_store(h, "estcpu",          6, newSVnv(ki.ki_estcpu), 0);
+        hv_store(h, "slptime",         7, newSVnv(ki.ki_slptime), 0);
+        hv_store(h, "swtime",          6, newSVnv(ki.ki_swtime), 0);
+        hv_store(h, "runtime",         7, newSVnv(ki.ki_runtime), 0);
 
     OUTPUT:
         RETVAL

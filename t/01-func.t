@@ -18,6 +18,6 @@ use BSD::Process;
     my $info = BSD::Process::info($$);
     is($info->{pid}, $$, "system says my pid is the same ($$)");
     isnt($info->{pid}, $info->{ppid}, "I am not my parent");
-    cmp_ok($info->{run_time}, '>', 0, "runtime greater than one microsecond ($info->{run_time})");
+    cmp_ok($info->{runtime}, '>', 0, "runtime greater than one microsecond ($info->{run_time})");
 }
 
