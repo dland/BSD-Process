@@ -25,6 +25,8 @@
 
 #define PATH_DEV_NULL "/dev/null"
 
+#define TIME_FRAC(t) ( (double)(t).tv_sec + (double)(t).tv_usec/1000000 )
+
 static int proc_info_mib[4] = { -1, -1, -1, -1 };
 
 MODULE = BSD::Process   PACKAGE = BSD::Process
@@ -104,20 +106,8 @@ _info(int pid)
         hv_store(h, "slptime",         7, newSViv(ki.ki_slptime), 0);
         hv_store(h, "swtime",          6, newSViv(ki.ki_swtime), 0);
         hv_store(h, "runtime",         7, newSViv(ki.ki_runtime), 0);
-        hv_store(h, "start",           5,
-            newSVnv(
-                (double)ki.ki_start.tv_sec
-                + (double)ki.ki_start.tv_usec/1000000
-            ),
-            0
-        );
-        hv_store(h, "childtime",       9,
-            newSVnv(
-                (double)ki.ki_childtime.tv_sec
-                + (double)ki.ki_childtime.tv_usec/1000000
-            ),
-            0
-        );
+        hv_store(h, "start",           5, newSVnv(TIME_FRAC(ki.ki_start)), 0);
+        hv_store(h, "childtime",       9, newSVnv(TIME_FRAC(ki.ki_childtime)), 0);
         hv_store(h, "stat",            4, newSViv(ki.ki_stat), 0);
         hv_store(h, "nice",            4, newSViv(ki.ki_nice), 0);
         hv_store(h, "ocomm",           5, newSVpv(ki.ki_ocomm, 0), 0);
