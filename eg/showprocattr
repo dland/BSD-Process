@@ -7,9 +7,14 @@ use Getopt::Std;
 use vars '$VERSION';
 $VERSION = '0.1';
 
-getopts( 'nrV', \my %opt );
+getopts( 'nqrV', \my %opt );
 
 print "$VERSION\n" and exit if $opt{V};
+
+if ($opt{q}) {
+    print join(' ', sort(BSD::Process::attr())), $/;
+    exit;
+}
 
 my @attr;
 for my $attr (@ARGV) {
@@ -88,6 +93,10 @@ on the system.
 =item B<-n>
 
 Non-zero. Only display the process if all attributes are non-zero.
+
+=item B<-q>
+
+Query. Display all the reognised attribute names that may be examined.
 
 =item B<-r>
 
