@@ -5,6 +5,7 @@ Makefile.PL
 README
 Process.pm
 Process.xs
+eg/procinfo
 t/00-basic.t
 t/01-func.t
 t/02-method.t
