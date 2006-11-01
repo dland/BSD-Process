@@ -31,6 +31,7 @@ use BSD::Process;
     is($pe->svuid, $pe->{svuid}, 'method svuid');
     is($pe->rgid,  $pe->{rgid},  'method rgid');
     is($pe->svgid, $pe->{svgid}, 'method svgid');
+    is($pe->ngroups, $pe->{ngroups}, 'method ngroups');
 
     # longhand method names
     is($pi->parent_pid,         $pi->ppid,  'alias parent_pid');
