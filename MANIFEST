@@ -5,6 +5,7 @@ Makefile.PL
 README
 Process.pm
 Process.xs
+TODO
 eg/procinfo
 eg/showprocattr
 t/00-basic.t
