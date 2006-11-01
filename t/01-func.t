@@ -33,7 +33,7 @@ use BSD::Process;
 
     delete @{$info}{qw(pid ppid runtime dsize ssize tsize size rssize)};
     for (sort keys %$info) {
-        diag( "$_: $info->{$_}\n" );
+        # diag( "$_: $info->{$_}\n" );
     }
 }
 

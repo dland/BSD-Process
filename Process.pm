@@ -18,6 +18,30 @@ $VERSION = '0.01';
 
 XSLoader::load __PACKAGE__, $VERSION;
 
+sub new {
+    my $class = shift;
+    my $pid = shift;
+    $pid = $$ unless defined $pid;
+    my $self = {
+        _pid  => $pid
+    };
+    my $info = _info($self->{_pid});
+    @{$self}{keys %$info} = values %$info;
+
+    return bless $self, $class;
+}
+
+sub refresh {
+    my $self = shift;
+    my $info = _info($self->{_pid});
+    @{$self}{keys %$info} = values %$info;
+    return $self;
+}
+
+sub info {
+    return _info(0+$_[0]);
+}
+
 =head1 NAME
 
 BSD::Process - Retrieve information about running processes
@@ -39,9 +63,15 @@ encapsulated in a C<BSD::Process> object. The data may be
 access via accessors, or through the underlying hash is speed is
 of the essence.
 
-=head1 METHODS
+=head1 FUNCTIONS
 
 =over 8
+
+=item info
+
+Returns the process information specified by a pid. A numeric value
+is expected. If garbage is passed, the process information of process
+0 will be returned.
 
 =item list
 
@@ -58,8 +88,8 @@ have to call it by its fully-qualified name.
 
   my @pid = BSD::Process::list;
   for my $p (@pid) {
-    # print each pid and its parent pid
-    print "$p ", BSD::Process->new($p)->ppid, $/;
+    my $proc =  BSD::Process::info($p);
+    print "$p $proc->{ppid}\n"; # print each pid and its parent pid
   }
 
 =item all
@@ -79,6 +109,12 @@ to instantiate the process objects.
 
 NOT YET IMPLEMENTED.
 
+=back
+
+=head1 METHODS
+
+=over 8
+
 =item new
 
 Creates a new C<BSD::Process> object. A valid pid of a
@@ -95,30 +131,19 @@ effect on the running process.
 
   my $init = BSD::Process(1); # get info about init
 
-=cut
+=item refresh
 
-sub new {
-    my $class = shift;
-    my $pid = shift;
-    $pid = $$ unless defined $pid;
-    return bless {
-        _pid  => $pid,
-        _info => _info($pid),
-    },
-    $class;
-}
+Refreshes the information of a C<BSD::Process> object. For
+instance, the following snippet shows a very accurate way
+of measuring elapsed CPU time:
 
-=item info
+  my $proc  = BSD::Process->new;
+  my $begin = $proc->runtime; # microseconds
+  lengthy_calculation();
 
-Returns the process information specified by a pid. A numeric value
-is expected. If garbage is passed, the process information of process
-0 will be returned.
-
-=cut
-
-sub info {
-	return _info(0+$_[0]);
-}
+  $proc->refresh;
+  my $elapsed = $proc->runtime - $begin;
+  print "that took $elapsed microseconds of CPU time\n";
 
 =back
 
@@ -173,3 +198,4 @@ it under the same terms as Perl itself.
 =cut
 
 'The Lusty Decadent Delights of Imperial Pompeii';
+

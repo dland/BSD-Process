@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use BSD::Process;
 
@@ -15,5 +15,9 @@ use BSD::Process;
     is( $pi->{pid}, $pe->{pid}, 'attribute pid' );
     is( $pi->{sid}, $pe->{sid}, 'attribute sid' );
     is( $pi->{tsid}, $pe->{tsid}, 'attribute tsid' );
+
+    my $time = $pi->{runtime};
+    $pi->refresh;
+    cmp_ok( $pi->{runtime}, '>', $time, 'burnt some CPU time' );
 }
 
