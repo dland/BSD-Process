@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 35;
+use Test::More tests => 55;
 
 use BSD::Process;
 
@@ -45,17 +45,31 @@ use BSD::Process;
     is($pe->swtime,    $pe->{swtime},    'method swtime');
     is($pe->runtime,   $pe->{runtime},   'method runtime');
     is($pe->xstat,     $pe->{xstat},     'method xstat');
-	is($pe->childtime, $pe->{childtime}, 'method childtime');
+    is($pe->childtime, $pe->{childtime}, 'method childtime');
     is($pe->nice,      $pe->{nice},      'method nice');
+    is($pe->stat,      $pe->{stat},      'method stat');
     is($pe->ocomm,     $pe->{ocomm},     'method ocomm');
     is($pe->comm,      $pe->{comm},      'method comm');
+    is($pe->wmesg,     $pe->{wmesg},     'method wmesg');
+    is($pe->login,     $pe->{login},     'method login');
+    is($pe->jid,       $pe->{jid},       'method jid');
+    is($pe->numthreads, $pe->{numthreads}, 'method numthreads');
+    is($pe->pri_class,  $pe->{pri_class},  'method pri_class');
+    is($pe->pri_level,  $pe->{pri_level},  'method pri_level');
+    is($pe->pri_native, $pe->{pri_native}, 'method pri_native');
+    is($pe->pri_user,   $pe->{pri_user},   'method pri_user');
+    is($pe->utime,      $pe->{utime},      'method utime');
+    is($pe->stime,      $pe->{stime},      'method stime');
 
     # longhand method names
-    is($pi->parent_pid,         $pi->ppid,  'alias parent_pid');
-    is($pi->process_group_id,   $pi->pgid,  'alias process_group_id');
+    is($pi->parent_pid,       $pi->ppid, 'alias parent_pid');
+    is($pi->process_group_id, $pi->pgid, 'alias process_group_id');
+    is($pi->number_of_threads,        1, 'alias number_of_threads');
 
-    cmp_ok(length($pi->command_name), '>', 0, 'alias command_name');
+    cmp_ok(length($pi->command_name),     '>', 0, 'alias command_name');
     cmp_ok(length($pi->old_command_name), '>', 0, 'alias old_command_name');
+    cmp_ok(length($pi->setlogin_name),    '>', 0, 'alias setlogin_name');
+    ok(defined($pi->wchan_message), 'alias wchan_message');
 
     my $time = $pi->runtime;
     $pi->refresh;

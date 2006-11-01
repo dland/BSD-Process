@@ -46,9 +46,20 @@ BEGIN {
         elapsed_time             => 'runtime',
         start_time               => 'start',
         children_time            => 'childtime',
+        status                   => 'stat',
         nice_priority            => 'nice',
         old_command_name         => 'ocomm',
         command_name             => 'comm',
+        wchan_message            => 'wmesg',
+        setlogin_name            => 'login',
+        process_jail_id          => 'jid',
+        number_of_threads        => 'numthreads',
+        priority_scheduling_class => 'pri_class',
+        priority_level            => 'pri_level',
+        priority_native           => 'pri_native',
+        priority_user             => 'pri_user',
+		user_time                 => 'utime',
+		system_time               => 'stime',
     );
 
     # make some shorthand accessors

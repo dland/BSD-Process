@@ -58,6 +58,7 @@ _info(int pid)
     PREINIT:
         /* TODO: int pid should be pid_t pid */
         struct kinfo_proc ki;
+        struct rusage *rp;
         size_t len;
         HV *h;
 
@@ -117,10 +118,33 @@ _info(int pid)
             ),
             0
         );
-        /* ki_stat is a char */
+        hv_store(h, "stat",            4, newSViv(ki.ki_stat), 0);
         hv_store(h, "nice",            4, newSViv(ki.ki_nice), 0);
         hv_store(h, "ocomm",           5, newSVpv(ki.ki_ocomm, 0), 0);
         hv_store(h, "comm",            4, newSVpv(ki.ki_comm, 0), 0);
+        hv_store(h, "wmesg",           5, newSVpv(ki.ki_wmesg, 0), 0);
+        hv_store(h, "login",           5, newSVpv(ki.ki_login, 0), 0);
+        hv_store(h, "jid",             3, newSViv(ki.ki_jid), 0);
+        hv_store(h, "numthreads",     10, newSViv(ki.ki_numthreads), 0);
+        hv_store(h, "pri_class",       9, newSViv(ki.ki_pri.pri_class), 0);
+        hv_store(h, "pri_level",       9, newSViv(ki.ki_pri.pri_level), 0);
+        hv_store(h, "pri_native",     10, newSViv(ki.ki_pri.pri_native), 0);
+        hv_store(h, "pri_user",        8, newSViv(ki.ki_pri.pri_user), 0);
 
+        rp = &ki.ki_rusage;
+        hv_store(h, "utime",           5,
+            newSVnv(
+                (double)rp->ru_utime.tv_sec
+                + (double)rp->ru_utime.tv_usec/1000000
+            ),
+            0
+        );
+        hv_store(h, "stime",           5,
+            newSVnv(
+                (double)rp->ru_stime.tv_sec
+                + (double)rp->ru_stime.tv_usec/1000000
+            ),
+            0
+        );
     OUTPUT:
         RETVAL
