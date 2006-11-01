@@ -189,6 +189,22 @@ sub list {
         $request = 6;
         $param   = $arg{real_user_id};
     }
+    elsif (exists $arg{gid}) {
+        $request = 11;
+        $param   = $arg{gid};
+    }
+    elsif (exists $arg{effective_group_id}) {
+        $request = 11;
+        $param   = $arg{effective_group_id};
+    }
+    elsif (exists $arg{rgid}) {
+        $request = 10;
+        $param   = $arg{rgid};
+    }
+    elsif (exists $arg{real_group_id}) {
+        $request = 10;
+        $param   = $arg{real_group_id};
+    }
     elsif (exists $arg{pgid}) {
         $request = 2;
         $param   = $arg{pgid};

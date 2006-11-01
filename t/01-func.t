@@ -4,7 +4,7 @@
 # Copyright (C) 2006 David Landgren
 
 use strict;
-use Test::More tests => 125;
+use Test::More tests => 131;
 
 use BSD::Process;
 
@@ -180,6 +180,50 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
     cmp_ok( scalar(@proc), '<',  $all_procs, "ruid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_ruid, "ruid $bigger smaller or equal to ruid $biggest" );
 }
+
+# processes owned by a gid
+{
+    # count the processes owned by each effective gid
+	# kinfo_proc lacks a gid field, so we'll punt with a real gid
+    my %gid;
+    for my $pid (@all) {
+        my $proc = BSD::Process->new($pid);
+        $gid{$proc->{rgid}}++;
+    }
+
+    # now find the gids that own the most processes
+    my ($biggest, $bigger) = (sort {$gid{$b} <=> $gid{$a} || $a <=> $b} keys %gid )[0,1];
+
+    my @proc = BSD::Process::list( gid => $biggest );
+    cmp_ok( scalar(@proc), '<', $all_procs, "gid $biggest smaller than count of all processes" );
+
+    my $biggest_gid = @proc;
+    @proc = BSD::Process::list( effective_group_id => $bigger );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "gid $bigger smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<=', $biggest_gid, "gid $bigger smaller or equal to gid $biggest" );
+}
+
+# processes owned by a rgid
+{
+    # count the processes owned by each real gid
+    my %rgid;
+    for my $pid (@all) {
+        my $proc = BSD::Process->new($pid);
+        $rgid{$proc->{rgid}}++;
+    }
+
+    # now find the gids that own the most processes
+    my ($biggest, $bigger) = (sort {$rgid{$b} <=> $rgid{$a} || $a <=> $b} keys %rgid )[0,1];
+
+    my @proc = BSD::Process::list( rgid => $biggest );
+    cmp_ok( scalar(@proc), '<', $all_procs, "rgid $biggest smaller than count of all processes" );
+
+    my $biggest_rgid = @proc;
+    @proc = BSD::Process::list( real_group_id => $bigger );
+    cmp_ok( scalar(@proc), '<',  $all_procs, "rgid $bigger smaller than count of all processes" );
+    cmp_ok( scalar(@proc), '<=', $biggest_rgid, "rgid $bigger smaller or equal to rgid $biggest" );
+}
+
 
 # process groups
 {
