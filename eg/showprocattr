@@ -7,12 +7,32 @@ use Getopt::Std;
 use vars '$VERSION';
 $VERSION = '0.2';
 
-getopts( 'nqrV', \my %opt );
+getopts( 'anqrV', \my %opt );
 
 print "$VERSION\n" and exit if $opt{V};
 
 if ($opt{q}) {
-    print join(' ', sort(BSD::Process::attr())), $/;
+    print "$_\n" for sort(BSD::Process::attr());
+    exit;
+}
+elsif ($opt{a}) {
+    my $len  = BSD::Process::attr_len;
+    for my $pid (@ARGV) {
+        $pid = $$ if $pid eq 'self';
+        my $proc = BSD::Process->new(
+            $pid,
+            {
+                resolve => exists($opt{r}) ? 1 : 0,
+            }
+        );
+        next unless defined $proc;
+
+        print "$pid\n" if @ARGV > 1;
+        for my $attr (sort (BSD::Process::attr())) {
+            next if $opt{n} and $proc->{$attr} =~ /^\d+$/ and $proc->{$attr} == 0;
+            printf "%*s %s\n", $len, $attr, $proc->{$attr};
+        }
+    }
     exit;
 }
 
@@ -81,7 +101,9 @@ showprocattr - Show attributes of current processes
 
 =head1 SYNOPSIS
 
-B<showprocattr> [B<-nrv>] attr [...]
+B<showprocattr> [B<-nrV>] attr [...]
+
+B<showprocattr> B<-a> [B<-nr>] pid (or 'self') [...]
 
 =head1 DESCRIPTION
 
@@ -92,9 +114,15 @@ on the system.
 
 =over 4
 
+=item B<-a>
+
+All. Show all attributes of a specified pid. The magic label 'self'
+corresponds to the running process (hence, your perl interpreter).
+
 =item B<-n>
 
-Non-zero. Only display the process if all attributes are non-zero.
+Non-zero. Only display the process if all requested attributes are non-zero.
+When B<-a> is also active, will suppress attributes whose values are zero.
 
 =item B<-q>
 
