@@ -361,6 +361,9 @@ queried, extracted and reported upon. This allows a more
 natural style of programming (as opposed to scraping the
 output of ps(1)).
 
+The information is retrieved via the C<kvm> subsystem, not
+the F</proc> filesystem.
+
 =head1 FUNCTIONS
 
 =over 4
@@ -1061,6 +1064,26 @@ added in future versions.
 Read and write kernel variables. With these two modules, there
 should be much less need for writing shell scripts that scrape
 the output of ps(1) and sysctl(8).
+
+=item L<Proc::ProcessTable>
+
+Seems to be a fairly wide cross-platform module. Goes into
+a fair amount of depth, but not as much as C<BSD::Process>
+does in its own particular niche. Also, FreeBSD has moved
+away from the F</proc> filesystem.
+
+Definitely the module to use if you need to go
+multi-platform.
+
+=item L<Solaris::Procfs>
+
+Information about processes on the Solaris platform. The
+documentation indicates that it is not finished, however,
+it does not appear to have been updated since 2003.
+
+=item L<Win32::Process::Info>
+
+Information about current processes on the Win32 platform.
 
 =back
 
