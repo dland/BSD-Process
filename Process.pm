@@ -47,15 +47,10 @@ BEGIN {
         command_name             => 'comm',
     );
 
-    my %alias_FreeBSD_6 = (
+    my %alias_FreeBSD_5 = (
+        %alias_FreeBSD_4,
         process_args             => 'args',
-        process_pid              => 'pid',
-        parent_pid               => 'ppid',
-        process_group_id         => 'pgid',
-        tty_process_group_id     => 'tpgid',
-        process_session_id       => 'sid',
         terminal_session_id      => 'tsid',
-        job_control_counter      => 'jobc',
         effective_user_id        => 'uid',
         real_user_id             => 'ruid',
         saved_effective_user_id  => 'svuid',
@@ -64,21 +59,10 @@ BEGIN {
         number_of_groups         => 'ngroups',
         group_list               => 'groups',
         virtual_size             => 'size',
-        resident_set_size        => 'rssize',
-        rssize_before_swap       => 'swrss',
-        text_size                => 'tsize',
         data_size                => 'dsize',
         stack_size               => 'ssize',
-        exit_status              => 'xstat',
-        accounting_flags         => 'acflag',
-        percent_cpu              => 'pctcpu',
-        estimated_cpu            => 'estcpu',
-        sleep_time               => 'slptime',
-        time_last_swap           => 'swtime',
-        elapsed_time             => 'runtime',
         start_time               => 'start',
         children_time            => 'childtime',
-        process_flags            => 'flag',
         posix_advisory_lock      => 'advlock',
         has_controlling_terminal => 'controlt',
         is_kernel_thread         => 'kthread',
@@ -86,7 +70,6 @@ BEGIN {
         parent_waiting           => 'ppwait',
         started_profiling        => 'profil',
         stopped_profiling        => 'stopprof',
-        process_had_threads      => 'hadthreads',
         id_privs_set             => 'sugid',
         system_process           => 'system',
         single_exit_not_wait     => 'single_exit',
@@ -106,19 +89,8 @@ BEGIN {
         is_a_zombie              => 'stat_5',
         is_waiting_on_intr       => 'stat_6',
         is_blocked               => 'stat_7',
-        nice_priority            => 'nice',
-        process_lock_count       => 'lock',
-        run_queue_index          => 'rqindex',
-        current_cpu              => 'oncpu',
-        last_cpu                 => 'lastcpu',
         old_command_name         => 'ocomm',
-        wchan_message            => 'wmesg',
-        setlogin_name            => 'login',
         name_of_lock             => 'lockname',
-        command_name             => 'comm',
-        emulation_name           => 'emul',
-        process_jail_id          => 'jid',
-        number_of_threads        => 'numthreads',
         priority_scheduling_class => 'pri_class',
         priority_level            => 'pri_level',
         priority_native           => 'pri_native',
@@ -140,6 +112,15 @@ BEGIN {
         signals_received          => 'nsignals',
         voluntary_context_switch   => 'nvcsw',
         involuntary_context_switch => 'nivcsw',
+    );
+
+    my %alias_FreeBSD_6 = (
+        %alias_FreeBSD_4,
+        %alias_FreeBSD_5,
+        process_had_threads      => 'hadthreads',
+        emulation_name           => 'emul',
+        process_jail_id          => 'jid',
+        number_of_threads        => 'numthreads',
         user_time_ch               => 'utime_ch',
         system_time_ch             => 'stime_ch',
         total_time_ch              => 'time_ch',
@@ -167,6 +148,9 @@ BEGIN {
         if ($osrelease =~ /^4/) {
             $alias = \%alias_FreeBSD_4;
         }
+        elsif ($osrelease =~ /^5/) {
+            $alias = \%alias_FreeBSD_5;
+        }
         else {
             $alias = \%alias_FreeBSD_6;
         }
@@ -177,6 +161,9 @@ BEGIN {
             use Config;
             if ($Config{osvers} =~ /^4/) {
                 $alias = \%alias_FreeBSD_4;
+            }
+            elsif ($Config{osvers} =~ /^5/) {
+                $alias = \%alias_FreeBSD_5;
             }
             else {
                 $alias = \%alias_FreeBSD_6;

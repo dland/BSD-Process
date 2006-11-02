@@ -49,7 +49,7 @@ struct kinfo_proc *_proc_request (kvm_t *kd, int request, int param, int *pnr) {
     case 6:
         kip = kvm_getprocs(kd, KERN_PROC_RUID, param, pnr);
         break;
-#if __FreeBSD_version >= 500000
+#if __FreeBSD_version >= 600000
     case 10:
         kip = kvm_getprocs(kd, KERN_PROC_RGID, param, pnr);
         break;
@@ -115,7 +115,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "acflag",  6, newSViv(kp->kp_proc.p_acflag), 0);
 #endif
 
-#if __FreeBSD_version >= 600000
+#if __FreeBSD_version >= 500000
     nlistf = memf = PATH_DEV_NULL;
     kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
     argv = kvm_getargv(kd, kp, 0);
@@ -252,7 +252,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "ppwait",       6, newSViv(P_FLAG(P_PPWAIT), 0);
     hv_store(h, "profil",       6, newSViv(P_FLAG(P_PROFIL), 0);
     hv_store(h, "stopprof",     8, newSViv(P_FLAG(P_STOPPROF), 0);
-    hv_store(h, "hadthreads",  10, newSViv(P_FLAG(P_HADTHREADS), 0);
     hv_store(h, "sugid",        5, newSViv(P_FLAG(P_SUGID), 0);
     hv_store(h, "system",       6, newSViv(P_FLAG(P_SYSTEM), 0);
     hv_store(h, "single_exit", 11, newSViv(P_FLAG(P_SINGLE_EXIT), 0);
@@ -284,9 +283,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "login",       5, newSVpv(kp->ki_login, 0), 0);
     hv_store(h, "lockname",    8, newSVpv(kp->ki_lockname, 0), 0);
     hv_store(h, "comm",        4, newSVpv(kp->ki_comm, 0), 0);
-    hv_store(h, "emul",        4, newSVpv(kp->ki_emul, 0), 0);
-    hv_store(h, "jid",         3, newSViv(kp->ki_jid), 0);
-    hv_store(h, "numthreads", 10, newSViv(kp->ki_numthreads), 0);
 
     hv_store(h, "pri_class",   9, newSViv(kp->ki_pri.pri_class), 0);
     hv_store(h, "pri_level",   9, newSViv(kp->ki_pri.pri_level), 0);
@@ -313,6 +309,13 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "nvcsw",    5, newSViv(rp->ru_nvcsw), 0);
     hv_store(h, "nivcsw",   6, newSViv(rp->ru_nivcsw), 0);
 
+#if __FreeBSD_version >= 600000
+    hv_store(h, "hadthreads",  10, newSViv(P_FLAG(P_HADTHREADS), 0);
+
+    hv_store(h, "emul",        4, newSVpv(kp->ki_emul, 0), 0);
+    hv_store(h, "jid",         3, newSViv(kp->ki_jid), 0);
+    hv_store(h, "numthreads", 10, newSViv(kp->ki_numthreads), 0);
+
     rp = &kp->ki_rusage_ch;
     hv_store(h, "utime_ch",    3+5, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
     hv_store(h, "stime_ch",    3+5, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
@@ -332,6 +335,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "nsignals_ch", 3+8, newSViv(rp->ru_nsignals), 0);
     hv_store(h, "nvcsw_ch",    3+5, newSViv(rp->ru_nvcsw), 0);
     hv_store(h, "nivcsw_ch",   3+6, newSViv(rp->ru_nivcsw), 0);
+#endif
 #endif
 
     return h;
