@@ -525,7 +525,7 @@ becomes:
   my $len = BSD::Process::attr_len;
   my $self = BSD::Process->new;
   for my $attr (BSD::Process::attr) {
-    printf "$*s %s\n", $len, $attr, $self->{$attr};
+    printf "%*s %s\n", $len, $attr, $self->{$attr};
   }
 
 =item attr_alias
