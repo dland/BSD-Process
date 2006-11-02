@@ -10,6 +10,7 @@ use BSD::Process;
 
 use Config;
 my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
+my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
 
 plan tests => 151 + scalar(BSD::Process::attr);
 
@@ -43,7 +44,7 @@ ok( defined( delete $info->{login} ), 'attribute login');
 ok( defined( delete $info->{comm} ), 'attribute comm');
 
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 84 )
+    skip( "not supported on FreeBSD 4.x", 65 )
         if $RUNNING_ON_FREEBSD_4;
 ok( defined( delete $info->{args} ), 'attribute args');
 ok( defined( delete $info->{tsid} ), 'attribute tsid');
@@ -56,6 +57,7 @@ my $ngroups;
 ok( defined( $ngroups = delete $info->{ngroups} ), 'attribute ngroups');
 ok( defined( delete $info->{size} ), 'attribute size');
 ok( defined( delete $info->{dsize} ), 'attribute dsize');
+# 10
 ok( defined( delete $info->{ssize} ), 'attribute ssize');
 ok( defined( delete $info->{start} ), 'attribute start');
 ok( defined( delete $info->{childtime} ), 'attribute childtime');
@@ -66,7 +68,7 @@ ok( defined( delete $info->{noload} ), 'attribute noload');
 ok( defined( delete $info->{ppwait} ), 'attribute ppwait');
 ok( defined( delete $info->{profil} ), 'attribute profil');
 ok( defined( delete $info->{stopprof} ), 'attribute stopprof');
-ok( defined( delete $info->{hadthreads} ), 'attribute hadthreads');
+# 20
 ok( defined( delete $info->{sugid} ), 'attribute sugid');
 ok( defined( delete $info->{system} ), 'attribute system');
 ok( defined( delete $info->{single_exit} ), 'attribute single_exit');
@@ -77,6 +79,7 @@ ok( defined( delete $info->{exec} ), 'attribute exec');
 ok( defined( delete $info->{kiflag} ), 'attribute kiflag');
 ok( defined( delete $info->{locked} ), 'attribute locked');
 ok( defined( delete $info->{isctty} ), 'attribute isctty');
+# 30
 ok( defined( delete $info->{issleader} ), 'attribute issleader');
 ok( defined( delete $info->{stat} ), 'attribute stat');
 ok( defined( delete $info->{stat_1} ), 'attribute stat_1');
@@ -87,10 +90,8 @@ ok( defined( delete $info->{stat_5} ), 'attribute stat_5');
 ok( defined( delete $info->{stat_6} ), 'attribute stat_6');
 ok( defined( delete $info->{stat_7} ), 'attribute stat_7');
 ok( defined( delete $info->{ocomm} ), 'attribute ocomm');
+# 40
 ok( defined( delete $info->{lockname} ), 'attribute lockname');
-ok( defined( delete $info->{emul} ), 'attribute emul');
-ok( defined( delete $info->{jid} ), 'attribute jid');
-ok( defined( delete $info->{numthreads} ), 'attribute numthreads');
 ok( defined( delete $info->{pri_class} ), 'attribute pri_class');
 ok( defined( delete $info->{pri_level} ), 'attribute pri_level');
 ok( defined( delete $info->{pri_native} ), 'attribute pri_native');
@@ -100,6 +101,7 @@ ok( defined( delete $info->{stime} ), 'attribute stime');
 ok( defined( delete $info->{time} ), 'attribute time (utime+stime)');
 ok( defined( delete $info->{maxrss} ), 'attribute maxrss');
 ok( defined( delete $info->{ixrss} ), 'attribute ixrss');
+# 50
 ok( defined( delete $info->{idrss} ), 'attribute idrss');
 ok( defined( delete $info->{isrss} ), 'attribute isrss');
 ok( defined( delete $info->{minflt} ), 'attribute minflt');
@@ -110,8 +112,17 @@ ok( defined( delete $info->{oublock} ), 'attribute oublock');
 ok( defined( delete $info->{msgsnd} ), 'attribute msgsnd');
 ok( defined( delete $info->{msgrcv} ), 'attribute msgrcv');
 ok( defined( delete $info->{nsignals} ), 'attribute nsignals');
+# 60
 ok( defined( delete $info->{nvcsw} ), 'attribute nvcsw');
 ok( defined( delete $info->{nivcsw} ), 'attribute nivcsw');
+
+SKIP: {
+    skip( "not supported on FreeBSD 5.x", 21 )
+        if $RUNNING_ON_FREEBSD_5;
+ok( defined( delete $info->{hadthreads} ), 'attribute hadthreads');
+ok( defined( delete $info->{emul} ), 'attribute emul');
+ok( defined( delete $info->{jid} ), 'attribute jid');
+ok( defined( delete $info->{numthreads} ), 'attribute numthreads');
 ok( defined( delete $info->{utime_ch} ), 'attribute utime_ch');
 ok( defined( delete $info->{stime_ch} ), 'attribute stime_ch');
 ok( defined( delete $info->{time_ch} ), 'attribute time_ch (utime_ch+stime_ch)');
@@ -129,6 +140,7 @@ ok( defined( delete $info->{msgrcv_ch} ), 'attribute msgrcv_ch');
 ok( defined( delete $info->{nsignals_ch} ), 'attribute nsignals_ch');
 ok( defined( delete $info->{nvcsw_ch} ), 'attribute nvcsw_ch');
 ok( defined( delete $info->{nivcsw_ch} ), 'attribute nivcsw_ch');
+}
 
 # attribute returning non-scalars
 
@@ -179,7 +191,12 @@ SKIP: {
     my %uid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-        $uid{$proc->{uid}}++;
+	if ($proc) {
+            $uid{$proc->{uid}}++;
+        }
+        else {
+            diag( "new() failed for pid $pid" );
+        }
     }
 
     # now find the uids that own the most processes
@@ -208,7 +225,7 @@ SKIP: {
 
 # processes owned by a ruid
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 4 )
+    skip( "not supported on FreeBSD 4.x", 5 )
         if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each real uid
     my %ruid;
@@ -247,8 +264,8 @@ SKIP: {
 
 # processes owned by an effective gid
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 4 )
-        if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x or 5.x", 3 )
+        if $RUNNING_ON_FREEBSD_4 or $RUNNING_ON_FREEBSD_5;
     # count the processes owned by each effective gid
     # kinfo_proc lacks a gid field, so we'll punt with a real gid
     my %gid;
@@ -271,8 +288,8 @@ SKIP: {
 
 # processes owned by a rgid
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 4 )
-        if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x or 5.x", 3 )
+        if $RUNNING_ON_FREEBSD_4 or $RUNNING_ON_FREEBSD_5;
     # count the processes owned by each real gid
     my %rgid;
     for my $pid (@all) {
@@ -294,7 +311,7 @@ SKIP: {
 
 # process groups
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 4 )
+    skip( "not supported on FreeBSD 4.x", 3 )
         if $RUNNING_ON_FREEBSD_4;
     # count the processes in each process group
     my %pgid;
@@ -392,8 +409,8 @@ SKIP: {
 }
 
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 2 )
-        if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x or 5.x", 2 )
+        if $RUNNING_ON_FREEBSD_4 or $RUNNING_ON_FREEBSD_5;
 
     my $wheel_gid = getgrnam('wheel');
     {
