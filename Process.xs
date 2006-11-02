@@ -118,9 +118,15 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
 #if __FreeBSD_version >= 500000
     nlistf = memf = PATH_DEV_NULL;
     kd = kvm_openfiles(nlistf, memf, NULL, O_RDONLY, errbuf);
-    argv = kvm_getargv(kd, kp, 0);
+    if (!kd) {
+        warn( "kvm_openfiles failed: %s\n", errbuf );
+        argv = 0;
+    }
+    else {
+        argv = kvm_getargv(kd, kp, 0);
+    }
 
-    if( *argv ) {
+    if( argv && *argv ) {
 #ifdef NEVER
         len = strlen(*argv);
         argsv = newSVpvn(*argv, len);
@@ -137,7 +143,9 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     else {
         hv_store(h, "args", 4, newSVpvn("", 0), 0);
     }
-    kvm_close(kd);
+    if (kd) {
+        kvm_close(kd);
+    }
 
     hv_store(h, "pid",   3, newSViv(kp->ki_pid), 0);
     hv_store(h, "ppid",  4, newSViv(kp->ki_ppid), 0);
