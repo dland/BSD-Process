@@ -10,6 +10,7 @@ use BSD::Process;
 
 use Config;
 my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
+my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
 
 plan tests => 242
     + BSD::Process::max_kernel_groups
@@ -50,9 +51,9 @@ plan tests => 242
     is($pe->comm,        delete $pe->{comm},        'method comm');
 
     my $ngroups;
-	SKIP: {
-		skip( "not supported on FreeBSD 4.x", 86 )
-			if $RUNNING_ON_FREEBSD_4;
+    SKIP: {
+        skip( "not supported on FreeBSD 4.x", 86 )
+            if $RUNNING_ON_FREEBSD_4;
 
     is($pe->args,        delete $pe->{args},        'method args' );
     is($pe->tsid,        delete $pe->{tsid},        'method tsid');
@@ -74,7 +75,6 @@ plan tests => 242
     is($pe->ppwait,      delete $pe->{ppwait},      'method ppwait');
     is($pe->profil,      delete $pe->{profil},      'method profil');
     is($pe->stopprof,    delete $pe->{stopprof},    'method stopprof');
-    is($pe->hadthreads,  delete $pe->{hadthreads},  'method hadthreads');
     is($pe->sugid,       delete $pe->{sugid},       'method sugid');
     is($pe->system,      delete $pe->{system},      'method system');
     is($pe->single_exit, delete $pe->{single_exit}, 'method single_exit');
@@ -96,9 +96,6 @@ plan tests => 242
     is($pe->stat_7,      delete $pe->{stat_7},      'method stat_7');
     is($pe->ocomm,       delete $pe->{ocomm},       'method ocomm');
     is($pe->lockname,    delete $pe->{lockname},    'method lockname');
-    is($pe->emul,        delete $pe->{emul},        'method emul');
-    is($pe->jid,         delete $pe->{jid},         'method jid');
-    is($pe->numthreads,  delete $pe->{numthreads},  'method numthreads');
     is($pe->pri_class,   delete $pe->{pri_class},   'method pri_class');
     is($pe->pri_level,   delete $pe->{pri_level},   'method pri_level');
     is($pe->pri_native,  delete $pe->{pri_native},  'method pri_native');
@@ -120,6 +117,21 @@ plan tests => 242
     is($pe->nsignals,    delete $pe->{nsignals},    'method nsignals');
     is($pe->nvcsw,       delete $pe->{nvcsw},       'method nvcsw');
     is($pe->nivcsw,      delete $pe->{nivcsw},      'method nivcsw');
+
+    my $grouplist = $pe->groups;
+    delete $pe->{groups};
+    ok( defined($grouplist), 'method groups' );
+    is( ref($grouplist), 'ARRAY', q{... it's a list} );
+    is( scalar(@$grouplist), $ngroups, "... of the expected size" )
+        or diag("grouplist = (@$grouplist)");
+
+    SKIP: {
+        skip( "not supported on FreeBSD 5.x", 21 )
+            if $RUNNING_ON_FREEBSD_5;
+    is($pe->hadthreads,  delete $pe->{hadthreads},  'method hadthreads');
+    is($pe->emul,        delete $pe->{emul},        'method emul');
+    is($pe->jid,         delete $pe->{jid},         'method jid');
+    is($pe->numthreads,  delete $pe->{numthreads},  'method numthreads');
     is($pe->utime_ch,    delete $pe->{utime_ch},    'method utime_ch');
     is($pe->stime_ch,    delete $pe->{stime_ch},    'method stime_ch');
     is($pe->time_ch,     delete $pe->{time_ch},     'method time_ch (utime_ch+stime_ch');
@@ -137,14 +149,8 @@ plan tests => 242
     is($pe->nsignals_ch, delete $pe->{nsignals_ch}, 'method nsignals_ch');
     is($pe->nvcsw_ch,    delete $pe->{nvcsw_ch},    'method nvcsw_ch');
     is($pe->nivcsw_ch,   delete $pe->{nivcsw_ch},   'method nivcsw_ch');
-
-    my $grouplist = $pe->groups;
-    delete $pe->{groups};
-    ok( defined($grouplist), 'method groups' );
-    is( ref($grouplist), 'ARRAY', q{... it's a list} );
-    is( scalar(@$grouplist), $ngroups, "... of the expected size" )
-        or diag("grouplist = (@$grouplist)");
-	} # SKIP
+    } # SKIP 5
+    } # SKIP 4
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all methods have been accounted for' )
         or diag( 'leftover: ' . join( ',', grep {!/^_/} keys %$pe ));
@@ -178,9 +184,9 @@ plan tests => 242
     is($pe->setlogin_name,                 delete $pe->{login},       'alias setlogin_name');
     is($pe->command_name,                  delete $pe->{comm},        'alias command_name');
 
-	SKIP: {
-		skip( "not supported on FreeBSD 4.x", 84 )
-			if $RUNNING_ON_FREEBSD_4;
+    SKIP: {
+        skip( "not supported on FreeBSD 4.x", 84 )
+            if $RUNNING_ON_FREEBSD_4;
     is($pe->process_args,                  delete $pe->{args},        'alias process_args' );
     is($pe->terminal_session_id,           delete $pe->{tsid},        'alias terminal_session_id');
     is($pe->effective_user_id,             delete $pe->{uid},         'alias effective_user_id');
@@ -201,7 +207,6 @@ plan tests => 242
     is($pe->parent_waiting,                delete $pe->{ppwait},      'alias parent_waiting');
     is($pe->started_profiling,             delete $pe->{profil},      'alias started_profiling');
     is($pe->stopped_profiling,             delete $pe->{stopprof},    'alias stopped_profiling');
-    is($pe->process_had_threads,           delete $pe->{hadthreads},  'alias process_had_threads');
     is($pe->id_privs_set,                  delete $pe->{sugid},       'alias id_privs_set');
     is($pe->system_process,                delete $pe->{system},      'alias system_process');
     is($pe->single_exit_not_wait,          delete $pe->{single_exit}, 'alias single_exit_not_wait');
@@ -223,9 +228,6 @@ plan tests => 242
     is($pe->is_blocked,                    delete $pe->{stat_7},      'alias is_blocked');
     is($pe->old_command_name,              delete $pe->{ocomm},       'alias old_command_name');
     is($pe->name_of_lock,                  delete $pe->{lockname},    'alias name_of_lock');
-    is($pe->emulation_name,                delete $pe->{emul},        'alias emulation_name');
-    is($pe->process_jail_id,               delete $pe->{jid},         'alias process_jail_id');
-    is($pe->number_of_threads,             delete $pe->{numthreads},  'alias number_of_threads');
     is($pe->priority_scheduling_class,     delete $pe->{pri_class},   'alias priority_scheduling_class');
     is($pe->priority_level,                delete $pe->{pri_level},   'alias priority_level');
     is($pe->priority_native,               delete $pe->{pri_native},  'alias priority_native');
@@ -247,6 +249,13 @@ plan tests => 242
     is($pe->signals_received,              delete $pe->{nsignals},    'alias signals_received');
     is($pe->voluntary_context_switch,      delete $pe->{nvcsw},       'alias voluntary_context_switch');
     is($pe->involuntary_context_switch,    delete $pe->{nivcsw},      'alias involuntary_context_switch');
+    SKIP: {
+        skip( "not supported on FreeBSD 5.x", 21 )
+            if $RUNNING_ON_FREEBSD_5;
+    is($pe->process_had_threads,           delete $pe->{hadthreads},  'alias process_had_threads');
+    is($pe->emulation_name,                delete $pe->{emul},        'alias emulation_name');
+    is($pe->process_jail_id,               delete $pe->{jid},         'alias process_jail_id');
+    is($pe->number_of_threads,             delete $pe->{numthreads},  'alias number_of_threads');
     is($pe->user_time_ch,                  delete $pe->{utime_ch},    'alias user_time');
     is($pe->system_time_ch,                delete $pe->{stime_ch},    'alias system_time');
     is($pe->total_time_ch,                 delete $pe->{time_ch},     'alias total_time');
@@ -264,18 +273,19 @@ plan tests => 242
     is($pe->signals_received_ch,           delete $pe->{nsignals_ch}, 'alias signals_received');
     is($pe->voluntary_context_switch_ch,   delete $pe->{nvcsw_ch},    'alias voluntary_context_switch');
     is($pe->involuntary_context_switch_ch, delete $pe->{nivcsw_ch},   'alias involuntary_context_switch');
-	} # SKIP
+    } # SKIP 5
+    } # SKIP 4
 
-	SKIP: {
-		skip( "not supported on FreeBSD 4.x", 3 )
-			if $RUNNING_ON_FREEBSD_4;
+    SKIP: {
+        skip( "not supported on FreeBSD 4.x", 3 )
+            if $RUNNING_ON_FREEBSD_4;
     my $grouplist = $pe->group_list;
     delete $pe->{groups};
     ok( defined($grouplist), 'alias group_list' );
     is( ref($grouplist), 'ARRAY', q{... it's also a list} );
     is( scalar(@$grouplist), $ngroups, "... also of the expected size" )
         or diag("grouplist = (@$grouplist)");
-	} # SKIP
+    } # SKIP
 
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all aliases have been accounted for' )
@@ -296,9 +306,9 @@ plan tests => 242
     my $sym_imp = BSD::Process->new(     {resolve => 1} );
     my $sym_exp = BSD::Process->new( $$, {resolve => 1} );
 
-	SKIP: {
-		skip( "not supported on FreeBSD 4.x", 13 )
-			if $RUNNING_ON_FREEBSD_4;
+    SKIP: {
+        skip( "not supported on FreeBSD 4.x", 13 )
+            if $RUNNING_ON_FREEBSD_4;
     is( $num->uid,   scalar(getpwnam($sym_imp->uid)),   'implicit pid resolve muid' );
     is( $num->ruid,  scalar(getpwnam($sym_imp->ruid)),  'implicit pid resolve ruid' );
     is( $num->svuid, scalar(getpwnam($sym_imp->svuid)), 'implicit pid resolve svuid' );
@@ -326,5 +336,5 @@ plan tests => 242
             pass( "resolve group $gid (undefined)" );
         }
     }
-	} # SKIP
+    } # SKIP
 }
