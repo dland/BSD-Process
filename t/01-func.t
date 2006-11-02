@@ -43,8 +43,8 @@ ok( defined( delete $info->{login} ), 'attribute login');
 ok( defined( delete $info->{comm} ), 'attribute comm');
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 84 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 84 )
+        if $RUNNING_ON_FREEBSD_4;
 ok( defined( delete $info->{args} ), 'attribute args');
 ok( defined( delete $info->{tsid} ), 'attribute tsid');
 ok( defined( delete $info->{uid} ), 'attribute uid');
@@ -173,8 +173,8 @@ cmp_ok( scalar(@all), '>', 10, "list of all processes ($all_procs)" )
 
 # processes owned by a uid
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 4 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 4 )
+        if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each uid
     my %uid;
     for my $pid (@all) {
@@ -208,8 +208,8 @@ SKIP: {
 
 # processes owned by a ruid
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 4 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 4 )
+        if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each real uid
     my %ruid;
     for my $pid (@all) {
@@ -247,8 +247,8 @@ SKIP: {
 
 # processes owned by an effective gid
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 4 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 4 )
+        if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each effective gid
     # kinfo_proc lacks a gid field, so we'll punt with a real gid
     my %gid;
@@ -271,8 +271,8 @@ SKIP: {
 
 # processes owned by a rgid
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 4 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 4 )
+        if $RUNNING_ON_FREEBSD_4;
     # count the processes owned by each real gid
     my %rgid;
     for my $pid (@all) {
@@ -294,8 +294,8 @@ SKIP: {
 
 # process groups
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 4 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 4 )
+        if $RUNNING_ON_FREEBSD_4;
     # count the processes in each process group
     my %pgid;
     for my $pid (@all) {
@@ -346,8 +346,8 @@ isnt( $info->{pid}, $parent->{ppid}, 'I am not my grandparent' );
 isnt( $parent->{pid}, $parent->{ppid}, 'and my parent is not my grandparent' );
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 2 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 2 )
+        if $RUNNING_ON_FREEBSD_4;
 my $resolved = BSD::Process::info({resolve => 1});
 is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve implicit pid' );
 
@@ -356,8 +356,8 @@ is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
 }
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 1 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 1 )
+        if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( uid => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
@@ -365,8 +365,8 @@ SKIP: {
 }
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 1 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 1 )
+        if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( effective_user_id => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
@@ -374,8 +374,8 @@ SKIP: {
 }
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 1 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 1 )
+        if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( ruid => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
@@ -383,8 +383,8 @@ SKIP: {
 }
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 1 )
-		if $RUNNING_ON_FREEBSD_4;
+    skip( "not supported on FreeBSD 4.x", 1 )
+        if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( real_user_id => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
@@ -392,19 +392,50 @@ SKIP: {
 }
 
 SKIP: {
-	skip( "not supported on FreeBSD 4.x", 1 )
-		if $RUNNING_ON_FREEBSD_4;
-    my $wheel = BSD::Process::all( gid => 'wheel' );
-    my $gid_wheel_count = 0;
-    $wheel->{$_}->rgid == 0 and ++$gid_wheel_count for keys %$wheel;
-    is( $gid_wheel_count, scalar(keys %$wheel), q{counted all gid wheel's processes} );
-}
+    skip( "not supported on FreeBSD 4.x", 2 )
+        if $RUNNING_ON_FREEBSD_4;
 
-SKIP: {
-	skip( "not supported on FreeBSD 4.x", 1 )
-		if $RUNNING_ON_FREEBSD_4;
-    my $wheel = BSD::Process::all( effective_group_id => 'wheel' );
-    my $gid_wheel_count = 0;
-    $wheel->{$_}->rgid == 0 and ++$gid_wheel_count for keys %$wheel;
-    is( $gid_wheel_count, scalar(keys %$wheel), q{counted all effective_group_id wheel's processes} );
+    my $wheel_gid = getgrnam('wheel');
+    {
+        my $wheel = BSD::Process::all( gid => 'wheel' );
+        my $gid_wheel_count = 0;
+        for my $pid (keys %$wheel) {
+            my $proc = $wheel->{$pid};
+            if ($proc->rgid == $wheel_gid) {
+                 ++$gid_wheel_count;
+            }
+            else {
+                my $msg = "$proc->{comm}($proc->{pid}) has rgid $proc->{rgid} not $wheel_gid";
+                if ($proc->{comm} eq 'sshd') {
+                    # sshd uses process separation, which throws this off
+                    ++$gid_wheel_count;
+                    $msg .= " (pass)";
+                }
+                diag( $msg );
+            }
+        }
+        is( $gid_wheel_count, scalar(keys %$wheel), q{counted all gid wheel's processes} );
+    }
+
+    {
+        my $wheel = BSD::Process::all( effective_group_id => 'wheel' );
+        my $gid_wheel_count = 0;
+        for my $pid (keys %$wheel) {
+            my $proc = $wheel->{$pid};
+            if ($proc->rgid == $wheel_gid) {
+                 ++$gid_wheel_count;
+            }
+            else {
+                my $msg = "$proc->{comm}($proc->{pid}) has rgid $proc->{rgid} not $wheel_gid";
+                if ($proc->{comm} eq 'sshd') {
+                    # sshd uses process separation, which throws this off
+                    ++$gid_wheel_count;
+                    $msg .= " (pass)";
+                }
+                diag( $msg );
+            }
+        }
+
+        is( $gid_wheel_count, scalar(keys %$wheel), q{counted all effective_group_id wheel's processes} );
+    }
 }
