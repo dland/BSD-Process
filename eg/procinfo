@@ -7,10 +7,21 @@
 use strict;
 use BSD::Process;
 
+use Config;
+my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
+
 use vars '$VERSION';
 $VERSION = '0.1';
 
-for my $pid (sort {$a <=> $b} BSD::Process::list) {
+my @pid;
+if (@ARGV) {
+    @pid = @ARGV;
+}
+else {
+    @pid = BSD::Process::list();
+}
+
+for my $pid (sort {$a <=> $b} @pid) {
     
     my $proc = BSD::Process->new($pid);
 
@@ -26,7 +37,7 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
     print "process has parent waiting\n"            if $proc->ppwait;
     print "process has started profiling\n"         if $proc->profil;
     print "process has stopped profiling\n"         if $proc->stopprof;
-    print "process has had threads\n"               if $proc->hadthreads;
+    print "process has had threads\n"               if !$RUNNING_ON_FREEBSD_5 and $proc->hadthreads;
     print "process has set id privileges\n"         if $proc->sugid;
     print "process is a system process\n"           if $proc->system;
     print "threads should exit not wait\n"          if $proc->single_exit;
@@ -37,6 +48,6 @@ for my $pid (sort {$a <=> $b} BSD::Process::list) {
     print "process is locked\n"                     if $proc->locked;
     print "controlling terminal active\n"           if $proc->isctty;
     print "process is session leader\n"             if $proc->issleader;
-    print "\n";
+    print "\n" if @pid > 1;
 }
 
