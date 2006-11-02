@@ -44,7 +44,7 @@ ok( defined( delete $info->{login} ), 'attribute login');
 ok( defined( delete $info->{comm} ), 'attribute comm');
 
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 65 )
+    skip( "not supported on FreeBSD 4.x", 86 )
         if $RUNNING_ON_FREEBSD_4;
 ok( defined( delete $info->{args} ), 'attribute args');
 ok( defined( delete $info->{tsid} ), 'attribute tsid');
