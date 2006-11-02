@@ -326,7 +326,7 @@ BSD::Process - Retrieve information about running processes
 =head1 VERSION
 
 This document describes version 0.02 of BSD::Process,
-released 2006-11-01.
+released 2006-11-02.
 
 =head1 SYNOPSIS
 

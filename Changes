@@ -1,6 +1,12 @@
 Revision history for Perl extension BSD::Process
 
-0.02
+0.02 2006-11-02 15:14:30 UTC
+    - support for FreeBSD 5.x added
+    - support for FreeBSD 4.x improved
+    - eg/* received minor functionality improvements
+    - guards for tests that involve processes doing
+      privilege separation.
+    - added SEE ALSO for other modules
 
 0.01  2006-09-13 13:18:10 UTC
     - original version; created by genpm v1.2
