@@ -191,7 +191,7 @@ SKIP: {
     my %uid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
-	if ($proc) {
+        if ($proc) {
             $uid{$proc->{uid}}++;
         }
         else {
