@@ -16,7 +16,7 @@ if ($opt{q}) {
     exit;
 }
 elsif ($opt{a}) {
-    my $len  = BSD::Process::attr_len;
+    my $len  = BSD::Process::attr_len();
     for my $pid (@ARGV) {
         $pid = $$ if $pid eq 'self';
         my $proc = BSD::Process->new(
