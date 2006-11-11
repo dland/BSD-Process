@@ -141,9 +141,10 @@ BEGIN {
     );
 
     my $alias;
-    eval {
-        # lighter than pulling in Config
-        use BSD::Sysctl;
+    # lighter than pulling in Config
+    eval "use BSD::Sysctl";
+    if (!$@) {
+        # it worked!
         my $osrelease = BSD::Sysctl::sysctl('kern.osrelease');
         if ($osrelease =~ /^4/) {
             $alias = \%alias_FreeBSD_4;
