@@ -51,10 +51,6 @@ plan tests => 242
     is($pe->comm,        delete $pe->{comm},        'method comm');
 
     my $ngroups;
-    SKIP: {
-        skip( "not supported on FreeBSD 4.x", 86 )
-            if $RUNNING_ON_FREEBSD_4;
-
     is($pe->args,        delete $pe->{args},        'method args' );
     is($pe->tsid,        delete $pe->{tsid},        'method tsid');
     is($pe->uid,         delete $pe->{uid},         'method uid');
@@ -125,9 +121,6 @@ plan tests => 242
     is( scalar(@$grouplist), $ngroups, "... of the expected size" )
         or diag("grouplist = (@$grouplist)");
 
-    SKIP: {
-        skip( "not supported on FreeBSD 5.x", 21 )
-            if $RUNNING_ON_FREEBSD_5;
     is($pe->hadthreads,  delete $pe->{hadthreads},  'method hadthreads');
     is($pe->emul,        delete $pe->{emul},        'method emul');
     is($pe->jid,         delete $pe->{jid},         'method jid');
@@ -149,8 +142,6 @@ plan tests => 242
     is($pe->nsignals_ch, delete $pe->{nsignals_ch}, 'method nsignals_ch');
     is($pe->nvcsw_ch,    delete $pe->{nvcsw_ch},    'method nvcsw_ch');
     is($pe->nivcsw_ch,   delete $pe->{nivcsw_ch},   'method nivcsw_ch');
-    } # SKIP 5
-    } # SKIP 4
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all methods have been accounted for' )
         or diag( 'leftover: ' . join( ',', grep {!/^_/} keys %$pe ));
@@ -184,9 +175,6 @@ plan tests => 242
     is($pe->setlogin_name,                 delete $pe->{login},       'alias setlogin_name');
     is($pe->command_name,                  delete $pe->{comm},        'alias command_name');
 
-    SKIP: {
-        skip( "not supported on FreeBSD 4.x", 84 )
-            if $RUNNING_ON_FREEBSD_4;
     is($pe->process_args,                  delete $pe->{args},        'alias process_args' );
     is($pe->terminal_session_id,           delete $pe->{tsid},        'alias terminal_session_id');
     is($pe->effective_user_id,             delete $pe->{uid},         'alias effective_user_id');
@@ -249,9 +237,6 @@ plan tests => 242
     is($pe->signals_received,              delete $pe->{nsignals},    'alias signals_received');
     is($pe->voluntary_context_switch,      delete $pe->{nvcsw},       'alias voluntary_context_switch');
     is($pe->involuntary_context_switch,    delete $pe->{nivcsw},      'alias involuntary_context_switch');
-    SKIP: {
-        skip( "not supported on FreeBSD 5.x", 21 )
-            if $RUNNING_ON_FREEBSD_5;
     is($pe->process_had_threads,           delete $pe->{hadthreads},  'alias process_had_threads');
     is($pe->emulation_name,                delete $pe->{emul},        'alias emulation_name');
     is($pe->process_jail_id,               delete $pe->{jid},         'alias process_jail_id');
@@ -273,8 +258,6 @@ plan tests => 242
     is($pe->signals_received_ch,           delete $pe->{nsignals_ch}, 'alias signals_received');
     is($pe->voluntary_context_switch_ch,   delete $pe->{nvcsw_ch},    'alias voluntary_context_switch');
     is($pe->involuntary_context_switch_ch, delete $pe->{nivcsw_ch},   'alias involuntary_context_switch');
-    } # SKIP 5
-    } # SKIP 4
 
     SKIP: {
         skip( "not supported on FreeBSD 4.x", 3 )
