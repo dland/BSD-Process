@@ -1,6 +1,9 @@
 Revision history for Perl extension BSD::Process
 
 0.03
+    - All platforms now handle all attributes. If the requested
+      attribute is not implemented (for instance, jid/jail_id on
+      FreeBSD 4.x), -1 is returned.
 
 0.02 2006-11-02 15:14:30 UTC
     - support for FreeBSD 5.x added
