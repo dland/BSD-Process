@@ -19,7 +19,7 @@ $VERSION = '0.03';
 @EXPORT_OK = (qw(process_info process_list));
 
 BEGIN {
-    my %alias_FreeBSD_4 = (
+    my %alias = (
         process_pid              => 'pid',
         parent_pid               => 'ppid',
         process_group_id         => 'pgid',
@@ -45,10 +45,6 @@ BEGIN {
         wchan_message            => 'wmesg',
         setlogin_name            => 'login',
         command_name             => 'comm',
-    );
-
-    my %alias_FreeBSD_5 = (
-        %alias_FreeBSD_4,
         process_args             => 'args',
         terminal_session_id      => 'tsid',
         effective_user_id        => 'uid',
@@ -112,15 +108,10 @@ BEGIN {
         signals_received          => 'nsignals',
         voluntary_context_switch   => 'nvcsw',
         involuntary_context_switch => 'nivcsw',
-    );
-
-    my %alias_FreeBSD_6 = (
-        %alias_FreeBSD_4,
-        %alias_FreeBSD_5,
-        process_had_threads      => 'hadthreads',
-        emulation_name           => 'emul',
-        process_jail_id          => 'jid',
-        number_of_threads        => 'numthreads',
+        process_had_threads        => 'hadthreads',
+        emulation_name             => 'emul',
+        process_jail_id            => 'jid',
+        number_of_threads          => 'numthreads',
         user_time_ch               => 'utime_ch',
         system_time_ch             => 'stime_ch',
         total_time_ch              => 'time_ch',
@@ -140,61 +131,29 @@ BEGIN {
         involuntary_context_switch_ch => 'nivcsw_ch',
     );
 
-    my $alias;
-    # lighter than pulling in Config
-    eval "use BSD::Sysctl";
-    if (!$@) {
-        # it worked!
-        my $osrelease = BSD::Sysctl::sysctl('kern.osrelease');
-        if ($osrelease =~ /^4/) {
-            $alias = \%alias_FreeBSD_4;
-        }
-        elsif ($osrelease =~ /^5/) {
-            $alias = \%alias_FreeBSD_5;
-        }
-        else {
-            $alias = \%alias_FreeBSD_6;
-        }
-    };
-
-    if (!defined $alias) {
-        eval {
-            use Config;
-            if ($Config{osvers} =~ /^4/) {
-                $alias = \%alias_FreeBSD_4;
-            }
-            elsif ($Config{osvers} =~ /^5/) {
-                $alias = \%alias_FreeBSD_5;
-            }
-            else {
-                $alias = \%alias_FreeBSD_6;
-            }
-        }
-    }
-
     # make some shorthand accessors
-    BSD::Process->mk_ro_accessors( values %$alias );
+    BSD::Process->mk_ro_accessors( values %alias );
 
     # and map some longhand aliases to them
     no strict 'refs';
-    for my $long (keys %$alias) {
-        *{$long} = *{$alias->{$long}};
+    for my $long (keys %alias) {
+        *{$long} = *{$alias{$long}};
     }
 
     sub attr {
-        return values(%$alias);
+        return values(%alias);
     }
 
     sub attr_len {
         my $len = 0;
-        for my $attr(values %$alias) {
+        for my $attr(values %alias) {
             $len = length($attr) if $len < length($attr);
         }
         return $len;
     }
 
     sub attr_alias {
-        return keys(%$alias);
+        return keys(%alias);
     }
 }
 
