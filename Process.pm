@@ -321,7 +321,7 @@ sub info {
 
 =head1 NAME
 
-BSD::Process - Retrieve information about running processes
+BSD::Process - Information about running processes on BSD platforms
 
 =head1 VERSION
 
@@ -342,7 +342,7 @@ released 2006-11-02.
 
 =head1 DESCRIPTION
 
-C<BSD::Process> renders the information the kernel maintains
+C<BSD::Process> renders the information the BSD kernel maintains
 about current processes as Perl objects. These may then be
 queried, extracted and reported upon. This allows a more
 natural style of programming (as opposed to scraping the
@@ -564,6 +564,14 @@ simpler code. The following three statements are equivalent:
 A modification of a value in the underlying hash of the object
 has no corresponding effect on the system process it represents.
 
+Older kernels do not track as many process attributes as more
+modern kernels. In these cases, the value -1 will be returned.
+
+In the following list, the key B<F5+> means that the method
+returns something useful in FreeBSD 5.x or better. The key
+B<F6> means the method returns something useful for FreeBSD
+6.x.
+
 =over 4
 
 =item process_arguments, args
@@ -592,12 +600,12 @@ same pgid.
 
 Similarly, a number of processes belong to the same tty process
 group. This means that they were all originated from the same console
-login session or terminal window.
+login session or terminal window. B<F5+>
 
 =item process_session_id, sid
 
 Processes also belong to a session, identified by the process session
-id.
+id. B<F5+>
 
 =item terminal_session_id, tsid
 
@@ -606,7 +614,7 @@ terminal session id.
 
 =item job_control_counter, jobc
 
-The job control counter of a process. (purpose?)
+The job control counter of a process. (purpose?) B<F5+>
 
 =item effective_user_id, uid
 
@@ -615,34 +623,34 @@ setuid bit set can be launched by any user, and the effective user
 id will be that of the program itself, rather than that of the user.
 
 The symbolic name of the uid will be returned if the constructor
-had the C<resolve> attribute set.
+had the C<resolve> attribute set. B<F5+>
 
 =item real_user_id, ruid
 
-The user id of the user that launched the process.
+The user id of the user that launched the process. B<F5+>
 
 =item saved_effective_user_id, svuid
 
-The saved effective user id of the process. (purpose?)
+The saved effective user id of the process. (purpose?) B<F5+>
 
 =item real_group_id, rgid
 
 The primary group id of the user that launched the process.
 
 The symbolic name of the gid will be returned if the constructor
-had the C<resolve> attribute set.
+had the C<resolve> attribute set. B<F5+>
 
 =item saved_effective_group_id, svgid
 
-The saved effective group id of the process. (purpose?)
+The saved effective group id of the process. (purpose?) B<F5+>
 
 =item number_of_groups, ngroups
 
-The number of groups to which the process belongs.
+The number of groups to which the process belongs. B<F5+>
 
 =item virtual_size, size
 
-The size (in bytes) of virtual memory occupied by the process.
+The size (in bytes) of virtual memory occupied by the process. B<F5+>
 
 =item resident_set_size, rssize
 
@@ -658,11 +666,11 @@ Text size (in pages) of the process.
 
 =item data_size, dsize
 
-Data size (in pages) of the process.
+Data size (in pages) of the process. B<F5+>
 
 =item stack_size, ssize
 
-Stack size (in pages) of the process.
+Stack size (in pages) of the process. B<F5+>
 
 =item exit_status, xstat
 
@@ -696,12 +704,12 @@ Real time used by the process, in microseconds.
 
 =item start_time, start
 
-Epoch time of the creation of the process.
+Epoch time of the creation of the process. B<F5+>
 
 =item children_time, childtime
 
 Amount of real time used by the children processes (if any) of the
-process.
+process. B<F5+>
 
 =item process_flags, flag
 
@@ -710,79 +718,79 @@ or 1).
 
 =item posix_advisory_lock, advlock
 
-Flag indicating whether the process holds a POSIX advisory lock.
+Flag indicating whether the process holds a POSIX advisory lock. B<F5+>
 
 =item has_controlling_terminal, controlt
 
 Flag indicating whether the process has a controlling terminal (if
-true, the terminal session id is stored in the C<tsid> attribute).
+true, the terminal session id is stored in the C<tsid> attribute). B<F5+>
 
 =item is_kernel_thread, kthread
 
-Flag indicating whether the process is a kernel thread.
+Flag indicating whether the process is a kernel thread. B<F5+>
 
 =item no_loadavg_calc, noload
 
 Flag indicating whether the process contributes to the load average
-calculations of the system.
+calculations of the system. B<F5+>
 
 =item parent_waiting, ppwait
 
 Flag indicating whether the parent is waiting for the process to
-exit.
+exit. B<F5+>
 
 =item started_profiling, profil
 
-Flag indicating whether the process has started profiling.
+Flag indicating whether the process has started profiling. B<F5+>
 
 =item stopped_profiling, stopprof
 
 Flag indicating whether the process has a thread that has requesting
-profiling to stop.
+profiling to stop. B<F5+>
 
 =item process_had_threads, hadthreads
 
-Flag indicating whether the process has had thresds.
+Flag indicating whether the process has had thresds. B<F6+>
 
 =item id_privs_set, sugid
 
 Flag indicating whether the process has set id privileges since
-last exec.
+last exec. B<F5+>
 
 =item system_process, system
 
-Flag indicating whether the process is a system process.
+Flag indicating whether the process is a system process. B<F5+>
 
 =item single_exit_not_wait, single_exit
 
 Flag indicating that threads that are suspended should exit, not
-wait.
+wait. B<F5+>
 
 =item traced_by_debugger, traced
 
-Flag indicating that the process is being traced by a debugger.
+Flag indicating that the process is being traced by a debugger. B<F5+>
 
 =item waited_on_by_other, waited
 
-Flag indicating that another process is waiting for the process.
+Flag indicating that another process is waiting for the process. B<F5+>
 
 =item working_on_exiting, wexit
 
-Flag indicating that the process is working on exiting.
+Flag indicating that the process is working on exiting. B<F5+>
 
 =item process_called_exec, exec
 
-Flag indicating that the process has called exec.
+Flag indicating that the process has called exec. B<F5+>
 
 =item kernel_session_flag, kiflag
 
 A bitmap described kernel session status of the process, described
-via the following attributes.
+via the following attributes. B<F5+>
 
 =item is_locked, locked
 
 Flag indicating that the process is waiting on a lock (whose name
-may be obtained from the C<lock> attribute).
+may be obtained from the C<lock> attribute). B<F5+>
 
   if ($p->is_locked) {
     print "$p->{comm} is waiting on lock $p->{lockname}\n";
@@ -793,46 +801,46 @@ may be obtained from the C<lock> attribute).
 
 =item controlling_tty_active, isctty
 
-Flag indicating that the vnode of the controlling tty is active.
+Flag indicating that the vnode of the controlling tty is active. B<F5+>
 
 =item is_session_leader, issleader
 
-Flag indicating that the process is a session leader.
+Flag indicating that the process is a session leader. B<F5+>
 
 =item process_status, stat
 
 Numeric value indicating the status of the process, decoded via the
-following attibutes.
+following attibutes. B<F5+>
 
 =item is_being_forked, stat_1
 
-Status indicates that the process is being forked.
+Status indicates that the process is being forked. B<F5+>
 
 =item is_runnable, stat_2
 
-Status indicates the process is runnable.
+Status indicates the process is runnable. B<F5+>
 
 =item is_sleeping_on_addr, stat_3
 
-Status indicates the process is sleeping on an address.
+Status indicates the process is sleeping on an address. B<F5+>
 
 =item is_stopped, stat_4
 
 Status indicates the process is stopped, either suspended or in a
-debugger.
+debugger. B<F5+>
 
 =item is_a_zombie, stat_5
 
 Status indicates the process is a zombie. It is waiting for its
-parent to collect its exit code.
+parent to collect its exit code. B<F5+>
 
 =item is_waiting_on_intr, stat_6
 
-Status indicates the process is waiting for an interrupt.
+Status indicates the process is waiting for an interrupt. B<F5+>
 
 =item is_blocked, stat_7
 
-Status indicates the process is blocked by a lock.
+Status indicates the process is blocked by a lock. B<F5+>
 
 =item nice_priority, nice
 
@@ -858,7 +866,7 @@ Identifies the last CPU on which the process was running.
 
 =item old_command_name, ocomm
 
-The old command name.
+The old command name. B<F5+>
 
 =item wchan_message, wmesg
 
@@ -871,7 +879,7 @@ Name of the user login process that launched the command.
 =item name_of_lock, lockname
 
 Name of the lock that the process is waiting on (if the process is
-waiting on a lock).
+waiting on a lock). B<F5+>
 
 =item command_name, comm
 
@@ -879,15 +887,15 @@ Name of the command.
 
 =item emulation_name, emul
 
-Name of the emulation.
+Name of the emulation. B<F6+>
 
 =item process_jail_id, jid
 
-The process jail identifier
+The process jail identifier B<F6+>
 
 =item number_of_threads, numthreads
 
-Number of threads in the process.
+Number of threads in the process. B<F6+>
 
 =item priority_scheduling_class, pri_class
 
@@ -897,91 +905,91 @@ Number of threads in the process.
 
 =item priority_user, pri_user
 
-The parameters pertaining to the scheduling of the process.
+The parameters pertaining to the scheduling of the process. B<F6+>
 
 =item user_time, utime
 
 Process resource usage information. The amount of time spent by the
-process in userland.
+process in userland. B<F5+>
 
 =item system_time, stime
 
 Process resource usage information. The amount of time spent by the
-process in the kernel (system calls).
+process in the kernel (system calls). B<F5+>
 
 =item total_time, time
 
 The sum of the user and system times of the process.
 
 Process resource usage information. The amount of time spent by the
-process in the kernel (system calls).
+process in the kernel (system calls). B<F5+>
 
 =item max_resident_set_size, maxrss
 
 Process resource usage information. The maximum resident set size
-(the high-water mark of physical memory used) of the process.
+(the high-water mark of physical memory used) of the process. B<F5+>
 
 =item shared_memory_size, ixrss
 
-Process resource usage information. The size of shared memory.
+Process resource usage information. The size of shared memory. B<F5+>
 
 =item unshared_data_size, idrss
 
-Process resource usage information. The size of unshared memory.
+Process resource usage information. The size of unshared memory. B<F5+>
 
 =item unshared_stack_size, isrss
 
-Process resource usage information. The size of unshared stack.
+Process resource usage information. The size of unshared stack. B<F5+>
 
 =item page_reclaims, minflt
 
 Process resource usage information. Minor page faults, the number
-of page reclaims.
+of page reclaims. B<F5+>
 
 =item page_faults, majflt
 
 Process resource usage information. Major page faults, the number
-of page faults.
+of page faults. B<F5+>
 
 =item number_of_swaps, nswap
 
 Process resource usage information. The number of swaps the
-process has undergone.
+process has undergone. B<F5+>
 
 =item block_input_ops, inblock
 
 Process resource usage information. Total number of input block
-operations performed by the process.
+operations performed by the process. B<F5+>
 
 =item block_output_ops, oublock
 
 Process resource usage information. Total number of output block
-operations performed by the process.
+operations performed by the process. B<F5+>
 
 =item messages_sent, msgsnd
 
 Process resource usage information. Number of messages sent by
-the process.
+the process. B<F5+>
 
 =item messages_received, msgrcv
 
 Process resource usage information. Number of messages received by
-the process.
+the process. B<F5+>
 
 =item signals_received, nsignals
 
 Process resource usage information. Number of signals received by
-the process.
+the process. B<F5+>
 
 =item voluntary_context_switch, nvcsw
 
 Process resource usage information. Number of voluntary context
-switches performed by the process.
+switches performed by the process. B<F5+>
 
 =item involuntary_context_switch, nivcsw
 
 Process resource usage information. Number of involuntary context
-switches performed by the process.
+switches performed by the process. B<F5+>
 
 =item user_time_ch, utime_ch
 
@@ -1017,10 +1025,11 @@ switches performed by the process.
 
 =item involuntary_context_switch_ch => nivcsw_ch
 
-These attributes store the resource usage of the child processes
-spawned by this process. Currently, the kernel only fills in the
-information for the the C<utime_ch> and C<stime_ch> fields (and
-hence the C<time_ch> value is derived from them).
+These attributes (only available in FreeBSD 6.x) store the resource
+usage of the child processes spawned by this process. Currently,
+the kernel only fills in the information for the the C<utime_ch>
+and C<stime_ch> fields (and hence the C<time_ch> value is derived
+from them).
 
 In theory (and in practice as far as I can tell) C<time_ch> is
 equal to C<childtime>.
@@ -1038,9 +1047,8 @@ asking the system to return the information about a process.
 
 =head1 NOTES
 
-Currently, only FreeBSD versions 4 and 6 are supported. Support for
-version 5 of FreeBSD and versions of NetBSD and OpenBSD will be
-added in future versions.
+Currently, only FreeBSD versions 4 through 6 are supported. Support
+for NetBSD and OpenBSD will be added in future versions.
 
 =head1 SEE ALSO
 

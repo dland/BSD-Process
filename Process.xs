@@ -140,6 +140,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "ppwait",       6, newSViv(-1), 0);
     hv_store(h, "profil",       6, newSViv(-1), 0);
     hv_store(h, "stopprof",     8, newSViv(-1), 0);
+    hv_store(h, "hadthreads",  10, newSViv(-1), 0);
     hv_store(h, "sugid",        5, newSViv(-1), 0);
     hv_store(h, "system",       6, newSViv(-1), 0);
     hv_store(h, "single_exit", 11, newSViv(-1), 0);
@@ -340,7 +341,9 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "waited",       6, newSViv(P_FLAG(P_WAITED), 0);
     hv_store(h, "wexit",        5, newSViv(P_FLAG(P_WEXIT), 0);
     hv_store(h, "exec",         4, newSViv(P_FLAG(P_EXEC), 0);
-#if __FreeBSD_version >= 600000
+#if __FreeBSD_version < 600000
+    hv_store(h, "hadthreads",  10, newSViv(-1), 0);
+#else
     hv_store(h, "hadthreads",  10, newSViv(P_FLAG(P_HADTHREADS), 0);
 #endif
 
@@ -396,7 +399,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
 
     /* attributes available only in FreeBSD 6.x */
 #if __FreeBSD_version < 600000
-    hv_store(h, "hadthreads",  10, newSViv(-1), 0);
     hv_store(h, "emul",         4, newSViv(-1), 0);
     hv_store(h, "jid",          3, newSViv(-1), 0);
     hv_store(h, "numthreads",   10, newSViv(-1), 0);
