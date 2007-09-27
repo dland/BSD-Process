@@ -1,13 +1,10 @@
 # 01-basic.t
 # Basic sanity checks for BSD::Process
 #
-# Copyright (C) 2006 David Landgren
+# Copyright (C) 2006-2007 David Landgren
 
 use strict;
-use Test::More tests => 6;
-
-my $fixed = 'The scalar remains the same';
-$_ = $fixed;
+use Test::More tests => 5;
 
 BEGIN { use_ok('BSD::Process'); }
 
@@ -30,5 +27,3 @@ SKIP: {
         };
     pod_coverage_ok( 'BSD::Process', 'POD coverage is go' );
 };
-
-is($_, $fixed, '$_ has not been modified');

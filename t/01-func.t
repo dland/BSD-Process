@@ -1,7 +1,7 @@
 # 01-func.t
 # Test the public BSD::Process routines
 #
-# Copyright (C) 2006 David Landgren
+# Copyright (C) 2006-2007 David Landgren
 
 use strict;
 use Test::More;
@@ -9,10 +9,14 @@ use Test::More;
 use BSD::Process;
 
 use Config;
+
+my $Unchanged = 'The scalar remains the same';
+$_ = $Unchanged;
+
 my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
 my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
 
-plan tests => 151 + scalar(BSD::Process::attr);
+plan tests => 152 + scalar(BSD::Process::attr);
 
 my $info = BSD::Process::info();
 
@@ -381,7 +385,16 @@ SKIP: {
         if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( ruid => 'root' );
     my $uid_root_count = 0;
-    $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+    for (keys %$root) {
+        if ($root->{$_}->uid == 0) {
+            ++$uid_root_count;
+        }
+        elsif ($root->{$_}->ruid == 0) {
+            ++$uid_root_count;
+            $ENV{PERL_AUTHOR_TESTING}
+                and diag("root proc $_ has uid " . $root->{$_}->uid . "/" . $root->{$_}->ruid  );
+        }
+    }
     is( $uid_root_count, scalar(keys %$root), q{counted all ruid root's processes} );
 }
 
@@ -390,7 +403,7 @@ SKIP: {
         if $RUNNING_ON_FREEBSD_4;
     my $root = BSD::Process::all( real_user_id => 'root' );
     my $uid_root_count = 0;
-    $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
+    $root->{$_}->ruid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all real_user_id root's processes} );
 }
 
@@ -407,7 +420,7 @@ SKIP: {
             if ($proc->rgid == $wheel_gid) {
                  ++$gid_wheel_count;
             }
-            else {
+            elsif ($ENV{PERL_AUTHOR_TESTING}) {
                 my $msg = "$proc->{comm}($proc->{pid}) has rgid $proc->{rgid} not $wheel_gid";
                 if ($proc->{comm} eq 'sshd') {
                     # sshd uses process separation, which throws this off
@@ -442,3 +455,5 @@ SKIP: {
         is( $gid_wheel_count, scalar(keys %$wheel), q{counted all effective_group_id wheel's processes} );
     }
 }
+
+is($_, $Unchanged, $Unchanged);
