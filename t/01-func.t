@@ -6,8 +6,6 @@
 use strict;
 use Test::More;
 
-use BSD::Process;
-
 use Config;
 
 my $Unchanged = 'The scalar remains the same';
@@ -16,7 +14,9 @@ $_ = $Unchanged;
 my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
 my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
 
-plan tests => 152 + scalar(BSD::Process::attr);
+plan tests => 152 + scalar(BSD::Process::attr());
+
+BEGIN { use_ok('BSD::Process'); }
 
 my $info = BSD::Process::info();
 
