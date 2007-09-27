@@ -1,4 +1,4 @@
-# 01-basic.t
+# 00-basic.t
 # Documentation (POD) checks for BSD::Process
 #
 # Copyright (C) 2006-2007 David Landgren
@@ -15,6 +15,7 @@ my %tests = (
     POD          => 3,
     POD_COVERAGE => 1,
 );
+my %tests_skip = %tests;
 
 eval qq{use Test::Pod};
 $@ and delete $tests{POD};
@@ -32,7 +33,7 @@ else {
 }
 
 SKIP: {
-    skip( 'Test::Pod not installed on this system', 3 )
+    skip( 'Test::Pod not installed on this system', $tests_skip{POD} )
         unless $tests{POD};
     pod_file_ok( 'Process.pm' );
     pod_file_ok( 'eg/showprocattr' );
@@ -40,7 +41,7 @@ SKIP: {
 }
 
 SKIP: {
-    skip( 'Test::Pod::Coverage not installed on this system', 1 )
+    skip( 'Test::Pod::Coverage not installed on this system', $tests_skip{POD_COVERAGE} )
         unless $tests{POD_COVERAGE};
     pod_coverage_ok( 'BSD::Process', 'POD coverage is go' );
 };
