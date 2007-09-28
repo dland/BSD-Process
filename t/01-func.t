@@ -139,7 +139,7 @@ ok( defined( $ngroups = delete $info->{ngroups} ), 'attribute ngroups');
 my $grouplist = delete $info->{groups};
 ok( defined($grouplist), 'attribute groups' );
 is( ref($grouplist), 'ARRAY', q{... it's a list} );
-if (RUNNING_ON_FREEBSD_4) {
+if ($RUNNING_ON_FREEBSD_4) {
     pass("... of the expected size (unknowable on FreeBSD 4.x)");
 }
 else {
