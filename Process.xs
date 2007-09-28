@@ -405,7 +405,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "utime_ch",     8, newSViv(-1), 0);
     hv_store(h, "stime_ch",     8, newSViv(-1), 0);
     hv_store(h, "time_ch",      7, newSViv(-1), 0);
-        TIME_FRAC(rp->ru_utime)+TIME_FRAC(rp->ru_stime)), 0);
     hv_store(h, "maxrss_ch",    9, newSViv(-1), 0);
     hv_store(h, "ixrss_ch",     8, newSViv(-1), 0);
     hv_store(h, "idrss_ch",     8, newSViv(-1), 0);
