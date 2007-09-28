@@ -99,7 +99,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "swrss",   5, newSViv(kp->kp_eproc.e_xswrss), 0);
     hv_store(h, "flag",    4, newSViv(kp->kp_eproc.e_flag), 0);
     hv_store(h, "login",   5, newSVpv(kp->kp_eproc.e_login, 0), 0);
-    hv_store(h, "sid",     3, newSViv(kp->kp_eproc.e_sid), 0);
     hv_store(h, "estcpu",  6, newSViv(kp->kp_proc.p_estcpu), 0);
     hv_store(h, "pctcpu",  6, newSViv(kp->kp_proc.p_pctcpu), 0);
     hv_store(h, "slptime", 7, newSViv(kp->kp_proc.p_slptime), 0);
