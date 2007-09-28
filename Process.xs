@@ -116,6 +116,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     /* not available in FreeBSD 4.x */
     hv_store(h, "tpgid",  5, newSViv(-1), 0);
     hv_store(h, "sid",    3, newSViv(-1), 0);
+    hv_store(h, "tsid",   4, newSViv(-1), 0);
     hv_store(h, "jobc",   4, newSViv(-1), 0);
     hv_store(h, "uid",    3, newSViv(-1), 0);
     hv_store(h, "ruid",   4, newSViv(-1), 0);
@@ -162,6 +163,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "stat_6",      6, newSViv(-1), 0);
     hv_store(h, "stat_7",      6, newSViv(-1), 0);
     hv_store(h, "ocomm",       5, newSViv(-1), 0);
+    hv_store(h, "lockname",    8, newSViv(-1), 0);
 
     hv_store(h, "pri_class",   9, newSViv(-1), 0);
     hv_store(h, "pri_level",   9, newSViv(-1), 0);
