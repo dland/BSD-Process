@@ -54,8 +54,6 @@ ok( defined( delete $info->{ruid} ), 'attribute ruid');
 ok( defined( delete $info->{svuid} ), 'attribute svuid');
 ok( defined( delete $info->{rgid} ), 'attribute rgid');
 ok( defined( delete $info->{svgid} ), 'attribute svgid');
-my $ngroups;
-ok( defined( $ngroups = delete $info->{ngroups} ), 'attribute ngroups');
 ok( defined( delete $info->{size} ), 'attribute size');
 ok( defined( delete $info->{dsize} ), 'attribute dsize');
 ok( defined( delete $info->{ssize} ), 'attribute ssize');
@@ -133,13 +131,21 @@ ok( defined( delete $info->{nsignals_ch} ), 'attribute nsignals_ch');
 ok( defined( delete $info->{nvcsw_ch} ), 'attribute nvcsw_ch');
 ok( defined( delete $info->{nivcsw_ch} ), 'attribute nivcsw_ch');
 
+my $ngroups;
+ok( defined( $ngroups = delete $info->{ngroups} ), 'attribute ngroups');
+
 # attribute returning non-scalars
 
 my $grouplist = delete $info->{groups};
 ok( defined($grouplist), 'attribute groups' );
 is( ref($grouplist), 'ARRAY', q{... it's a list} );
-is( scalar(@$grouplist), $ngroups, "... of the expected size" )
-    or diag("grouplist = (@$grouplist)");
+if (RUNNING_ON_FREEBSD_4) {
+    pass("... of the expected size (unknowable on FreeBSD 4.x)");
+}
+else {
+    is( scalar(@$grouplist), $ngroups, "... of the expected size" )
+        or diag("grouplist = (@$grouplist)");
+}
 
 # check for typos in hv_store calls in Process.xs
 is( scalar(keys %$info), 0, 'all attributes have been accounted for' )
