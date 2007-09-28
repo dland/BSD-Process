@@ -426,14 +426,14 @@ SKIP: {
             if ($proc->rgid == $wheel_gid) {
                  ++$gid_wheel_count;
             }
-            elsif ($ENV{PERL_AUTHOR_TESTING}) {
+            else {
                 my $msg = "$proc->{comm}($proc->{pid}) has rgid $proc->{rgid} not $wheel_gid";
                 if ($proc->{comm} eq 'sshd') {
                     # sshd uses process separation, which throws this off
                     ++$gid_wheel_count;
                     $msg .= " (pass)";
                 }
-                diag( $msg );
+                $ENV{PERL_AUTHOR_TESTING} and diag( $msg );
             }
         }
         is( $gid_wheel_count, scalar(keys %$wheel), q{counted all gid wheel's processes} );
@@ -454,7 +454,7 @@ SKIP: {
                     ++$gid_wheel_count;
                     $msg .= " (pass)";
                 }
-                diag( $msg );
+                $ENV{PERL_AUTHOR_TESTING} and diag( $msg );
             }
         }
 
