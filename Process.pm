@@ -1005,6 +1005,11 @@ occurs, I'd like to know how you managed it.
 B<kvm error in all()/list()>: another "can't happen" error when
 asking the system to return the information about a process.
 
+B<kvm error in list(): proc size mismatch (nnn total, nnn chunks)>:
+you have upgraded a system across major versions, for instance 4.x
+to 5.x, but the published system header files belong to the previous
+version.
+
 =head1 NOTES
 
 Currently, only FreeBSD versions 4 through 6 are supported. Support
