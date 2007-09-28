@@ -1,5 +1,9 @@
 Revision history for Perl extension BSD::Process
 
+0.04
+    - Fixed silly cut'n'paste errors for FreeBSD 4.x and 5.x
+	  that lead to C compilation errors
+
 0.03 2007-09-27 09:22:26 UTC
     - All platforms now handle all attributes. If the requested
       attribute is not implemented (for instance, jid/jail_id on
