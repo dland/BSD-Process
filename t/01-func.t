@@ -291,7 +291,7 @@ SKIP: {
     # now find the gids that own the most processes
     ($biggest, $bigger) = (sort {$rgid{$b} <=> $rgid{$a} || $a <=> $b} keys %rgid )[0,1];
 
-    my @proc = BSD::Process::list( rgid => $biggest );
+    @proc = BSD::Process::list( rgid => $biggest );
     cmp_ok( scalar(@proc), '<', $all_procs, "rgid $biggest smaller than count of all processes" );
 
     my $biggest_rgid = @proc;
