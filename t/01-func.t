@@ -188,6 +188,8 @@ SKIP: {
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
         if ($proc) {
+            diag( "proc $proc->{_pid} is a zombie" )
+                if exists $proc->{_pid} and not exists $proc->{pid};
             $uid{$proc->{uid}}++;
         }
         else {
@@ -354,18 +356,14 @@ isnt( $info->{pid}, $parent->{ppid}, 'I am not my grandparent' );
 isnt( $parent->{pid}, $parent->{ppid}, 'and my parent is not my grandparent' );
 
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 2 )
+    skip( "not supported on FreeBSD 4.x", 6 )
         if $RUNNING_ON_FREEBSD_4;
-my $resolved = BSD::Process::info({resolve => 1});
-is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve implicit pid' );
 
-$resolved = BSD::Process::info($info->{pid}, {resolve => 1});
-is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
-}
+    my $resolved = BSD::Process::info({resolve => 1});
+    is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve implicit pid' );
 
-SKIP: {
-    skip( "not supported on FreeBSD 4.x", 4 )
-        if $RUNNING_ON_FREEBSD_4;
+    $resolved = BSD::Process::info($info->{pid}, {resolve => 1});
+    is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
 
     my $root = BSD::Process::all( uid => 'root' );
     my $uid_root_count = 0;
