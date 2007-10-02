@@ -258,9 +258,9 @@ SKIP: {
     is ($total, $blessed, "... and all blessed BSD::Process objects" );
 }
 
-# processes owned by an effective gid
 SKIP: {
-    skip( "not supported on FreeBSD 4.x or 5.x", 3 )
+    # processes owned by an effective gid
+    skip( "not supported on FreeBSD 4.x or 5.x", 6 )
         if $RUNNING_ON_FREEBSD_4 or $RUNNING_ON_FREEBSD_5;
     # count the processes owned by each effective gid
     # kinfo_proc lacks a gid field, so we'll punt with a real gid
@@ -280,13 +280,8 @@ SKIP: {
     @proc = BSD::Process::list( effective_group_id => $bigger );
     cmp_ok( scalar(@proc), '<',  $all_procs, "gid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_gid, "gid $bigger smaller or equal to gid $biggest" );
-}
 
-# processes owned by a rgid
-SKIP: {
-    skip( "not supported on FreeBSD 4.x or 5.x", 3 )
-        if $RUNNING_ON_FREEBSD_4 or $RUNNING_ON_FREEBSD_5;
-    # count the processes owned by each real gid
+    # processes owned by a rgid
     my %rgid;
     for my $pid (@all) {
         my $proc = BSD::Process->new($pid);
@@ -294,7 +289,7 @@ SKIP: {
     }
 
     # now find the gids that own the most processes
-    my ($biggest, $bigger) = (sort {$rgid{$b} <=> $rgid{$a} || $a <=> $b} keys %rgid )[0,1];
+    ($biggest, $bigger) = (sort {$rgid{$b} <=> $rgid{$a} || $a <=> $b} keys %rgid )[0,1];
 
     my @proc = BSD::Process::list( rgid => $biggest );
     cmp_ok( scalar(@proc), '<', $all_procs, "rgid $biggest smaller than count of all processes" );
@@ -369,28 +364,21 @@ is( $resolved->{uid}, scalar(getpwuid($info->{uid})), 'resolve explicit pid' );
 }
 
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 1 )
+    skip( "not supported on FreeBSD 4.x", 4 )
         if $RUNNING_ON_FREEBSD_4;
+
     my $root = BSD::Process::all( uid => 'root' );
     my $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all uid root's processes} );
-}
 
-SKIP: {
-    skip( "not supported on FreeBSD 4.x", 1 )
-        if $RUNNING_ON_FREEBSD_4;
-    my $root = BSD::Process::all( effective_user_id => 'root' );
-    my $uid_root_count = 0;
+    $root = BSD::Process::all( effective_user_id => 'root' );
+    $uid_root_count = 0;
     $root->{$_}->uid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all effective uid root's processes} );
-}
 
-SKIP: {
-    skip( "not supported on FreeBSD 4.x", 1 )
-        if $RUNNING_ON_FREEBSD_4;
-    my $root = BSD::Process::all( ruid => 'root' );
-    my $uid_root_count = 0;
+    $root = BSD::Process::all( ruid => 'root' );
+    $uid_root_count = 0;
     for (keys %$root) {
         if ($root->{$_}->uid == 0) {
             ++$uid_root_count;
@@ -402,13 +390,9 @@ SKIP: {
         }
     }
     is( $uid_root_count, scalar(keys %$root), q{counted all ruid root's processes} );
-}
 
-SKIP: {
-    skip( "not supported on FreeBSD 4.x", 1 )
-        if $RUNNING_ON_FREEBSD_4;
-    my $root = BSD::Process::all( real_user_id => 'root' );
-    my $uid_root_count = 0;
+    $root = BSD::Process::all( real_user_id => 'root' );
+    $uid_root_count = 0;
     $root->{$_}->ruid == 0 and ++$uid_root_count for keys %$root;
     is( $uid_root_count, scalar(keys %$root), q{counted all real_user_id root's processes} );
 }
