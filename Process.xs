@@ -577,15 +577,3 @@ _all(int resolve, int request, int param)
 
     OUTPUT:
         RETVAL
-
-void
-ary()
-    PREINIT:
-#ifdef dXSTARG
-    dXSTARG;
-#else
-    dTARGET;
-#endif
-    PPCODE:
-        XPUSHp("ratty",5);
-        XPUSHi(15);
