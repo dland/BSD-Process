@@ -4,9 +4,9 @@ use strict;
 use BSD::Process;
 
 use vars '$VERSION';
-$VERSION = '0.1';
+$VERSION = '0.2';
 
-if ($ARGV[0] eq '-V') {
+if (@ARGV and $ARGV[0] eq '-V') {
     print $VERSION, $/;
     exit;
 }
