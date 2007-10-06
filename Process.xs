@@ -499,6 +499,13 @@ _info(int pid, int resolve)
 void
 _list(int request, int param)
     PREINIT:
+#if __FreeBSD_version < 500000
+#ifdef dXSTARG
+    dXSTARG;
+#else
+    dTARGET;
+#endif
+#endif
         struct kinfo_proc *kip;
         kvm_t *kd;
         int nr;
@@ -512,7 +519,7 @@ _list(int request, int param)
             int p;
             for (p = 0; p < nr; ++kip, ++p) {
 #if __FreeBSD_version < 500000
-                mPUSHi(kip->kp_proc.p_pid);
+                XPUSHi(kip->kp_proc.p_pid);
 #else
                 mPUSHi(kip->ki_pid);
 #endif
@@ -570,3 +577,15 @@ _all(int resolve, int request, int param)
 
     OUTPUT:
         RETVAL
+
+void
+ary()
+    PREINIT:
+#ifdef dXSTARG
+    dXSTARG;
+#else
+    dTARGET;
+#endif
+    PPCODE:
+        XPUSHp("ratty",5);
+        XPUSHi(15);
