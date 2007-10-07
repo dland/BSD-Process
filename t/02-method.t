@@ -263,13 +263,15 @@ plan tests => 242
     is($pe->voluntary_context_switch_ch,   delete $pe->{nvcsw_ch},    'alias voluntary_context_switch');
     is($pe->involuntary_context_switch_ch, delete $pe->{nivcsw_ch},   'alias involuntary_context_switch');
 
+    $grouplist = $pe->group_list;
     delete $pe->{groups};
     SKIP: {
         skip( "not supported on FreeBSD 4.x", 3 )
             if $RUNNING_ON_FREEBSD_4;
-        my $grouplist = $pe->group_list;
         ok( defined($grouplist), 'alias group_list' );
         is( ref($grouplist), 'ARRAY', q{... it's also a list} );
+        skip( "didn't get an ARRAY in previous test", 1 )
+            unless ref($grouplist);
         is( scalar(@$grouplist), $ngroups, "... also of the expected size" )
             or diag("grouplist = (@$grouplist)");
     } # SKIP
