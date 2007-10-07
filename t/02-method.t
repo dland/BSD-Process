@@ -1,7 +1,7 @@
 # 02-method.t
 # Method tests for BSD::Process
 #
-# Copyright (C) 2006 David Landgren
+# Copyright (C) 2006-2007 David Landgren
 
 use strict;
 use Test::More;
