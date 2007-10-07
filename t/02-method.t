@@ -270,11 +270,13 @@ plan tests => 242
             if $RUNNING_ON_FREEBSD_4;
         ok( defined($grouplist), 'alias group_list' );
         is( ref($grouplist), 'ARRAY', q{... it's also a list} );
-        skip( "didn't get an ARRAY in previous test", 1 )
-            unless ref($grouplist);
-        is( scalar(@$grouplist), $ngroups, "... also of the expected size" )
-            or diag("grouplist = (@$grouplist)");
-    } # SKIP
+        SKIP: {
+            skip( "didn't get an ARRAY in previous test", 1 )
+                unless ref($grouplist);
+            is( scalar(@$grouplist), $ngroups, "... also of the expected size" )
+                or diag("grouplist = (@$grouplist)");
+        }
+    }
 
     # check for typos in hv_store calls in Process.xs
     is( scalar(grep {!/^_/} keys %$pe), 0, 'all aliases have been accounted for' )
@@ -284,7 +286,7 @@ plan tests => 242
     cmp_ok( $pi->refresh->runtime, '>', $time, 'refresh updates counters' );
 
     $pe->refresh;
-    for my $method (sort BSD::Process::attr_alias) {
+    for my $method (sort {$a cmp $b} BSD::Process::attr_alias) {
         ok($pe->can($method), "can $method");
     }
 }
