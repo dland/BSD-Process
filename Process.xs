@@ -22,6 +22,12 @@
 #undef cv
 #endif
 
+#if __FreeBSD_version < 500000
+#define PID_FIELD kp_proc.p_pid
+#else
+#define PID_FIELD ki_pid
+#endif
+
 #include <fcntl.h> /* O_RDONLY */
 #include <limits.h> /* _POSIX2_LINE_MAX */
 
@@ -499,12 +505,10 @@ _info(int pid, int resolve)
 void
 _list(int request, int param)
     PREINIT:
-#if __FreeBSD_version < 500000
 #ifdef dXSTARG
     dXSTARG;
 #else
     dTARGET;
-#endif
 #endif
         struct kinfo_proc *kip;
         kvm_t *kd;
@@ -518,10 +522,11 @@ _list(int request, int param)
         if (kip) {
             int p;
             for (p = 0; p < nr; ++kip, ++p) {
-#if __FreeBSD_version < 500000
-                XPUSHi(kip->kp_proc.p_pid);
+#if PERL_API_VERSION == 5 && PERL_VERSION == 6
+                EXTEND(SP,1);
+                XPUSHi(kip->PID_FIELD);
 #else
-                mPUSHi(kip->ki_pid);
+                mPUSHi(kip->PID_FIELD);
 #endif
             }
             kvm_close(kd);
