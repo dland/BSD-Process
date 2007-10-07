@@ -1,6 +1,6 @@
 # BSD::Process.pm
 #
-# Copyright (c) 2006 David Landgren
+# Copyright (c) 2006-2007 David Landgren
 # All rights reserved
 
 package BSD::Process;
@@ -286,7 +286,7 @@ BSD::Process - Information about running processes on BSD platforms
 =head1 VERSION
 
 This document describes version 0.04 of BSD::Process,
-released 2007-xx-xx.
+released 2007-10-08.
 
 =head1 SYNOPSIS
 
@@ -1070,7 +1070,7 @@ None.
 
 =head1 AUTHOR
 
-David Landgren, copyright (C) 2006. All rights reserved.
+David Landgren, copyright (C) 2006-2007. All rights reserved.
 
 http://www.landgren.net/perl/
 
