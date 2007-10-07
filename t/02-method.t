@@ -284,7 +284,7 @@ plan tests => 242
     cmp_ok( $pi->refresh->runtime, '>', $time, 'refresh updates counters' );
 
     $pe->refresh;
-    for my $method (BSD::Process::attr_alias) {
+    for my $method (sort BSD::Process::attr_alias) {
         ok($pe->can($method), "can $method");
     }
 }
