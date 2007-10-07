@@ -297,35 +297,36 @@ plan tests => 242
     my $sym_imp = BSD::Process->new(     {resolve => 1} );
     my $sym_exp = BSD::Process->new( $$, {resolve => 1} );
 
-    SKIP: {
-        skip( "not supported on FreeBSD 4.x", 13 )
-            if $RUNNING_ON_FREEBSD_4;
-    is( $num->uid,   scalar(getpwnam($sym_imp->uid)),   'implicit pid resolve muid' );
-    is( $num->ruid,  scalar(getpwnam($sym_imp->ruid)),  'implicit pid resolve ruid' );
-    is( $num->svuid, scalar(getpwnam($sym_imp->svuid)), 'implicit pid resolve svuid' );
-    is( $num->rgid,  scalar(getgrnam($sym_imp->rgid)),  'implicit pid resolve rgid' );
-    is( $num->svgid, scalar(getgrnam($sym_imp->svgid)), 'implicit pid resolve svgid' );
-
-    is( $num->uid,   scalar(getpwnam($sym_exp->uid)),   'explicit pid resolve uid' );
-    is( $num->ruid,  scalar(getpwnam($sym_exp->ruid)),  'explicit pid resolve ruid' );
-    is( $num->svuid, scalar(getpwnam($sym_exp->svuid)), 'explicit pid resolve svuid' );
-    is( $num->rgid,  scalar(getgrnam($sym_exp->rgid)),  'explicit pid resolve rgid' );
-    is( $num->svgid, scalar(getgrnam($sym_exp->svgid)), 'explicit pid resolve svgid' );
-
     my $num_grouplist = $num->groups;
     my $sym_grouplist = $sym_imp->group_list;
 
-    is( ref($num_grouplist), 'ARRAY', 'numeric grouplist is an ARRAY' );
-    is( ref($sym_grouplist), 'ARRAY', 'symbolic grouplist is an ARRAY' );
+    SKIP: {
+        skip( "not supported on FreeBSD 4.x", 13 )
+            if $RUNNING_ON_FREEBSD_4;
+        is( $num->uid,   scalar(getpwnam($sym_imp->uid)),   'implicit pid resolve muid' );
+        is( $num->ruid,  scalar(getpwnam($sym_imp->ruid)),  'implicit pid resolve ruid' );
+        is( $num->svuid, scalar(getpwnam($sym_imp->svuid)), 'implicit pid resolve svuid' );
+        is( $num->rgid,  scalar(getgrnam($sym_imp->rgid)),  'implicit pid resolve rgid' );
+        is( $num->svgid, scalar(getgrnam($sym_imp->svgid)), 'implicit pid resolve svgid' );
 
-    is( scalar(@$num_grouplist), scalar(@$sym_grouplist), 'groups counts' );
+        is( $num->uid,   scalar(getpwnam($sym_exp->uid)),   'explicit pid resolve uid' );
+        is( $num->ruid,  scalar(getpwnam($sym_exp->ruid)),  'explicit pid resolve ruid' );
+        is( $num->svuid, scalar(getpwnam($sym_exp->svuid)), 'explicit pid resolve svuid' );
+        is( $num->rgid,  scalar(getgrnam($sym_exp->rgid)),  'explicit pid resolve rgid' );
+        is( $num->svgid, scalar(getgrnam($sym_exp->svgid)), 'explicit pid resolve svgid' );
+
+        is( ref($num_grouplist), 'ARRAY', 'numeric grouplist is an ARRAY' );
+        is( ref($sym_grouplist), 'ARRAY', 'symbolic grouplist is an ARRAY' );
+
+        is( scalar(@$num_grouplist), scalar(@$sym_grouplist), 'groups counts' );
+    }
+
     for my $gid (0..BSD::Process::max_kernel_groups) {
         if ($gid < @$num_grouplist) {
             is( $num_grouplist->[$gid],  scalar(getgrnam($sym_grouplist->[$gid])), "resolve group $gid" );
         }
         else {
-            pass( "resolve group $gid (undefined)" );
+            pass( "resolve group $gid (none on this platform)" );
         }
     }
-    } # SKIP
 }
