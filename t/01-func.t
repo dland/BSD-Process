@@ -304,7 +304,7 @@ SKIP: {
 
 # process groups
 SKIP: {
-    skip( "not supported on FreeBSD 4.x", 3 )
+    skip( "not supported on FreeBSD 4.x", 6 )
         if $RUNNING_ON_FREEBSD_4;
     # count the processes in each process group
     my %pgid;
@@ -323,10 +323,8 @@ SKIP: {
     @proc = BSD::Process::list( process_group_id => $bigger );
     cmp_ok( scalar(@proc), '<',  $all_procs, "pgid $bigger smaller than count of all processes" );
     cmp_ok( scalar(@proc), '<=', $biggest_pgid, "pgid $bigger smaller or equal to pgid $biggest" );
-}
 
-# process sessions
-{
+    # process sessions
     # count the processes in each process session
     my %sid;
     for my $pid (@all) {
@@ -335,9 +333,9 @@ SKIP: {
     }
 
     # now find the process groups with the most members
-    my ($biggest, $bigger) = (sort {$sid{$b} <=> $sid{$a} || $a <=> $b} keys %sid )[0,1];
+    ($biggest, $bigger) = (sort {$sid{$b} <=> $sid{$a} || $a <=> $b} keys %sid )[0,1];
 
-    my @proc = BSD::Process::list( sid => $biggest );
+    @proc = BSD::Process::list( sid => $biggest );
     cmp_ok( scalar(@proc), '<', $all_procs, "sid $biggest smaller than count of all processes" );
 
     my $biggest_sid = @proc;
