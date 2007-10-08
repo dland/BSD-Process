@@ -13,7 +13,7 @@ use XSLoader;
 use base qw(Class::Accessor);
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '0.04';
+$VERSION = '0.05';
 @ISA = qw(Exporter Class::Accessor);
 
 @EXPORT_OK = (qw(process_info process_list));
@@ -285,8 +285,8 @@ BSD::Process - Information about running processes on BSD platforms
 
 =head1 VERSION
 
-This document describes version 0.04 of BSD::Process,
-released 2007-10-07.
+This document describes version 0.05 of BSD::Process,
+released 2007-xx-xx.
 
 =head1 SYNOPSIS
 
