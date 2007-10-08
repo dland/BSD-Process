@@ -1,5 +1,8 @@
 Revision history for Perl extension BSD::Process
 
+0.05
+    - _all() benefits from #define PID_FIELD too (simplification)
+
 0.04 2007-10-07 22:11:41 UTC
     - Fixed silly cut'n'paste errors for FreeBSD 4.x and 5.x
       that lead to C compilation errors
