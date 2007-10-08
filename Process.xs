@@ -568,13 +568,8 @@ _all(int resolve, int request, int param)
         for (p = 0; p < nr; ++kip, ++p) {
             h = _procinfo( kip, resolve );
             hv_store(h, "_resolve", 8, newSViv(resolve), 0);
-#if __FreeBSD_version < 500000
-            hv_store(h, "_pid",     4, newSViv(kip->kp_proc.p_pid), 0);
-            sprintf( pidbuf, "%d", kip->kp_proc.p_pid );
-#else
-            hv_store(h, "_pid",     4, newSViv(kip->ki_pid), 0);
-            sprintf( pidbuf, "%d", kip->ki_pid );
-#endif
+            hv_store(h, "_pid",     4, newSViv(kip->PID_FIELD), 0);
+            sprintf( pidbuf, "%d", kip->PID_FIELD);
             hv_store(out, pidbuf, strlen(pidbuf),
                 sv_bless(newRV((SV *)h), package), 0);
         }
