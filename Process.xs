@@ -131,10 +131,11 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     struct group *gr;
     short g;
     AV *grlist;
-    struct rusage *rp;
 #if __FreeBSD_version < 500000
     struct proc *p;
     struct eproc *e;
+#else
+    struct rusage *rp;
 #endif
 
     h = (HV *)sv_2mortal((SV *)newHV());
@@ -170,11 +171,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     /* not available in FreeBSD 4.x */
     hv_store(h, "groups", 6, newRV(sv_2mortal((SV *)newAV())), 0);
 
-    hv_store(h, "uid",    3, newSViv(-1), 0);
-    hv_store(h, "ruid",   4, newSViv(-1), 0);
-    hv_store(h, "svuid",  5, newSViv(-1), 0);
-    hv_store(h, "rgid",   4, newSViv(-1), 0);
-    hv_store(h, "svgid",  5, newSViv(-1), 0);
     hv_store(h, "args",   4, newSViv(-1), 0);
 
 #else
