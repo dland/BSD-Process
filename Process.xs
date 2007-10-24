@@ -228,9 +228,9 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
         NO_FREEBSD_4x(store_gid(h, "svgid", kp->ki_svgid));
     }
 
+    grlist = (AV *)sv_2mortal((SV *)newAV());
 #if __FreeBSD_version < 500000
     /* not available in FreeBSD 4.x */
-    hv_store(h, "groups", 6, newRV(sv_2mortal((SV *)newAV())), 0);
     hv_store(h, "args",   4, newSViv(-1), 0);
 #else
     /* attributes available only in FreeBSD 5.x, 6.x */
@@ -266,7 +266,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     }
 
     /* deal with groups array */
-    grlist = (AV *)sv_2mortal((SV *)newAV());
     for (g = 0; g < kp->ki_ngroups; ++g) {
         if (resolve && (gr = getgrgid(kp->ki_groups[g]))) {
             av_push(grlist, newSVpvn(gr->gr_name, strlen(gr->gr_name)));
@@ -275,8 +274,8 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
             av_push(grlist, newSViv(kp->ki_groups[g]));
         }
     }
-    hv_store(h, "groups", 6, newRV((SV *)grlist), 0);
 #endif
+    hv_store(h, "groups", 6, newRV((SV *)grlist), 0);
 
     hv_store(h, "ngroups",   7, newSViv(NO_FREEBSD_4x(kp->ki_ngroups)), 0);
     hv_store(h, "size",      4, newSViv(NO_FREEBSD_4x(kp->ki_size)), 0);
