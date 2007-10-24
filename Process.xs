@@ -87,6 +87,39 @@ struct kinfo_proc *_proc_request (kvm_t *kd, int request, int param, int *pnr) {
     return(kip);
 }
 
+void store_uid (HV *h, const char *field, uid_t uid) {
+    struct passwd *pw;
+    size_t flen;
+    size_t len;
+
+    flen = strlen(field);
+    if (!(pw = getpwuid(uid))) {
+        /* shouldn't ever happen... */
+        hv_store(h, field, flen, newSViv(uid), 0);
+    }
+    else {
+        len = strlen(pw->pw_name);
+        hv_store(h, field, flen, newSVpvn(pw->pw_name,len), 0);
+    }
+}
+
+void store_gid (HV *h, const char *field, gid_t gid) {
+    struct group *gr;
+    size_t flen;
+    size_t len;
+
+    flen = strlen(field);
+    if (!(gr = getgrgid(gid))) {
+        /* shouldn't ever happen... */
+        hv_store(h, field, flen, newSViv(gid), 0);
+    }
+    else {
+        len = strlen(gr->gr_name);
+        hv_store(h, field, flen, newSVpvn(gr->gr_name,len), 0);
+    }
+}
+
+
 HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     HV *h;
     const char *nlistf, *memf;
@@ -95,7 +128,6 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     char **argv;
     SV *argsv;
     size_t len;
-    struct passwd *pw;
     struct group *gr;
     short g;
     AV *grlist;
@@ -198,64 +230,11 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
         hv_store(h, "svgid", 5, newSViv(kp->ki_svgid), 0);
     }
     else {
-        /* first, the user ids */
-        pw = getpwuid(kp->ki_uid);
-        if (!pw) {
-            /* shouldn't ever happen... */
-            hv_store(h, "uid", 3, newSViv(kp->ki_uid), 0);
-        }
-        else {
-            len = strlen(pw->pw_name);
-            hv_store(h, "uid", 3, newSVpvn(pw->pw_name,len), 0);
-        }
-
-        /* if the real uid is the same, use the previous results */
-        if (kp->ki_ruid != kp->ki_uid) {
-            pw = getpwuid(kp->ki_ruid);
-            if (pw) {
-                len = strlen(pw->pw_name);
-            }
-        }
-        if (pw) {
-            hv_store(h, "ruid", 4, newSVpvn(pw->pw_name,len), 0);
-        }
-        else {
-            hv_store(h, "ruid", 4, newSViv(kp->ki_ruid), 0);
-        }
-
-        if (kp->ki_svuid != kp->ki_uid) {
-            pw = getpwuid(kp->ki_svuid);
-            len = strlen(pw->pw_name);
-        }
-        if (pw) {
-            hv_store(h, "svuid", 5, newSVpvn(pw->pw_name,len), 0);
-        }
-        else {
-            hv_store(h, "svuid", 5, newSViv(kp->ki_svuid), 0);
-        }
-
-        /* and now the group ids */
-        gr = getgrgid(kp->ki_rgid);
-        if (gr) {
-            len = strlen(gr->gr_name);
-            hv_store(h, "rgid", 4, newSVpvn(gr->gr_name,len), 0);
-        }
-        else {
-            hv_store(h, "rgid", 4, newSViv(kp->ki_rgid), 0);
-        }
-
-        if (kp->ki_svgid != kp->ki_rgid) {
-            gr = getgrgid(kp->ki_svgid);
-            if (gr) {
-                len = strlen(gr->gr_name);
-            }
-        }
-        if (gr) {
-            hv_store(h, "svgid", 5, newSVpvn(gr->gr_name,len), 0);
-        }
-        else {
-            hv_store(h, "svgid", 5, newSViv(kp->ki_svgid), 0);
-        }
+        store_uid(h, "uid",   NO_FREEBSD_4x(kp->ki_uid));
+        store_uid(h, "ruid",  NO_FREEBSD_4x(kp->ki_ruid));
+        store_uid(h, "svuid", NO_FREEBSD_4x(kp->ki_svuid));
+        store_gid(h, "rgid",  NO_FREEBSD_4x(kp->ki_rgid));
+        store_gid(h, "svgid", NO_FREEBSD_4x(kp->ki_svgid));
     }
 
     /* deal with groups array */
