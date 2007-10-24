@@ -336,7 +336,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "nivcsw",   6, newSViv(NO_FREEBSD_4x(rp->ru_nivcsw)), 0);
 
     /* attributes available only in FreeBSD 6.x */
-    hv_store(h, "emul",        4, newSVpv(NO_FREEBSD_5x(kp->ki_emul), 0), 0);
+    hv_store(h, "emul",        4, newSVpv(NO_FREEBSD_5x_pv(kp->ki_emul), 0), 0);
     hv_store(h, "jid",         3, newSViv(NO_FREEBSD_5x(kp->ki_jid)), 0);
     hv_store(h, "numthreads", 10, newSViv(NO_FREEBSD_5x(kp->ki_numthreads)), 0);
 
