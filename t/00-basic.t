@@ -17,10 +17,10 @@ my %tests = (
 );
 my %tests_skip = %tests;
 
-eval qq{use Test::Pod};
+eval "use Test::Pod";
 $@ and delete $tests{POD};
 
-eval qq{use Test::Pod::Coverage};
+eval "use Test::Pod::Coverage";
 $@ and delete $tests{POD_COVERAGE};
 
 if (keys %tests) {
