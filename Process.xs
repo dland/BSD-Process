@@ -40,17 +40,17 @@
 #if __FreeBSD_version < 500000
 #define NO_FREEBSD_4x(a)    (-1)
 #define NO_FREEBSD_4x_pv(a) ("")
-#define NO_FREEBSD_4x_TF(a) (-1)
 #else
 #define NO_FREEBSD_4x(a)    (a)
 #define NO_FREEBSD_4x_pv(a) (a)
-#define NO_FREEBSD_4x_TF(a) TIME_FRAC(a)
 #endif
 
 #if __FreeBSD_version < 600000
-#define NO_FREEBSD_5x(a) (-1)
+#define NO_FREEBSD_5x(a)    (-1)
+#define NO_FREEBSD_5x_pv(a) ("")
 #else
-#define NO_FREEBSD_5x(a) (a)
+#define NO_FREEBSD_5x(a)    (a)
+#define NO_FREEBSD_5x_pv(a) (a)
 #endif
 
 static int proc_info_mib[4] = { -1, -1, -1, -1 };
@@ -220,23 +220,23 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "tsid",  4, newSViv(NO_FREEBSD_4x(kp->ki_tsid)), 0);
     hv_store(h, "jobc",  4, newSViv(NO_FREEBSD_4x(kp->ki_jobc)), 0);
 
-#if __FreeBSD_version >= 500000
     if (!resolve) {
         /* numeric user and group ids */
-        hv_store(h, "uid",   3, newSViv(kp->ki_uid), 0);
-        hv_store(h, "ruid",  4, newSViv(kp->ki_ruid), 0);
-        hv_store(h, "svuid", 5, newSViv(kp->ki_svuid), 0);
-        hv_store(h, "rgid",  4, newSViv(kp->ki_rgid), 0);
-        hv_store(h, "svgid", 5, newSViv(kp->ki_svgid), 0);
+        hv_store(h, "uid",   3, newSViv(NO_FREEBSD_4x(kp->ki_uid)), 0);
+        hv_store(h, "ruid",  4, newSViv(NO_FREEBSD_4x(kp->ki_ruid)), 0);
+        hv_store(h, "svuid", 5, newSViv(NO_FREEBSD_4x(kp->ki_svuid)), 0);
+        hv_store(h, "rgid",  4, newSViv(NO_FREEBSD_4x(kp->ki_rgid)), 0);
+        hv_store(h, "svgid", 5, newSViv(NO_FREEBSD_4x(kp->ki_svgid)), 0);
     }
     else {
-        store_uid(h, "uid",   NO_FREEBSD_4x(kp->ki_uid));
-        store_uid(h, "ruid",  NO_FREEBSD_4x(kp->ki_ruid));
-        store_uid(h, "svuid", NO_FREEBSD_4x(kp->ki_svuid));
-        store_gid(h, "rgid",  NO_FREEBSD_4x(kp->ki_rgid));
-        store_gid(h, "svgid", NO_FREEBSD_4x(kp->ki_svgid));
+        NO_FREEBSD_4x(store_uid(h, "uid",   kp->ki_uid));
+        NO_FREEBSD_4x(store_uid(h, "ruid",  kp->ki_ruid));
+        NO_FREEBSD_4x(store_uid(h, "svuid", kp->ki_svuid));
+        NO_FREEBSD_4x(store_gid(h, "rgid",  kp->ki_rgid));
+        NO_FREEBSD_4x(store_gid(h, "svgid", kp->ki_svgid));
     }
 
+#if __FreeBSD_version >= 500000
     /* deal with groups array */
     grlist = (AV *)sv_2mortal((SV *)newAV());
     for (g = 0; g < kp->ki_ngroups; ++g) {
@@ -306,20 +306,18 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "pri_native", 10, newSViv(NO_FREEBSD_4x(kp->ki_pri.pri_native)), 0);
     hv_store(h, "pri_user",    8, newSViv(NO_FREEBSD_4x(kp->ki_pri.pri_user)), 0);
 
-#if __FreeBSD_version >= 500000
-    hv_store(h, "nice",        4, newSViv(kp->ki_nice), 0);
-    hv_store(h, "lock",        4, newSViv(kp->ki_lock), 0);
-    hv_store(h, "rqindex",     7, newSViv(kp->ki_rqindex), 0);
-    hv_store(h, "oncpu",       5, newSViv(kp->ki_oncpu), 0);
-    hv_store(h, "lastcpu",     7, newSViv(kp->ki_lastcpu), 0);
-    hv_store(h, "wmesg",       5, newSVpv(kp->ki_wmesg, 0), 0);
-    hv_store(h, "login",       5, newSVpv(kp->ki_login, 0), 0);
-    hv_store(h, "comm",        4, newSVpv(kp->ki_comm, 0), 0);
-#endif
+    hv_store(h, "nice",        4, newSViv(NO_FREEBSD_5x(kp->ki_nice)), 0);
+    hv_store(h, "lock",        4, newSViv(NO_FREEBSD_5x(kp->ki_lock)), 0);
+    hv_store(h, "rqindex",     7, newSViv(NO_FREEBSD_5x(kp->ki_rqindex)), 0);
+    hv_store(h, "oncpu",       5, newSViv(NO_FREEBSD_5x(kp->ki_oncpu)), 0);
+    hv_store(h, "lastcpu",     7, newSViv(NO_FREEBSD_5x(kp->ki_lastcpu)), 0);
+    hv_store(h, "wmesg",       5, newSVpv(NO_FREEBSD_5x_pv(kp->ki_wmesg), 0), 0);
+    hv_store(h, "login",       5, newSVpv(NO_FREEBSD_5x_pv(kp->ki_login), 0), 0);
+    hv_store(h, "comm",        4, newSVpv(NO_FREEBSD_5x_pv(kp->ki_comm), 0), 0);
 
     NO_FREEBSD_4x(rp = &kp->ki_rusage);
-    hv_store(h, "utime",    5, newSVnv(NO_FREEBSD_4x_TF(rp->ru_utime)), 0);
-    hv_store(h, "stime",    5, newSVnv(NO_FREEBSD_4x_TF(rp->ru_stime)), 0);
+    hv_store(h, "utime",    5, newSVnv(NO_FREEBSD_4x(TIME_FRAC(rp->ru_utime))), 0);
+    hv_store(h, "stime",    5, newSVnv(NO_FREEBSD_4x(TIME_FRAC(rp->ru_stime))), 0);
     hv_store(h, "time",     4, newSVnv(NO_FREEBSD_4x(
         TIME_FRAC(rp->ru_utime)+TIME_FRAC(rp->ru_stime))), 0);
     hv_store(h, "maxrss",   6, newSVnv(NO_FREEBSD_4x(rp->ru_maxrss)), 0);
@@ -338,53 +336,29 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "nivcsw",   6, newSViv(NO_FREEBSD_4x(rp->ru_nivcsw)), 0);
 
     /* attributes available only in FreeBSD 6.x */
-#if __FreeBSD_version < 600000
-    hv_store(h, "emul",         4, newSViv(-1), 0);
-    hv_store(h, "jid",          3, newSViv(-1), 0);
-    hv_store(h, "numthreads",   10, newSViv(-1), 0);
-    hv_store(h, "utime_ch",     8, newSViv(-1), 0);
-    hv_store(h, "stime_ch",     8, newSViv(-1), 0);
-    hv_store(h, "time_ch",      7, newSViv(-1), 0);
-    hv_store(h, "maxrss_ch",    9, newSViv(-1), 0);
-    hv_store(h, "ixrss_ch",     8, newSViv(-1), 0);
-    hv_store(h, "idrss_ch",     8, newSViv(-1), 0);
-    hv_store(h, "isrss_ch",     8, newSViv(-1), 0);
-    hv_store(h, "minflt_ch",    9, newSViv(-1), 0);
-    hv_store(h, "majflt_ch",    9, newSViv(-1), 0);
-    hv_store(h, "nswap_ch",     8, newSViv(-1), 0);
-    hv_store(h, "inblock_ch",  10, newSViv(-1), 0);
-    hv_store(h, "oublock_ch",  10, newSViv(-1), 0);
-    hv_store(h, "msgsnd_ch",    9, newSViv(-1), 0);
-    hv_store(h, "msgrcv_ch",    9, newSViv(-1), 0);
-    hv_store(h, "nsignals_ch", 11, newSViv(-1), 0);
-    hv_store(h, "nvcsw_ch",     8, newSViv(-1), 0);
-    hv_store(h, "nivcsw_ch",    9, newSViv(-1), 0);
-#else
+    hv_store(h, "emul",        4, newSVpv(NO_FREEBSD_5x(kp->ki_emul), 0), 0);
+    hv_store(h, "jid",         3, newSViv(NO_FREEBSD_5x(kp->ki_jid)), 0);
+    hv_store(h, "numthreads", 10, newSViv(NO_FREEBSD_5x(kp->ki_numthreads)), 0);
 
-    hv_store(h, "emul",        4, newSVpv(kp->ki_emul, 0), 0);
-    hv_store(h, "jid",         3, newSViv(kp->ki_jid), 0);
-    hv_store(h, "numthreads", 10, newSViv(kp->ki_numthreads), 0);
-
-    rp = &kp->ki_rusage_ch;
-    hv_store(h, "utime_ch",     8, newSVnv(TIME_FRAC(rp->ru_utime)), 0);
-    hv_store(h, "stime_ch",     8, newSVnv(TIME_FRAC(rp->ru_stime)), 0);
-    hv_store(h, "time_ch",      7, newSVnv(
-        TIME_FRAC(rp->ru_utime)+TIME_FRAC(rp->ru_stime)), 0);
-    hv_store(h, "maxrss_ch",    9, newSVnv(rp->ru_maxrss), 0);
-    hv_store(h, "ixrss_ch",     8, newSVnv(rp->ru_ixrss), 0);
-    hv_store(h, "idrss_ch",     8, newSVnv(rp->ru_idrss), 0);
-    hv_store(h, "isrss_ch",     8, newSVnv(rp->ru_isrss), 0);
-    hv_store(h, "minflt_ch",    9, newSVnv(rp->ru_minflt), 0);
-    hv_store(h, "majflt_ch",    9, newSVnv(rp->ru_majflt), 0);
-    hv_store(h, "nswap_ch",     8, newSVnv(rp->ru_nswap), 0);
-    hv_store(h, "inblock_ch",  10, newSVnv(rp->ru_inblock), 0);
-    hv_store(h, "oublock_ch",  10, newSVnv(rp->ru_oublock), 0);
-    hv_store(h, "msgsnd_ch",    9, newSVnv(rp->ru_msgsnd), 0);
-    hv_store(h, "msgrcv_ch",    9, newSVnv(rp->ru_msgrcv), 0);
-    hv_store(h, "nsignals_ch", 11, newSViv(rp->ru_nsignals), 0);
-    hv_store(h, "nvcsw_ch",     8, newSViv(rp->ru_nvcsw), 0);
-    hv_store(h, "nivcsw_ch",    9, newSViv(rp->ru_nivcsw), 0);
-#endif
+    NO_FREEBSD_5x(rp = &kp->ki_rusage_ch);
+    hv_store(h, "utime_ch",     8, newSVnv(NO_FREEBSD_5x(TIME_FRAC(rp->ru_utime))), 0);
+    hv_store(h, "stime_ch",     8, newSVnv(NO_FREEBSD_5x(TIME_FRAC(rp->ru_stime))), 0);
+    hv_store(h, "time_ch",      7, newSVnv(NO_FREEBSD_5x(
+        TIME_FRAC(rp->ru_utime)+TIME_FRAC(rp->ru_stime))), 0);
+    hv_store(h, "maxrss_ch",    9, newSVnv(NO_FREEBSD_5x(rp->ru_maxrss)), 0);
+    hv_store(h, "ixrss_ch",     8, newSVnv(NO_FREEBSD_5x(rp->ru_ixrss)), 0);
+    hv_store(h, "idrss_ch",     8, newSVnv(NO_FREEBSD_5x(rp->ru_idrss)), 0);
+    hv_store(h, "isrss_ch",     8, newSVnv(NO_FREEBSD_5x(rp->ru_isrss)), 0);
+    hv_store(h, "minflt_ch",    9, newSVnv(NO_FREEBSD_5x(rp->ru_minflt)), 0);
+    hv_store(h, "majflt_ch",    9, newSVnv(NO_FREEBSD_5x(rp->ru_majflt)), 0);
+    hv_store(h, "nswap_ch",     8, newSVnv(NO_FREEBSD_5x(rp->ru_nswap)), 0);
+    hv_store(h, "inblock_ch",  10, newSVnv(NO_FREEBSD_5x(rp->ru_inblock)), 0);
+    hv_store(h, "oublock_ch",  10, newSVnv(NO_FREEBSD_5x(rp->ru_oublock)), 0);
+    hv_store(h, "msgsnd_ch",    9, newSVnv(NO_FREEBSD_5x(rp->ru_msgsnd)), 0);
+    hv_store(h, "msgrcv_ch",    9, newSVnv(NO_FREEBSD_5x(rp->ru_msgrcv)), 0);
+    hv_store(h, "nsignals_ch", 11, newSViv(NO_FREEBSD_5x(rp->ru_nsignals)), 0);
+    hv_store(h, "nvcsw_ch",     8, newSViv(NO_FREEBSD_5x(rp->ru_nvcsw)), 0);
+    hv_store(h, "nivcsw_ch",    9, newSViv(NO_FREEBSD_5x(rp->ru_nivcsw)), 0);
 
     return h;
 }
