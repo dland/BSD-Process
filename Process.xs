@@ -34,8 +34,8 @@
 #define PATH_DEV_NULL "/dev/null"
 
 #define TIME_FRAC(t) ((double)(t).tv_sec + (double)(t).tv_usec/1000000)
-#define P_FLAG(f)    ((kp->ki_flag   & f) ? 1 : 0))
-#define KI_FLAG(f)   ((kp->ki_kiflag & f) ? 1 : 0))
+#define P_FLAG(f)    ((kp->ki_flag   & f) ? 1 : 0)
+#define KI_FLAG(f)   ((kp->ki_kiflag & f) ? 1 : 0)
 
 #if __FreeBSD_version < 500000
 #define NO_FREEBSD_4x(a)    (-1)
