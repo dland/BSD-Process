@@ -11,5 +11,7 @@ if (!$ENV{PERL_AUTHOR_TESTING}) {
     exit;
 }
 
+plan skip_all => 'Test::Kwalitee is borked'; exit;
+
 eval { require Test::Kwalitee; Test::Kwalitee->import() };
 plan( skip_all => 'Test::Kwalitee not available on this system' ) if $@;
