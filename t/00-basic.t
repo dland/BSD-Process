@@ -11,38 +11,43 @@ if (!$ENV{PERL_AUTHOR_TESTING}) {
     exit;
 }
 
-my %tests = (
-    POD          => 3,
-    POD_COVERAGE => 1,
-);
-my %tests_skip = %tests;
-
-eval "use Test::Pod";
-$@ and delete $tests{POD};
-
-eval "use Test::Pod::Coverage";
-$@ and delete $tests{POD_COVERAGE};
-
-if (keys %tests) {
-    my $nr = 0;
-    $nr += $_ for values %tests;
-    plan tests => $nr;
+my @file;
+if (open my $MAN, '<', 'MANIFEST') {
+    while (<$MAN>) {
+        chomp;
+        push @file, $_ if m{^eg/|\.pm$};
+    }
+    close $MAN;
 }
 else {
-    plan skip_all => 'POD and Kwalitee testing modules not installed';
+    diag "failed to read MANIFEST: $!";
+}
+
+my @coverage = qw(
+    BSD::Process
+);
+
+my $test_pod_tests = eval "use Test::Pod"
+    ? 0 : @file;
+
+my $test_pod_coverage_tests = eval "use Test::Pod::Coverage"
+    ? 0 : @coverage;
+
+if ($test_pod_tests + $test_pod_coverage_tests) {
+    plan tests => @file + @coverage;
+}
+else {
+    plan skip_all => 'POD testing modules not installed';
 }
 
 SKIP: {
-    skip( 'Test::Pod not installed on this system', $tests_skip{POD} )
-        unless $tests{POD};
-    pod_file_ok( 'Process.pm' );
-    pod_file_ok( 'eg/showprocattr' );
-    pod_file_ok( 'eg/topten' );
+    skip( 'Test::Pod not installed on this system', scalar(@file) )
+        unless $test_pod_tests;
+    pod_file_ok($_) for @file;
 }
 
 SKIP: {
-    skip( 'Test::Pod::Coverage not installed on this system', $tests_skip{POD_COVERAGE} )
-        unless $tests{POD_COVERAGE};
-    pod_coverage_ok( 'BSD::Process', 'POD coverage is go' );
-};
-
+    skip( 'Test::Pod::Coverage not installed on this system', scalar(@coverage) )
+        unless $test_pod_coverage_tests;
+    pod_coverage_ok( $_, "$_ POD coverage is go!" ) for @coverage;
+}
