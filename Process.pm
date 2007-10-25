@@ -286,7 +286,7 @@ BSD::Process - Information about running processes on BSD platforms
 =head1 VERSION
 
 This document describes version 0.05 of BSD::Process,
-released 2007-xx-xx.
+released 2007-10-25.
 
 =head1 SYNOPSIS
 
