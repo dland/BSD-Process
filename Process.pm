@@ -1,6 +1,6 @@
 # BSD::Process.pm
 #
-# Copyright (c) 2006-2007 David Landgren
+# Copyright (c) 2006-2011 David Landgren
 # All rights reserved
 
 package BSD::Process;
@@ -285,8 +285,8 @@ BSD::Process - Information about running processes on BSD platforms
 
 =head1 VERSION
 
-This document describes version 0.05 of BSD::Process,
-released 2007-10-25.
+This document describes version 0.06 of BSD::Process,
+released 2011-xx-xx.
 
 =head1 SYNOPSIS
 
@@ -1061,7 +1061,7 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=BSD-Process|rt.cpan.org>
 
 Make sure you include the output from the following two commands:
 
-  perl -MBSD::Process -le 'print BSD::Process::VERSION'
+  perl -MBSD::Process -le 'print $BSD::Process::VERSION'
   perl -V
 
 =head1 ACKNOWLEDGEMENTS
@@ -1070,7 +1070,7 @@ None.
 
 =head1 AUTHOR
 
-David Landgren, copyright (C) 2006-2007. All rights reserved.
+David Landgren, copyright (C) 2006-2011. All rights reserved.
 
 http://www.landgren.net/perl/
 
