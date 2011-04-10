@@ -305,7 +305,7 @@ BSD::Process - Information about running processes on BSD platforms
 =head1 VERSION
 
 This document describes version 0.06 of BSD::Process,
-released 2011-xx-xx.
+released 2011-04-10.
 
 =head1 SYNOPSIS
 
@@ -324,11 +324,10 @@ released 2011-xx-xx.
 
 =head1 DESCRIPTION
 
-C<BSD::Process> renders the information the BSD kernel maintains
-about current processes as Perl objects. These may then be
-queried, extracted and reported upon. This allows a more
-natural style of programming (as opposed to scraping the
-output of ps(1)).
+C<BSD::Process> creates Perl objects that render the information
+the BSD kernel maintains about current processes.  These may then
+be queried, extracted and reported upon. This allows a more natural
+style of programming (as opposed to scraping the output of ps(1)).
 
 The information is retrieved via the C<kvm> subsystem, and will
 thus work even if the F</proc> filesystem is not mounted.
@@ -363,6 +362,13 @@ expected: the pid of the current process will be used implicitly.
     {resolve => 1},
   );
 
+Once the object has been created, the various process attributes
+can be examined via method calls or as hash keys, see below.
+
+At the current time C<new> is implemented in terms of C<info> (see
+below), but may in the future be implemented in terms of lazy
+fetching.
+
 =item P
 
 Stashes a global BSD::Process variable, for use in one-liners. By
@@ -372,6 +378,7 @@ be specified via its process id.
   print P->rssize, "\n"; # resident set size of running process
   P(P->ppid);            # now refer to parent
   print P->rssize, "\n"; # rss of parent
+  P(1);                  # talking about init(8)
 
 But more likely:
 
@@ -383,7 +390,7 @@ a threaded program, use objects instead.
 
 =item info, process_info
 
-Returns the the entire set of process attributes and their values,
+Returns the entire set of process attributes and their values,
 as specified by a process identifier (or I<pid>).
 
 The input value is numified. Thus, if a some random string is passed
