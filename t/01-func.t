@@ -1,10 +1,13 @@
 # 01-func.t
 # Test the public BSD::Process routines
 #
-# Copyright (C) 2006-2007 David Landgren
+# Copyright (C) 2006-2011 David Landgren
 
 use strict;
 use Test::More;
+
+use BSD::Process;
+plan tests => 152 + scalar(BSD::Process::attr());
 
 use Config;
 
@@ -13,10 +16,6 @@ $_ = $Unchanged;
 
 my $RUNNING_ON_FREEBSD_4 = $Config{osvers} =~ /^4/;
 my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
-
-plan tests => 152 + scalar(BSD::Process::attr());
-
-BEGIN { use_ok('BSD::Process'); }
 
 my $info = BSD::Process::info();
 
