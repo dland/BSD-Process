@@ -13,10 +13,10 @@ use XSLoader;
 use base qw(Class::Accessor);
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '0.05';
+$VERSION = '0.06';
 @ISA = qw(Exporter Class::Accessor);
 
-@EXPORT_OK = (qw(process_info process_list));
+@EXPORT_OK = (qw(process_info process_list P));
 
 BEGIN {
     my %alias = (
@@ -181,6 +181,12 @@ sub new {
     return bless $self, $class;
 }
 
+sub resolve {
+    my $self = shift;
+    $self->{_resolve} = $_[0] ? $_[0] : 1;
+    return $self->refresh;
+}
+
 sub refresh {
     my $self = shift;
     my $info = _info($self->{_pid}, $self->{_resolve});
@@ -276,6 +282,19 @@ sub info {
     return _info($pid, $resolve);
 }
 
+{
+    my $P;
+    sub P {
+        if ($_[0]) {
+            $P = BSD::Process->new($_[0]);
+        }
+        elsif (!$P) {
+            $P = BSD::Process->new();
+        }
+        return $P;
+    }
+}
+
 *process_info = *info;
 *process_list = *list;
 
@@ -293,12 +312,15 @@ released 2011-xx-xx.
   use BSD::Process;
 
   my $proc = BSD::Process->new;
-  print $proc->rssize, " resident set size\n";
+  print $proc->rssize, " resident set size\n"; # as a method
   print "This process has made $proc->{minflt} page reclaims\n";
 
   print $proc->time, " seconds spent on the CPU (user+system)\n";
   $proc->refresh;
-  print "And now $proc->{time} seconds\n";
+  print "And now $proc->{time} seconds\n"; # as an attribute
+
+  # oneliner shortcut
+  perl -MBSD::Process=P -le 'print P->ppid, " is my parent"';
 
 =head1 DESCRIPTION
 
@@ -308,8 +330,8 @@ queried, extracted and reported upon. This allows a more
 natural style of programming (as opposed to scraping the
 output of ps(1)).
 
-The information is retrieved via the C<kvm> subsystem, not
-the F</proc> filesystem.
+The information is retrieved via the C<kvm> subsystem, and will
+thus work even if the F</proc> filesystem is not mounted.
 
 =head1 FUNCTIONS
 
@@ -318,13 +340,13 @@ the F</proc> filesystem.
 =item new
 
 Creates a new C<BSD::Process> object. Takes an optional numeric
-value to specify the pid of the process explicitly, otherwise the
-pid of the current process is used by default.
+value to specify the pid of the target process, otherwise the
+current process is assumed.
 
 A second optional parameter, a reference to a hash, supplies
 additional information governing the creation of the object.
 
-Currently only one key is recognised:
+Currently, one key is available:
 
 B<resolve> - indicates whether uids and gids should be resolved to
 their symbolic equivalents (for instance, 0 becomes "root").
@@ -341,15 +363,33 @@ expected: the pid of the current process will be used implicitly.
     {resolve => 1},
   );
 
+=item P
+
+Stashes a global BSD::Process variable, for use in one-liners. By
+default, the current process is referenced, but any process may
+be specified via its process id.
+
+  print P->rssize, "\n"; # resident set size of running process
+  P(P->ppid);            # now refer to parent
+  print P->rssize, "\n"; # rss of parent
+
+But more likely:
+
+  perl -MBSD::Process=P -le 'print P->rssize';
+
+As this function is implemented in terms of a global private
+variable, it is adequate for oneliners. It should not be used in
+a threaded program, use objects instead.
+
 =item info, process_info
 
-Returns the process information specified by a process identifier
-(or I<pid>).
+Returns the the entire set of process attributes and their values,
+as specified by a process identifier (or I<pid>).
 
-The input value will be coerced to a number, thus, if a some random
-string is passed in, it will be coerced to 0, and you will receive
-the process information of process 0 (the swapper). If no parameter
-is passed, the pid of the running process is assumed.
+The input value is numified. Thus, if a some random string is passed
+in, it will be coerced to 0, and you will receive the process
+information of process 0 (the swapper). If no parameter is passed,
+the pid of the running process is assumed.
 
 A hash reference may be passed as an optional second parameter,
 see C<new> for a list of what is available.
@@ -401,14 +441,14 @@ are available:
 Return the list of pids that are owned by the specified effective
 user id. The uid may be specified in the symbolic or numeric form.
 
-  my @uid_pid  = BSD::Process::list( uid => 1001 );
-  my @root_pid = BSD::Process::list( uid => 'root' );
+  my @uid_pid  = BSD::Process::list(uid => 1001);
+  my @root_pid = BSD::Process::list(uid => 'root');
 
 =item pgid, process_group_id
 
 Return the processes that belong to the specified process group.
 
-  my @pgid_pid = BSD::Process::list( process_group_id => 378 );
+  my @pgid_pid = BSD::Process::list(process_group_id => 378);
 
 =item sid, process_session_id
 
@@ -447,9 +487,9 @@ able to restrict the set of objects returned. In addition, it also
 accepts the C<resolve> parameter, to indicate that uids and gids
 should be represented as symbolic names rather than numeric values.
 
-  my @own = BSD::Process::all( uid => 1000 );
+  my @own = BSD::Process::all(uid => 1000);
 
-  my @session = BSD::Process::all( sid => 632, resolve => 1 );
+  my @session = BSD::Process::all(sid => 632, resolve => 1);
 
 =item attr
 
@@ -506,11 +546,35 @@ of measuring elapsed CPU time:
   my $elapsed = $proc->runtime - $begin;
   print "that took $elapsed microseconds of CPU time\n";
 
+The method may be chained:
+
+  my $runtime = $proc->refresh->runtime;
+
+It may also be used with the C<P> shortcut.
+
+  P; # to initialise
+  lengthy_calculation();
+  P->refresh;
+
+=item resolve
+
+Switches symbolic resolution on or off.
+
+  my $proc = BSD::Process->new;
+  print "$proc->{uid}\n";
+  $proc->resolve;
+  print "$proc->{uid}\n";
+
+Note that changing the resolve setting will result in the
+object being C<refresh>ed.
+
 =back
+
+=head1 PROCESS ATTRIBUTES
 
 The following methods may be called on a C<BSD::Process> object.
 Each process attribute may be accessed via two methods, a longer,
-more descriptive name, or a terse name (inspired by the member
+more descriptive name, or a terse name (following the member
 name in the underlying C<kinfo_proc> C struct).
 
 Furthermore, you may also interpolate the attribute (equivalent to
@@ -530,11 +594,11 @@ modern kernels. In these cases, the value -1 will be returned.
 In the following list, the key B<F5+> means that the method
 returns something useful in FreeBSD 5.x or better. The key
 B<F6> means the method returns something useful for FreeBSD
-6.x.
+6.x and beyond.
 
 =over 4
 
-=item process_arguments, args
+=item process_args, args
 
 The command line arguments passed to the program. CURRENTLY
 UNIMPLEMENTED.
@@ -607,6 +671,10 @@ The saved effective group id of the process. (purpose?) B<F5+>
 =item number_of_groups, ngroups
 
 The number of groups to which the process belongs. B<F5+>
+
+=item group_list, groups
+
+A reference to an array of group ids (gids) to which the process belongs. B<F5+>
 
 =item virtual_size, size
 
@@ -1012,8 +1080,9 @@ version.
 
 =head1 NOTES
 
-Currently, only FreeBSD versions 4 through 6 are supported. Support
-for NetBSD and OpenBSD will be added in future versions.
+Currently, FreeBSD versions 4 through 7 are supported (and 8
+probably works out of the box). Support for NetBSD and OpenBSD may
+be added in future versions.
 
 =head1 SEE ALSO
 
