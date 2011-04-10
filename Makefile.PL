@@ -1,6 +1,6 @@
 # generate Makefile for building BSD::Process
 #
-# Copyright (C) 2006-2007 David Landgren
+# Copyright (C) 2006-2011 David Landgren
 
 use strict;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,7 @@ use Config;
 my $module_name = 'BSD::Process';
 
 if ($Config{osname} ne 'freebsd') {
-    die "$module_name does not support this platform ($Config{osname}).\n";
+    die "OS unsupported ($Config{osname}). Here's a nickel, go buy yourself a real OS.\n";
 }
 
 eval "use ExtUtils::MakeMaker::Coverage" and print "Adding testcover target\n";
