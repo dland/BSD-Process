@@ -12,3 +12,4 @@ eg/topten
 t/00-basic.t
 t/01-func.t
 t/02-method.t
+t/03-pod.t
