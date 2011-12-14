@@ -607,8 +607,13 @@ B<F6> means the method returns something useful for FreeBSD
 
 =item process_args, args
 
-The command line arguments passed to the program. CURRENTLY
-UNIMPLEMENTED.
+The command with all its arguments as a string. When the process
+args are unavailable, the name of the executable in brackets is
+returned (same as in the F<ps> program). This may happen when the
+length of the arguments exceeds the kernel limit set with the
+C<kern.ps_arg_cache_limit> kernel setting. (This is usually 256,
+for more information check the manual page for the F<sysctl>
+program.)
 
 =item process_pid, pid
 
