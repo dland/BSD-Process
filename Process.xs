@@ -245,22 +245,25 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     }
 
     if( argv && *argv ) {
-#ifdef NEVER
         len = strlen(*argv);
+
         argsv = newSVpvn(*argv, len);
         while (*++argv) {
             sv_catpvn(argsv, " ", 1);
             sv_catpvn(argsv, *argv, strlen(*argv));
-            len += strlen(*argv)+1;
         }
-        hv_store(h, "args", 4, argsv, 0);
-#else
-        hv_store(h, "args", 4, newSVpvn("", 0), 0);
-#endif
     }
     else {
-        hv_store(h, "args", 4, newSVpvn("", 0), 0);
+        /* sometimes the process args may be unavailable; when this happens the name
+         * of the executable in brackets is returned, similar to the ps program.
+         */
+        argsv = newSVpvn("[", 1);
+        sv_catpvn(argsv, kp->COMM_FIELD, strlen(kp->COMM_FIELD));
+        sv_catpvn(argsv, "]", 1);
     }
+
+    hv_store(h, "args", 4, argsv, 0);
+
     if (kd) {
         kvm_close(kd);
     }
