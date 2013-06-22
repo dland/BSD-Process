@@ -1,6 +1,6 @@
 # BSD::Process.pm
 #
-# Copyright (c) 2006-2011 David Landgren
+# Copyright (c) 2006-2013 David Landgren
 # All rights reserved
 
 package BSD::Process;
@@ -13,7 +13,7 @@ use XSLoader;
 use base qw(Class::Accessor);
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '0.06';
+$VERSION = '0.07';
 @ISA = qw(Exporter Class::Accessor);
 
 @EXPORT_OK = (qw(process_info process_list P));
@@ -304,8 +304,8 @@ BSD::Process - Information about running processes on BSD platforms
 
 =head1 VERSION
 
-This document describes version 0.06 of BSD::Process,
-released 2011-04-10.
+This document describes version 0.07 of BSD::Process,
+released 2013-06-22.
 
 =head1 SYNOPSIS
 
@@ -611,9 +611,12 @@ The command with all its arguments as a string. When the process
 args are unavailable, the name of the executable in brackets is
 returned (same as in the F<ps> program). This may happen when the
 length of the arguments exceeds the kernel limit set with the
-C<kern.ps_arg_cache_limit> kernel setting. (This is usually 256,
-for more information check the manual page for the F<sysctl>
-program.)
+C<kern.ps_arg_cache_limit> kernel setting. This is usually 256, for
+more information check the manual page for the F<sysctl> program.
+
+If you have the companion C<BSD::Sysctl> module installed, you can
+check this with C<print sysctl("kern.ps_arg_cache_limit");> or else
+with the C<sysctl(8)> command.
 
 =item process_pid, pid
 
@@ -1092,9 +1095,8 @@ version.
 
 =head1 NOTES
 
-Currently, FreeBSD versions 4 through 7 are supported (and 8
-probably works out of the box). Support for NetBSD and OpenBSD may
-be added in future versions.
+Currently, FreeBSD versions 4 through 8 are supported. Support for
+NetBSD and OpenBSD may be added in future versions.
 
 =head1 SEE ALSO
 
@@ -1130,9 +1132,6 @@ Information about current processes on the Win32 platform.
 
 =head1 BUGS
 
-Process arguments are not handled (current attempts result in
-coredumps).
-
 Not all of the ps(1) keywords are implemented. At the worst,
 this (currently) means that you could not rewrite it in Perl.
 This may be addressed in a future release.
@@ -1145,13 +1144,20 @@ Make sure you include the output from the following two commands:
   perl -MBSD::Process -le 'print $BSD::Process::VERSION'
   perl -V
 
+I also accept pull requests on Github. See
+L<https://github.com/dland/BSD-Process>
+
 =head1 ACKNOWLEDGEMENTS
 
-None.
+The FreeBSD Ports team, for their work on keeping this module up
+to date on the ports tree. Their efforts are greatly appreciated.
+
+Thanks also to az5112 on Github (I've lost their name), who implemented
+the C<args> method.
 
 =head1 AUTHOR
 
-David Landgren, copyright (C) 2006-2011. All rights reserved.
+David Landgren, copyright (C) 2006-2013. All rights reserved.
 
 http://www.landgren.net/perl/
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension BSD::Process
 
+0.07 2013-06-22 13:37:32 UTC
+    - The args method is now implemented (thanks to az5112 on github).
+    - The module compiles correctly on FreeBSD 9.x
+    - Improved module metadata (Kwalitee)
+
 0.06 2011-04-10 19:06:52 UTC
     - Interact correctly with the CPAN toolchain, and fix a test
       error.

@@ -1,3 +1,5 @@
+/* Process.xs -- part of the Perl BSD::Process distribution */
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"

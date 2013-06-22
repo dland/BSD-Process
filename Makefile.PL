@@ -33,4 +33,5 @@ WriteMakefile(
         'XSLoader'        => 0,
         'Class::Accessor' => '0.25',
     },
+    MIN_PERL_VERSION => '5.008001'
 );
