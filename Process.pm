@@ -18,7 +18,9 @@ $VERSION = '0.07';
 
 @EXPORT_OK = (qw(process_info process_list P));
 
-BEGIN {
+XSLoader::load __PACKAGE__, $VERSION;
+
+{
     my %alias = (
         process_pid              => 'pid',
         parent_pid               => 'ppid',
@@ -62,7 +64,7 @@ BEGIN {
         posix_advisory_lock      => 'advlock',
         has_controlling_terminal => 'controlt',
         is_kernel_thread         => 'kthread',
-        no_loadavg_calc          => 'noload',
+        (has_noload_field() ? (no_loadavg_calc => 'noload') : ()),
         parent_waiting           => 'ppwait',
         started_profiling        => 'profil',
         stopped_profiling        => 'stopprof',
@@ -156,8 +158,6 @@ BEGIN {
         return keys(%alias);
     }
 }
-
-XSLoader::load __PACKAGE__, $VERSION;
 
 sub new {
     my $class = shift;
