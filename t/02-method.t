@@ -67,7 +67,11 @@ plan tests => 242
     is($pe->advlock,     delete $pe->{advlock},     'method advlock');
     is($pe->controlt,    delete $pe->{controlt},    'method controlt');
     is($pe->kthread,     delete $pe->{kthread},     'method kthread');
-    is($pe->noload,      delete $pe->{noload},      'method noload');
+    SKIP: {
+        skip "noload not available, probably FreeBSD 9 or newer", 1
+	    if !BSD::Process::has_noload_field;
+        is($pe->noload,      delete $pe->{noload},      'method noload');
+    }
     is($pe->ppwait,      delete $pe->{ppwait},      'method ppwait');
     is($pe->profil,      delete $pe->{profil},      'method profil');
     is($pe->stopprof,    delete $pe->{stopprof},    'method stopprof');
@@ -195,7 +199,11 @@ plan tests => 242
     is($pe->posix_advisory_lock,           delete $pe->{advlock},     'alias posix_advisory_lock');
     is($pe->has_controlling_terminal,      delete $pe->{controlt},    'alias has_controlling_terminal');
     is($pe->is_kernel_thread,              delete $pe->{kthread},     'alias is_kernel_thread');
-    is($pe->no_loadavg_calc,               delete $pe->{noload},      'alias no_loadavg_calc');
+    SKIP: {
+        skip "noload not available, probably FreeBSD 9 or newer", 1
+	    if !BSD::Process::has_noload_field;
+        is($pe->no_loadavg_calc,               delete $pe->{noload},      'alias no_loadavg_calc');
+    }
     is($pe->parent_waiting,                delete $pe->{ppwait},      'alias parent_waiting');
     is($pe->started_profiling,             delete $pe->{profil},      'alias started_profiling');
     is($pe->stopped_profiling,             delete $pe->{stopprof},    'alias stopped_profiling');

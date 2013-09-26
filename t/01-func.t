@@ -61,7 +61,11 @@ ok( defined( delete $info->{childtime} ), 'attribute childtime');
 ok( defined( delete $info->{advlock} ), 'attribute advlock');
 ok( defined( delete $info->{controlt} ), 'attribute controlt');
 ok( defined( delete $info->{kthread} ), 'attribute kthread');
-ok( defined( delete $info->{noload} ), 'attribute noload');
+SKIP: {
+    skip "noload not available, probably FreeBSD 9 or newer", 1
+	if !BSD::Process::has_noload_field;
+    ok( defined( delete $info->{noload} ), 'attribute noload');
+}
 ok( defined( delete $info->{ppwait} ), 'attribute ppwait');
 ok( defined( delete $info->{profil} ), 'attribute profil');
 ok( defined( delete $info->{stopprof} ), 'attribute stopprof');
