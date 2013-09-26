@@ -49,6 +49,10 @@
 #define NO_FREEBSD_5x_pv(a) (a)
 #endif
 
+#if __FreeBSD_version < 802501
+#define HAS_NOLOAD_FIELD
+#endif
+
 static int proc_info_mib[4] = { -1, -1, -1, -1 };
 
 struct kinfo_proc *_proc_request (kvm_t *kd, int request, int param, int *pnr) {
@@ -292,7 +296,7 @@ HV *_procinfo (struct kinfo_proc *kp, int resolve) {
     hv_store(h, "advlock",      7, newSViv(NO_FREEBSD_4x(P_FLAG(P_ADVLOCK))), 0);
     hv_store(h, "controlt",     8, newSViv(NO_FREEBSD_4x(P_FLAG(P_CONTROLT))), 0);
     hv_store(h, "kthread",      7, newSViv(NO_FREEBSD_4x(P_FLAG(P_KTHREAD))), 0);
-#if __FreeBSD_version < 802501
+#ifdef HAS_NOLOAD_FIELD
     hv_store(h, "noload",       6, newSViv(NO_FREEBSD_4x(P_FLAG(P_NOLOAD))), 0);
 #endif
     hv_store(h, "ppwait",       6, newSViv(NO_FREEBSD_4x(P_FLAG(P_PPWAIT))), 0);
@@ -387,6 +391,17 @@ max_kernel_groups()
         RETVAL = 0;
 #else
         RETVAL = KI_NGROUPS;
+#endif
+    OUTPUT:
+        RETVAL
+
+short
+has_noload_field()
+    CODE:
+#ifdef HAS_NOLOAD_FIELD
+        RETVAL = 1;
+#else
+        RETVAL = 0;
 #endif
     OUTPUT:
         RETVAL
